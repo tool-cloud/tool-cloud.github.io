@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>コンデンサ容量計算</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100vw;
+      height: 100vh;
+      font-family: 'Arial', sans-serif;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      font-weight: bold;
+      text-align: center;
+      background-color: black;
+    }
+
+    h1 {
+      font-size: 3rem;
+      margin-bottom: 20px;
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 90%;
+      max-width: 400px;
+      background: #222;
+      padding: 20px;
+      border-radius: 10px;
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      margin-bottom: 15px;
+    }
+
+    .input-group label {
+      font-size: 1.5rem;
+      margin-bottom: 5px;
+    }
+
+    .input-group input {
+      width: 100%;
+      font-size: 1.8rem;
+      padding: 10px;
+      text-align: center;
+      border: 2px solid white;
+      background-color: black;
+      color: limegreen;
+      font-weight: bold;
+      border-radius: 5px;
+    }
+
+    .input-group input:focus {
+      outline: none;
+      border-color: yellow;
+    }
+
+    .output {
+      font-size: 1.8rem;
+      margin-top: 15px;
+      color: cyan;
+      text-align: left;
+    }
+  </style>
+</head>
+<body>
+  <h1>コンデンサ容量計算</h1>
+  <div class="container">
+    <div class="input-group">
+      <label for="code">コンデンサ表記</label>
+      <input type="text" id="code" oninput="calculateCapacitance()" placeholder="例: 473K">
+    </div>
+    <div class="output" id="result">
+      <div id="cap_pf">-</div>
+      <div id="cap_nf">-</div>
+      <div id="cap_uf">-</div>
+      <div id="tolerance">-</div>
+    </div>
+  </div>
+
+  <script>
+    function calculateCapacitance() {
+      let input = document.getElementById("code").value.trim().toUpperCase();
+      const capPf = document.getElementById("cap_pf");
+      const capNf = document.getElementById("cap_nf");
+      const capUf = document.getElementById("cap_uf");
+      const toleranceDisplay = document.getElementById("tolerance");
+
+      let capacitance = null;
+      let tolerance = "";
+
+      // 誤差判定（最後の文字が J/K/M の場合）
+      if (/[JKM]$/.test(input)) {
+        const lastChar = input.slice(-1);
+        if (lastChar === "J") tolerance = "±5%";
+        if (lastChar === "K") tolerance = "±10%";
+        if (lastChar === "M") tolerance = "±20%";
+        input = input.slice(0, -1); // 誤差記号を削除
+      }
+
+      // 2桁ならそのままpF
+      if (/^\d{2}$/.test(input)) {
+        capacitance = parseInt(input, 10);
+      }
+      // 3桁 (例: 473)
+      else if (/^\d{3}$/.test(input)) {
+        const base = parseInt(input.slice(0, 2), 10);
+        const exponent = parseInt(input.charAt(2), 10);
+        capacitance = base * Math.pow(10, exponent);
+      }
+
+      // 結果表示
+      if (capacitance !== null) {
+        capPf.textContent = `${capacitance} pF`;
+        capNf.textContent = `${(capacitance / 1000)} nF`;
+        capUf.textContent = `${(capacitance / 1000000)} μF`;
+        toleranceDisplay.textContent = tolerance ? `誤差: ${tolerance}` : "-";
+      } else {
+        capPf.textContent = "-";
+        capNf.textContent = "-";
+        capUf.textContent = "-";
+        toleranceDisplay.textContent = "-";
+      }
+    }
+
+    // **ページを開いたら入力欄に自動でフォーカス**
+    window.onload = function() {
+      document.getElementById("code").focus();
+    };
+  </script>
+</body>
+</html>

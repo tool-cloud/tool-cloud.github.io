@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>進数変換ツール</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100vw;
+      height: 100vh;
+      font-family: 'Arial', sans-serif;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      font-weight: bold;
+      text-align: center;
+      background-color: black; /* 背景色 */
+    }
+
+    h1 {
+      font-size: 8vw; /* タイトルの大きさ */
+      margin-bottom: 3vh;
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 90%;
+      max-width: 800px;
+    }
+
+    .input-group {
+      display: flex;
+      width: 100%;
+      align-items: center;
+      margin-bottom: 2vh;
+    }
+
+    .input-group label {
+      width: 30%;
+      font-size: 4vw;
+      text-align: right;
+      margin-right: 2vw;
+    }
+
+    .input-group input {
+      width: 60%;
+      font-size: 5vw;
+      padding: 10px;
+      text-align: center;
+      border: 2px solid white;
+      background-color: black;
+      color: limegreen;
+      font-weight: bold;
+    }
+
+    .input-group input:focus {
+      outline: none;
+      border-color: yellow;
+    }
+  </style>
+</head>
+<body>
+  <h1>進数変換ツール</h1>
+  <div class="container">
+    <div class="input-group">
+      <label for="binary">2進数</label>
+      <input type="text" id="binary" oninput="convertFromBinary(this.value)" placeholder="0 or 1">
+    </div>
+    <div class="input-group">
+      <label for="decimal">10進数</label>
+      <input type="text" id="decimal" oninput="convertFromDecimal(this.value)" placeholder="0-9">
+    </div>
+    <div class="input-group">
+      <label for="hexadecimal">16進数</label>
+      <input type="text" id="hexadecimal" oninput="convertFromHex(this.value)" placeholder="0-9, A-F">
+    </div>
+  </div>
+
+  <script>
+    function convertFromBinary(value) {
+      if (!/^[01]*$/.test(value)) return; // 2進数以外の入力を無視
+      const decimal = value ? parseInt(value, 2) : 0;
+      document.getElementById("decimal").value = decimal;
+      document.getElementById("hexadecimal").value = decimal.toString(16).toUpperCase();
+    }
+
+    function convertFromDecimal(value) {
+      if (!/^\d*$/.test(value)) return; // 10進数以外の入力を無視
+      const decimal = value ? parseInt(value, 10) : 0;
+      document.getElementById("binary").value = decimal.toString(2);
+      document.getElementById("hexadecimal").value = decimal.toString(16).toUpperCase();
+    }
+
+    function convertFromHex(value) {
+      if (!/^[0-9A-Fa-f]*$/.test(value)) return; // 16進数以外の入力を無視
+      const decimal = value ? parseInt(value, 16) : 0;
+      document.getElementById("binary").value = decimal.toString(2);
+      document.getElementById("decimal").value = decimal;
+    }
+
+    // **ページを開いたら2進数の入力欄にカーソルをセット**
+    window.onload = function() {
+      document.getElementById("binary").focus();
+    };
+  </script>
+</body>
+</html>

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>アナログ時計 Web</title>
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      background: #fff;
+      font-family: sans-serif;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .clock-container {
+      position: relative;
+      width: 90vmin;
+      height: 90vmin;
+      border: 8px solid #333;
+      border-radius: 50%;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    }
+    .clock-face {
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+    .hand {
+      position: absolute;
+      background: #333;
+      top: 50%;
+      left: 50%;
+      transform-origin: 100%;
+      transform: rotate(90deg);
+      transition: all 0.05s ease-in-out;
+    }
+    .hour-hand {
+      width: 25%;
+      height: 6px;
+      margin-left: -25%;
+    }
+    .minute-hand {
+      width: 35%;
+      height: 4px;
+      margin-left: -35%;
+    }
+    .second-hand {
+      width: 40%;
+      height: 2px;
+      background: red;
+      margin-left: -40%;
+    }
+    .center-dot {
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      background: #333;
+      border-radius: 50%;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+    .number {
+      position: absolute;
+      text-align: center;
+      font-weight: bold;
+      color: #333;
+    }
+    .date-display {
+      position: absolute;
+      text-align: center;
+      color: #333;
+      font-weight: bold;
+      white-space: nowrap;
+    }
+    #date-year {
+      top: 10%;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 8vmin;
+    }
+    #date-mdw {
+      bottom: 10%;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 6vmin;
+    }
+  </style>
+</head>
+<body>
+  <div class="clock-container">
+    <div class="clock-face" id="clock-face">
+      <div class="hand hour-hand"></div>
+      <div class="hand minute-hand"></div>
+      <div class="hand second-hand"></div>
+      <div class="center-dot"></div>
+      <div class="date-display" id="date-year"></div>
+      <div class="date-display" id="date-mdw"></div>
+    </div>
+  </div>
+  <script>
+    function updateClock() {
+      const now = new Date();
+      const seconds = now.getSeconds();
+      const minutes = now.getMinutes();
+      const hours = now.getHours();
+      document.querySelector('.second-hand').style.transform = `rotate(${((seconds / 60) * 360) + 90}deg)`;
+      document.querySelector('.minute-hand').style.transform = `rotate(${((minutes / 60) * 360) + ((seconds / 60) * 6) + 90}deg)`;
+      document.querySelector('.hour-hand').style.transform = `rotate(${(((hours % 12) / 12) * 360) + ((minutes / 60) * 30) + 90}deg)`;
+      document.getElementById('date-year').textContent = now.getFullYear() + "年";
+      document.getElementById('date-mdw').textContent = now.toLocaleDateString('ja-JP', { month: 'long', day: 'numeric', weekday: 'long' });
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+  </script>
+</body>
+</html>

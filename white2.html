@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>低音強調ピンクノイズ</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 20px;
+      background-color: #121212;
+      color: white;
+    }
+    h1 {
+      font-size: 22px;
+      margin-bottom: 20px;
+    }
+    button {
+      font-size: 22px;
+      padding: 15px 30px;
+      margin: 10px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      width: 90%;
+      max-width: 350px;
+    }
+    #play {
+      background-color: #4CAF50;
+      color: white;
+    }
+    #play.active {
+      background-color: #2E7D32;
+    }
+    #stop {
+      background-color: #f44336;
+      color: white;
+    }
+    #stop:disabled {
+      background-color: #aa2e25;
+      cursor: not-allowed;
+    }
+    .slider-container {
+      margin-top: 20px;
+    }
+    input[type="range"] {
+      width: 90%;
+      max-width: 350px;
+    }
+  </style>
+</head>
+<body>
+  <h1>低音強調ピンクノイズ</h1>
+  <button id="play" onclick="startNoise()">▶ 再生</button>
+  <button id="stop" onclick="stopNoise()" disabled>⏹ 停止</button>
+
+  <div class="slider-container">
+    <label for="bass">低音の強さ:</label><br>
+    <input type="range" id="bass" min="100" max="1000" value="300" step="50" onchange="updateBass(this.value)">
+    <span id="bassValue">300</span> Hz
+  </div>
+
+  <script>
+    let audioCtx;
+    let noiseSource;
+    let filter;
+    let gainNode;
+
+    function createPinkNoise() {
+      const bufferSize = 2 * 44100;
+      const buffer = audioCtx.createBuffer(1, bufferSize, 44100);
+      const output = buffer.getChannelData(0);
+      let lastOut = 0.0;
+
+      for (let i = 0; i < bufferSize; i++) {
+        const white = Math.random() * 2 - 1;
+        output[i] = (lastOut + (0.02 * white)) / 1.02;
+        lastOut = output[i];
+        output[i] *= 3.5;
+      }
+      return buffer;
+    }
+
+    function startNoise() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+
+      if (noiseSource) {
+        noiseSource.stop();
+      }
+
+      noiseSource = audioCtx.createBufferSource();
+      noiseSource.buffer = createPinkNoise();
+      noiseSource.loop = true;
+
+      filter = audioCtx.createBiquadFilter();
+      filter.type = "lowpass";
+      filter.frequency.value = document.getElementById("bass").value;
+
+      gainNode = audioCtx.createGain();
+      gainNode.gain.value = 0.4;
+
+      noiseSource.connect(filter);
+      filter.connect(gainNode);
+      gainNode.connect(audioCtx.destination);
+
+      noiseSource.start();
+
+      document.getElementById("play").classList.add("active");
+      document.getElementById("play").disabled = true;
+      document.getElementById("stop").disabled = false;
+    }
+
+    function stopNoise() {
+      if (noiseSource) {
+        noiseSource.stop();
+        noiseSource = null;
+      }
+
+      document.getElementById("play").classList.remove("active");
+      document.getElementById("play").disabled = false;
+      document.getElementById("stop").disabled = true;
+    }
+
+    function updateBass(value) {
+      document.getElementById("bassValue").innerText = value;
+      if (filter) {
+        filter.frequency.value = value;
+      }
+    }
+  </script>
+</body>
+</html>

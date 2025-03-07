@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>債券のデュレーションを使った価格変動計算</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        label { font-weight: bold; }
+        input { margin: 5px 0; padding: 5px; width: 150px; }
+        .description { font-size: 0.9em; color: #555; margin: 0 0 15px 0; }
+        #result { font-size: 1.2em; margin-top: 20px; }
+        table { border-collapse: collapse; margin: 20px 0; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+        canvas { margin-top: 20px; }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        function updateCalculation() {
+            const price = parseFloat(document.getElementById('price').value);
+            const yieldChangePercent = parseFloat(document.getElementById('yieldChange').value);
+            const duration = parseFloat(document.getElementById('duration').value);
+            const resultElement = document.getElementById('result');
+
+            if (!isNaN(price) && !isNaN(yieldChangePercent) && !isNaN(duration)) {
+                if (price <= 0 || duration < 0) {
+                    resultElement.innerText = '警告: 債券価格は正の値、デュレーションは0以上の値を入力してください';
+                    return;
+                }
+                const yieldChange = yieldChangePercent / 100; // %を小数に変換
+                const priceChange = -duration * yieldChange * price; // 価格変動計算
+                resultElement.innerText = `価格変動: ${priceChange.toFixed(2)}`;
+                updateChart(duration, price);
+            } else {
+                resultElement.innerText = '価格変動: すべての項目に有効な数値を入力してください';
+            }
+        }
+
+        function updateChart(duration, price) {
+            const ctx = document.getElementById('priceChangeChart').getContext('2d');
+            const yieldChangesPercent = [];
+            const priceChanges = [];
+            for (let dyPercent = -1; dyPercent <= 1; dyPercent += 0.2) {
+                yieldChangesPercent.push(dyPercent);
+                const dy = dyPercent / 100;
+                const dp = -duration * dy * price;
+                priceChanges.push(dp);
+            }
+            if (window.myChart) window.myChart.destroy();
+            window.myChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: yieldChangesPercent.map(dy => dy.toFixed(1)),
+                    datasets: [{
+                        label: '価格変動',
+                        data: priceChanges,
+                        borderColor: 'blue',
+                        fill: false
+                    }]
+                },
+                options: {
+                    scales: {
+                        x: { title: { display: true, text: '利回りの変動 (%)' } },
+                        y: { title: { display: true, text: '価格変動' } }
+                    }
+                }
+            });
+        }
+
+        window.onload = function() {
+            const inputs = document.querySelectorAll('input');
+            inputs.forEach(input => input.addEventListener('input', updateCalculation));
+            updateChart(5, 1000); // 初期グラフ
+        };
+    </script>
+</head>
+<body>
+    <h1>債券のデュレーションを使った価格変動計算</h1>
+    <p>債券のデュレーションを使用して、利回りの変動に対する価格変動を計算します。</p>
+
+    <div>
+        <label for="price">債券価格 (P):</label><br>
+        <input type="number" id="price" placeholder="例: 1000" step="0.01">
+        <p class="description">現在の債券価格を入力してください（例: 1000）。</p>
+    </div>
+
+    <div>
+        <label for="yieldChange">利回りの変動 (Δy, %):</label><br>
+        <input type="number" id="yieldChange" placeholder="例: 4.27 (4.27%)" step="0.01">
+        <p class="description">利回りの変動を%で入力してください（例: 4.27 = 4.27%）。</p>
+    </div>
+
+    <div>
+        <label for="duration">デュレーション (D):</label><br>
+        <input type="number" id="duration" placeholder="例: 5" step="0.1">
+        <p class="description">債券のデュレーションを入力してください。目安は以下の表を参照：</p>
+        <table>
+            <tr><th>債券の種類</th><th>デュレーションの目安</th></tr>
+            <tr><td>短期債（満期1年）</td><td>約1年</td></tr>
+            <tr><td>中期債（満期5年）</td><td>約4.5年</td></tr>
+            <tr><td>長期債（満期10年）</td><td>約8.5年</td></tr>
+            <tr><td>超長期債（満期20年）</td><td>約15年</td></tr>
+            <tr><td>超長期債（満期30年）</td><td>約18年</td></tr>
+        </table>
+    </div>
+
+    <p id="result">価格変動: ここに結果が表示されます</p>
+
+    <h3>利回り変動と価格変動の関係</h3>
+    <p>以下のグラフは、利回りの変動（-1%から1%）に対する債券価格の変動を示します。</p>
+    <canvas id="priceChangeChart" width="400" height="200"></canvas>
+
+    <h3>計算式</h3>
+    <p>価格変動 (ΔP) = -デュレーション (D) × (利回りの変動 (Δy) / 100) × 債券価格 (P)</p>
+</body>
+</html>

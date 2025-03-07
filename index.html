@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>便利ツル集</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f5f5f5;
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+    .tool-list {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-around;
+    }
+    .tool-card {
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      width: 300px;
+      margin: 20px;
+      padding: 20px;
+      text-align: center;
+      text-decoration: none;
+      color: #333;
+      transition: transform 0.2s;
+    }
+    .tool-card:hover {
+      transform: translateY(-5px);
+    }
+    .tool-title {
+      font-size: 20px;
+      margin-bottom: 10px;
+    }
+    .tool-description {
+      font-size: 16px;
+      color: #555;
+    }
+    /* 余白用（今後追加するツールのためのプレースホルダー） */
+    .placeholder {
+      width: 300px;
+      margin: 20px;
+      padding: 20px;
+      visibility: hidden;
+    }
+    .future-tools {
+      margin-top: 40px;
+      text-align: center;
+      font-size: 18px;
+      color: #888;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>便利ツール集</h1>
+    <div class="tool-list">
+      <!-- 進数変換ツール -->
+      <a href="https://tool-cloud.github.io/converter/" class="tool-card">
+        <div class="tool-title">進数変換ツール</div>
+        <div class="tool-description">
+          2進数、10進数、16進数などの進数変換を行います。
+        </div>
+      </a>
+      <!-- デジタル時計 -->
+      <a href="https://tool-cloud.github.io/digital-clock/" class="tool-card">
+        <div class="tool-title">デジタル時計</div>
+        <div class="tool-description">
+          現在時刻を美しく表示するデジタル時計です。
+        </div>
+      </a>
+      <!-- コンデンサ容量計算 -->
+      <a href="https://tool-cloud.github.io/condenser/" class="tool-card">
+        <div class="tool-title">コンデンサ容量計算</div>
+        <div class="tool-description">
+          コンデンサの表記から容量を計算するツールです。
+        </div>
+      </a>
+      <!-- ポモドーロタイマー -->
+      <a href="https://tool-cloud.github.io/polo-mode-timer/" class="tool-card">
+        <div class="tool-title">ポモドーロタイマー</div>
+        <div class="tool-description">
+          作業に集中するためのポモドーロタイマーです。
+        </div>
+      </a>
+      <!-- 低音強調ピンクノイズ -->
+      <a href="https://tool-cloud.github.io/pinknoise/" class="tool-card">
+        <div class="tool-title">低音強調ピンクノイズ</div>
+        <div class="tool-description">
+          低音を強調したピンクノイズを生成し、リラックス効果を提供します。
+        </div>
+      </a>
+      <!-- 今後追加するツールのための余白 -->
+      <div class="placeholder"></div>
+      <div class="placeholder"></div>
+    </div>
+    <div class="future-tools">※今後、ツールを追加予定です</div>
+  </div>
+</body>
+</html>

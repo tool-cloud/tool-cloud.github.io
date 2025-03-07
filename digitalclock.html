@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>デジタル時計</title>
+  <style>
+    /* 全体の背景と文字色 */
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: black;
+      color: limegreen; /* 緑色 */
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh; /* 画面いっぱい */
+      width: 100vw; /* 画面幅に合わせる */
+      text-align: center;
+      font-weight: bold;
+      overflow: hidden; /* 画面外にはみ出ないように */
+    }
+
+    /* 日付のスタイル */
+    #date {
+      font-size: 8vw; /* ビューポート幅に応じて日付の文字サイズを調整 */
+      margin: 0; /* 余白を完全にゼロに */
+    }
+
+    /* 時計部分のスタイル */
+    #clock {
+      font-size: 16vw; /* ビューポート幅と高さに応じて時計の文字サイズを調整 */
+      margin: 0; /* 余白を完全にゼロに */
+    }
+  </style>
+</head>
+<body>
+  <div>
+    <div id="date"></div>
+    <div id="clock"></div>
+  </div>
+
+  <script>
+    function updateClock() {
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = now.getMonth() + 1;
+      const day = now.getDate();
+      const weekDays = ["日", "月", "火", "水", "木", "金", "土"];
+      const weekDay = weekDays[now.getDay()];
+      const hours = now.getHours().toString().padStart(2, "0");
+      const minutes = now.getMinutes().toString().padStart(2, "0");
+      const seconds = now.getSeconds().toString().padStart(2, "0");
+
+      // 日付の表示
+      document.getElementById("date").innerText = `${year}/${month}/${day} (${weekDay})`;
+      
+      // 時計の表示
+      document.getElementById("clock").innerText = `${hours}:${minutes}:${seconds}`;
+    }
+
+    // 秒ごとにupdateClockを呼び出して、時計を更新
+    setInterval(updateClock, 1000);
+    
+    // 初期表示
+    updateClock();
+  </script>
+</body>
+</html>
