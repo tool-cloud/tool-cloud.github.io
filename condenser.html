@@ -2,9 +2,10 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, user-scalable=no">
   <title>コンデンサ容量計算</title>
   <style>
+    /* 全画面表示の基本設定 */
     html, body {
       margin: 0;
       padding: 0;
@@ -21,44 +22,47 @@
       background-color: black;
     }
 
+    /* タイトルのサイズを動的に調整 */
     h1 {
-      font-size: 3rem;
-      margin-bottom: 20px;
+      font-size: min(5vw, 3rem);
+      margin-bottom: 3vh;
     }
 
+    /* コンテンツエリアのデザイン */
     .container {
       display: flex;
       flex-direction: column;
       align-items: center;
-      width: 90%;
-      max-width: 400px;
+      width: 90vw;
+      max-width: 500px;
       background: #222;
-      padding: 20px;
-      border-radius: 10px;
+      padding: 3vh;
+      border-radius: 2vh;
     }
 
+    /* 入力グループ */
     .input-group {
       display: flex;
       flex-direction: column;
       width: 100%;
-      margin-bottom: 15px;
+      margin-bottom: 2vh;
     }
 
     .input-group label {
-      font-size: 1.5rem;
-      margin-bottom: 5px;
+      font-size: min(4vw, 2rem);
+      margin-bottom: 1vh;
     }
 
     .input-group input {
       width: 100%;
-      font-size: 1.8rem;
-      padding: 10px;
+      font-size: min(4vw, 2rem);
+      padding: 1.5vh;
       text-align: center;
-      border: 2px solid white;
+      border: 3px solid white;
       background-color: black;
       color: limegreen;
       font-weight: bold;
-      border-radius: 5px;
+      border-radius: 1vh;
     }
 
     .input-group input:focus {
@@ -66,11 +70,36 @@
       border-color: yellow;
     }
 
+    /* 結果表示エリア */
     .output {
-      font-size: 1.8rem;
-      margin-top: 15px;
+      font-size: min(4vw, 2rem);
+      margin-top: 2vh;
       color: cyan;
       text-align: left;
+    }
+
+    /* モバイル対応 */
+    @media (max-width: 600px) {
+      h1 {
+        font-size: 6vw;
+      }
+
+      .container {
+        width: 95vw;
+        padding: 4vw;
+      }
+
+      .input-group label {
+        font-size: 5vw;
+      }
+
+      .input-group input {
+        font-size: 5vw;
+      }
+
+      .output {
+        font-size: 5vw;
+      }
     }
   </style>
 </head>
