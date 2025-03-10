@@ -3,11 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<<<<<<< HEAD
   <title>便利ツール集</title>
-=======
-  <title>便利ツール集</title>
->>>>>>> 3437d722508ac72a22921718c29b6f3f2a52d93f
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -64,6 +60,41 @@
       font-size: 18px;
       color: #888;
     }
+
+    /* スマホ用：縦配置にする */
+    @media (max-width: 768px) {
+      .tool-list {
+        flex-direction: column;
+        align-items: center;
+      }
+      .tool-card {
+        width: 90%;
+      }
+    }
+
+    /* フッター（プライバシーポリシー・お問い合わせ） */
+    .footer-links {
+      position: fixed;
+      right: 10px;
+      bottom: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .footer-links a {
+      text-decoration: none;
+      color: #007BFF;
+      font-size: 14px;
+    }
+
+    /* スマホでは最下部に配置 */
+    @media (max-width: 768px) {
+      .footer-links {
+        position: static;
+        text-align: center;
+        margin-top: 40px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -105,11 +136,18 @@
           低音を強調したピンクノイズを生成し、リラックス効果を提供します。
         </div>
       </a>
+
       <!-- 今後追加するツールのための余白 -->
       <div class="placeholder"></div>
       <div class="placeholder"></div>
     </div>
-    <div class="future-tools">※今後11111、ツールを追加予定です</div>
+    <div class="future-tools">※今後、ツールを追加予定です</div>
+  </div>
+
+  <!-- フッターリンク -->
+  <div class="footer-links">
+    <a href="privacy-policy.html">プライバシーポリシー</a>
+    <a href="contact.html">お問い合わせ</a>
   </div>
 </body>
 </html>
