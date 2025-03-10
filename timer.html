@@ -17,7 +17,7 @@
       color: white;
       font-weight: bold;
       text-align: center;
-      background-color: #4CAF50; /* 初期背景色を緑 */
+      background-color: #4CAF50;
       transition: background-color 0.3s ease;
       flex-direction: column;
     }
@@ -32,9 +32,14 @@
       margin-bottom: 2vh;
     }
 
-    #startButton {
-      padding: 20px 40px;
-      font-size: 3rem;
+    #controls {
+      display: flex;
+      gap: 10px;
+    }
+
+    button {
+      padding: 15px 30px;
+      font-size: 2rem;
       background-color: black;
       color: white;
       border: none;
@@ -42,71 +47,54 @@
       cursor: pointer;
     }
 
-    #startButton:hover {
+    button:hover {
       background-color: #333;
-    }
-
-    .hidden {
-      display: none;
     }
   </style>
 </head>
 <body>
   <div id="status">作業中</div>
   <div id="timer">25:00</div>
-  <button id="startButton">開始</button>
+  <div id="controls">
+    <button id="startButton">開始</button>
+    <button id="pipButton">PiP</button>
+  </div>
+
+  <canvas id="pipCanvas" width="300" height="200" style="display:none;"></canvas>
+  <video id="pipVideo" style="display:none;" autoplay muted></video>
 
   <script>
     let isWorkTime = true;
     let timeLeft = 25 * 60;
     let timerInterval;
-
     const timerDisplay = document.getElementById("timer");
     const statusDisplay = document.getElementById("status");
     const startButton = document.getElementById("startButton");
+    const pipButton = document.getElementById("pipButton");
+    const pipCanvas = document.getElementById("pipCanvas");
+    const pipVideo = document.getElementById("pipVideo");
+    const ctx = pipCanvas.getContext("2d");
 
     function updateTimer() {
       const minutes = Math.floor(timeLeft / 60);
       const seconds = timeLeft % 60;
       timerDisplay.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+      drawCanvas();
     }
 
-    function changeBackgroundColor(color) {
-      document.body.style.backgroundColor = color;
-      document.documentElement.style.backgroundColor = color;
-    }
-
-    function playBeep(type) {
-      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-
-      function beep(frequency, duration, volume, delay) {
-        const oscillator = audioCtx.createOscillator();
-        const gainNode = audioCtx.createGain();
-
-        oscillator.type = "sine";
-        oscillator.frequency.setValueAtTime(frequency, audioCtx.currentTime);
-        gainNode.gain.setValueAtTime(volume, audioCtx.currentTime);
-
-        oscillator.connect(gainNode);
-        gainNode.connect(audioCtx.destination);
-
-        setTimeout(() => oscillator.start(), delay);
-        setTimeout(() => oscillator.stop(), delay + duration);
-      }
-
-      if (type === "workEnd") {
-        // 作業終了 → ピッ ピッ（2回）
-        beep(1000, 150, 0.1, 0); // ピッ
-        beep(1000, 150, 0.1, 300); // ピッ（300ms後）
-      } else if (type === "breakEnd") {
-        // 休憩終了 → ピー（1秒）
-        beep(1000, 1000, 0.15, 0);
-      }
+    function drawCanvas() {
+      ctx.clearRect(0, 0, pipCanvas.width, pipCanvas.height);
+      ctx.fillStyle = isWorkTime ? "#4CAF50" : "#FF6347";
+      ctx.fillRect(0, 0, pipCanvas.width, pipCanvas.height);
+      ctx.fillStyle = "white";
+      ctx.font = "40px Arial";
+      ctx.textAlign = "center";
+      ctx.fillText(timerDisplay.textContent, pipCanvas.width / 2, pipCanvas.height / 2);
     }
 
     function startTimer() {
       if (timerInterval) return;
-      startButton.classList.add("hidden");
+      startButton.style.display = "none";
       updateTimer();
 
       timerInterval = setInterval(() => {
@@ -117,31 +105,29 @@
           clearInterval(timerInterval);
           timerInterval = null;
 
-          if (isWorkTime) {
-            // 作業終了 → 休憩開始
-            playBeep("workEnd"); // ピッ ピッ
-            isWorkTime = false;
-            timeLeft = 5 * 60;
-            statusDisplay.textContent = "休憩中";
-            changeBackgroundColor("#FF6347");
-          } else {
-            // 休憩終了 → 作業開始
-            playBeep("breakEnd"); // ピー
-            isWorkTime = true;
-            timeLeft = 25 * 60;
-            statusDisplay.textContent = "作業中";
-            changeBackgroundColor("#4CAF50");
-          }
+          isWorkTime = !isWorkTime;
+          timeLeft = isWorkTime ? 25 * 60 : 5 * 60;
+          statusDisplay.textContent = isWorkTime ? "作業中" : "休憩中";
+          document.body.style.backgroundColor = isWorkTime ? "#4CAF50" : "#FF6347";
           startTimer();
         }
       }, 1000);
     }
 
-    startButton.addEventListener("click", function() {
-      if (!timerInterval) {
-        startTimer();
+    startButton.addEventListener("click", startTimer);
+
+    // Canvasの映像をPiPにする
+    async function startPiP() {
+      try {
+        pipVideo.srcObject = pipCanvas.captureStream();
+        await pipVideo.play();
+        await pipVideo.requestPictureInPicture();
+      } catch (error) {
+        console.error("PiPエラー", error);
       }
-    });
+    }
+
+    pipButton.addEventListener("click", startPiP);
   </script>
 </body>
 </html>
