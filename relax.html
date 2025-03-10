@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>瞑想リラックス音楽</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background: linear-gradient(to bottom, #3a6186, #89253e);
+            color: white;
+            padding: 20px;
+        }
+        h1 {
+            font-size: 24px;
+        }
+        .controls {
+            margin-top: 20px;
+        }
+        button {
+            background: #fff;
+            border: none;
+            padding: 10px 20px;
+            margin: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        button:hover {
+            background: #ddd;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>瞑想リラックス音楽</h1>
+    <p>アルファ波を促進するバイノーラルビート（10Hz）と癒しの周波数</p>
+
+    <div class="controls">
+        <button onclick="startSound()">再生</button>
+        <button onclick="stopSound()">停止</button>
+    </div>
+
+    <script>
+        let audioCtx;
+        let oscillators = [];
+
+        function startSound() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+
+            stopSound(); // 既に音が鳴っていたら停止
+
+            // 周波数リスト
+            const frequencies = [
+                { freq: 100, pan: -1 },  // 左耳（低音）
+                { freq: 110, pan: 1 },   // 右耳（10Hzバイノーラル）
+                { freq: 200, pan: -1 },  // 左耳
+                { freq: 210, pan: 1 },   // 右耳（10Hz差）
+                { freq: 432, pan: -1 },  // 左耳（リラックス）
+                { freq: 442, pan: 1 },   // 右耳（10Hz差）
+                { freq: 528, pan: 0 }    // 中央（心の安定）
+            ];
+
+            frequencies.forEach(({ freq, pan }) => {
+                let osc = audioCtx.createOscillator();
+                let gainNode = audioCtx.createGain();
+                let panner = audioCtx.createStereoPanner();
+
+                osc.frequency.value = freq;
+                gainNode.gain.value = 0.1; // 音量調整
+                panner.pan.value = pan; // 左右の音の位置
+
+                osc.connect(gainNode);
+                gainNode.connect(panner);
+                panner.connect(audioCtx.destination);
+
+                osc.start();
+                oscillators.push(osc);
+            });
+        }
+
+        function stopSound() {
+            oscillators.forEach(osc => osc.stop());
+            oscillators = [];
+        }
+    </script>
+
+</body>
+</html>
