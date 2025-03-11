@@ -22,6 +22,9 @@
       border: 8px solid #333;
       border-radius: 50%;
       box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
     .clock-face {
       position: relative;
@@ -66,8 +69,10 @@
     .number {
       position: absolute;
       text-align: center;
+      font-size: 8vmin;
       font-weight: bold;
       color: #333;
+      transform: translate(-50%, -50%);
     }
     .date-display {
       position: absolute;
@@ -77,13 +82,13 @@
       white-space: nowrap;
     }
     #date-year {
-      top: 10%;
+      top: 25%;
       left: 50%;
       transform: translateX(-50%);
-      font-size: 8vmin;
+      font-size: 6vmin;
     }
     #date-mdw {
-      bottom: 10%;
+      bottom: 25%;
       left: 50%;
       transform: translateX(-50%);
       font-size: 6vmin;
@@ -113,8 +118,25 @@
       document.getElementById('date-year').textContent = now.getFullYear() + "年";
       document.getElementById('date-mdw').textContent = now.toLocaleDateString('ja-JP', { month: 'long', day: 'numeric', weekday: 'long' });
     }
+
+    function addNumbers() {
+      const clockFace = document.getElementById('clock-face');
+      for (let i = 1; i <= 12; i++) {
+        const angle = (i * 30) * (Math.PI / 180);
+        const x = 50 + 40 * Math.sin(angle);
+        const y = 50 - 40 * Math.cos(angle);
+        const numberElement = document.createElement('div');
+        numberElement.className = 'number';
+        numberElement.style.left = `${x}%`;
+        numberElement.style.top = `${y}%`;
+        numberElement.textContent = i;
+        clockFace.appendChild(numberElement);
+      }
+    }
+
     setInterval(updateClock, 1000);
     updateClock();
+    addNumbers();
   </script>
 </body>
 </html>

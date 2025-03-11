@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>便利ツール集</title>
+  <link rel="icon" id="dynamic-favicon" type="image/png">
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -115,6 +116,13 @@
           現在時刻を美しく表示するデジタル時計です。
         </div>
       </a>
+      <!-- アナログ時計 -->
+      <a href="./analogclock.html" class="tool-card">
+        <div class="tool-title">アナログ時計</div>
+        <div class="tool-description">
+          現在時刻を美しく表示するデジタル時計です。
+        </div>
+      </a>
       <!-- コンデンサ容量計算 -->
       <a href="./condenser.html" class="tool-card">
         <div class="tool-title">コンデンサ容量計算</div>
@@ -127,6 +135,13 @@
         <div class="tool-title">ポモドーロタイマー</div>
         <div class="tool-description">
           作業に集中するためのポモドーロタイマーです。
+        </div>
+      </a>
+     <!-- ストップウォッチ -->
+      <a href="./stopwatch.html" class="tool-card">
+        <div class="tool-title">ストップウォッチ</div>
+        <div class="tool-description">
+          ストップウォッチ
         </div>
       </a>
       <!-- 低音強調ピンクノイズ -->
@@ -146,18 +161,51 @@
           10Hz バイノーラルビート：アルファ波を促進し、瞑想に適した状態へ
         </div>
       </a>
+　　　<!-- TODOリスト -->
+      <a href="./todo_b.html" class="tool-card">
+        <div class="tool-title">TODOリスト</div>
+        <div class="tool-description">
+          TODOリスト
+        </div>
+      </a>
 
-      <!-- 今後追加するツールのための余白 -->
-      <div class="placeholder"></div>
-      <div class="placeholder"></div>
+    <!-- 追加情報 -->
+    <div class="additional-info">
+      <h2>その他の情報</h2>
+      <ul>
+        <li>ファビコン（タブに表示される小さいアイコン画像）は本日の日付です。</li>
+        <li>各ツールは無料でご利用いただけます。</li>
+        <li>今後も便利なツールを追加予定です。</li>
+        <li>リクエストやご意見はお問い合わせページからお願いします。</li>
+      </ul>
     </div>
-    <div class="future-tools">※今後、ツールを追加予定です</div>
   </div>
+
 
   <!-- フッターリンク -->
   <div class="footer-links">
     <a href="privacy-policy.html">プライバシーポリシー</a>
     <a href="contact.html">お問い合わせ</a>
   </div>
+
+  <script>
+    function setFaviconDate() {
+      const today = new Date();
+      const dayString = today.getDate().toString();
+      const canvas = document.createElement("canvas");
+      canvas.width = 64;
+      canvas.height = 64;
+      const ctx = canvas.getContext("2d");
+      ctx.fillStyle = "white";
+      ctx.fillRect(0, 0, 64, 64);
+      ctx.fillStyle = "black";
+      ctx.font = "bold 40px Arial";
+      ctx.fillText(dayString, 10, 50);
+      const favicon = document.getElementById("dynamic-favicon");
+      favicon.href = canvas.toDataURL("image/png");
+    }
+    setFaviconDate();
+  </script>
+
 </body>
 </html>

@@ -21,14 +21,18 @@
         button {
             background: #fff;
             border: none;
-            padding: 10px 20px;
-            margin: 10px;
-            font-size: 16px;
+            padding: 20px 40px;
+            margin: 15px;
+            font-size: 24px;
+            font-weight: bold;
             cursor: pointer;
-            border-radius: 5px;
+            border-radius: 10px;
         }
         button:hover {
             background: #ddd;
+        }
+        .active {
+            background: #ffcc00;
         }
     </style>
 </head>
@@ -38,13 +42,18 @@
     <p>アルファ波を促進するバイノーラルビート（10Hz）と癒しの周波数</p>
 
     <div class="controls">
-        <button onclick="startSound()">再生</button>
-        <button onclick="stopSound()">停止</button>
+        <button id="playButton" onclick="startSound()">▶ 再生</button>
+        <button id="stopButton" onclick="stopSound()">■ 停止</button>
     </div>
 
     <script>
         let audioCtx;
         let oscillators = [];
+        
+        function updateButtonState(isPlaying) {
+            document.getElementById("playButton").classList.toggle("active", isPlaying);
+            document.getElementById("stopButton").classList.toggle("active", !isPlaying);
+        }
 
         function startSound() {
             if (!audioCtx) {
@@ -80,11 +89,14 @@
                 osc.start();
                 oscillators.push(osc);
             });
+
+            updateButtonState(true);
         }
 
         function stopSound() {
             oscillators.forEach(osc => osc.stop());
             oscillators = [];
+            updateButtonState(false);
         }
     </script>
 

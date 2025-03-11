@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ストップウォッチ</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f4f4;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            width: 98vw;
+            max-width: 800px;
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+        }
+        .time {
+            font-size: 15vmin;
+            font-weight: bold;
+            margin: 20px 0;
+            min-height: 1em;
+        }
+        .buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+        button {
+            padding: 15px 30px;
+            font-size: 6vmin;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .start {
+            background: #28a745;
+            color: white;
+        }
+        .stop {
+            background: #dc3545;
+            color: white;
+        }
+        .reset {
+            background: #007bff;
+            color: white;
+        }
+        .active {
+            background: #ffcc00 !important;
+            color: black !important;
+        }
+        button:hover {
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="time" id="display">00:00</div>
+        <div class="buttons">
+            <button class="start" id="startBtn" onclick="startTimer()">▶ スタート</button>
+            <button class="stop" id="stopBtn" onclick="stopTimer()">■ ストップ</button>
+            <button class="reset" onclick="resetTimer()">⟲ リセット</button>
+        </div>
+    </div>
+    
+    <script>
+        let startTime;
+        let elapsedTime = 0;
+        let timerInterval;
+        
+        function formatTime(ms) {
+            const date = new Date(ms);
+            const minutes = String(date.getUTCMinutes()).padStart(2, '0');
+            const seconds = String(date.getUTCSeconds()).padStart(2, '0');
+            const milliseconds = date.getUTCMilliseconds();
+            return milliseconds > 0 ? `${minutes}:${seconds}.${Math.floor(milliseconds / 100)}` : `${minutes}:${seconds}`;
+        }
+        
+        function updateDisplay() {
+            document.getElementById('display').textContent = formatTime(elapsedTime);
+        }
+        
+        function startTimer() {
+            if (!timerInterval) {
+                startTime = Date.now() - elapsedTime;
+                timerInterval = setInterval(() => {
+                    elapsedTime = Date.now() - startTime;
+                    updateDisplay();
+                }, 10);
+                document.getElementById("startBtn").classList.add("active");
+                document.getElementById("stopBtn").classList.remove("active");
+            }
+        }
+        
+        function stopTimer() {
+            clearInterval(timerInterval);
+            timerInterval = null;
+            document.getElementById("startBtn").classList.remove("active");
+            document.getElementById("stopBtn").classList.add("active");
+        }
+        
+        function resetTimer() {
+            stopTimer();
+            elapsedTime = 0;
+            updateDisplay();
+        }
+    </script>
+</body>
+</html>
