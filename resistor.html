@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SMD抵抗値計算</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; margin: 20px; }
+        input { width: 150px; padding: 10px; font-size: 1.5em; text-align: center; }
+        #result { font-size: 2em; margin-top: 20px; }
+    </style>
+    <script>
+        function calculateResistance() {
+            let code = document.getElementById("resistorCode").value.toUpperCase();
+            let resistance;
+            
+            if (/^\d{3}$/.test(code)) {
+                let significant = parseInt(code[0] + code[1], 10);
+                let multiplier = Math.pow(10, parseInt(code[2], 10));
+                resistance = significant * multiplier;
+            } else if (/^\d{4}$/.test(code)) {
+                let significant = parseInt(code[0] + code[1] + code[2], 10);
+                let multiplier = Math.pow(10, parseInt(code[3], 10));
+                resistance = significant * multiplier;
+            } else if (/^\d*R\d*$/.test(code)) {
+                resistance = parseFloat(code.replace("R", "."));
+            } else {
+                document.getElementById("result").textContent = "無効なコードです";
+                return;
+            }
+            
+            let displayValue;
+            if (resistance >= 1e6) {
+                displayValue = `${resistance / 1e6} MΩ`;
+            } else if (resistance >= 1e3) {
+                displayValue = `${resistance / 1e3} kΩ`;
+            } else {
+                displayValue = `${resistance} Ω`;
+            }
+            
+            document.getElementById("result").textContent = `抵抗値: ${displayValue}`;
+        }
+    </script>
+</head>
+<body>
+    <h1>SMD抵抗値計算機</h1>
+    <p>3桁または4桁のEIAコードを入力してください</p>
+    <input type="text" id="resistorCode" placeholder="例: 103, 4701, 1R5" oninput="calculateResistance()">
+    <div id="result"></div>
+</body>
+</html>
