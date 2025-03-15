@@ -30,3 +30,46 @@ button {
     padding: 10px;
     cursor: pointer;
 }
+
+/* 既存のツールカードスタイル（変更なし） */
+.tool-card {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  width: 300px;
+  margin: 20px;
+  padding: 20px;
+  text-align: center;
+  text-decoration: none;
+  color: #333;
+  transition: transform 0.2s;
+}
+
+/* アナログ時計専用：横並びレイアウト */
+.tool-card.analog {
+  display: flex;           /* 横並びにする */
+  align-items: center;       /* 垂直方向の中央揃え */
+  text-align: left;          /* テキストを左寄せ */
+  padding: 20px;             /* 内側余白（必要に応じて調整） */
+}
+
+/* 画像のスタイル：アナログ時計カード内の画像にのみ適用 */
+.tool-card.analog .tool-image {
+  width: 50px;              /* 画像の幅を50pxに固定 */
+  height: 50px;             /* 高さも50pxに固定（必要に応じて調整） */
+  margin-right: 15px;       /* 画像とテキストの間に余白 */
+  object-fit: contain;      /* 画像の縦横比を維持 */
+}
+
+/* ツールテキストのグループ化 */
+.tool-text {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* テキストをまとめる */
+.tool-text {
+  display: flex;
+  flex-direction: column;
+}

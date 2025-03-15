@@ -25,6 +25,7 @@
       flex-wrap: wrap;
       justify-content: space-around;
     }
+    /* 共通のカードスタイル */
     .tool-card {
       background-color: #fff;
       border-radius: 8px;
@@ -32,7 +33,6 @@
       width: 300px;
       margin: 20px;
       padding: 20px;
-      text-align: center;
       text-decoration: none;
       color: #333;
       transition: transform 0.2s;
@@ -48,6 +48,28 @@
       font-size: 16px;
       color: #555;
     }
+    /* 縦並びカード用（デフォルト） */
+    .tool-card:not(.analog) {
+      text-align: center;
+    }
+    /* アナログ時計カード（横並び） */
+    .tool-card.analog {
+      display: flex;
+      align-items: center;
+      text-align: left;
+      padding: 15px 20px;
+    }
+    .tool-card.analog .tool-image {
+      flex-shrink: 0;
+      width: 60px;
+      height: 60px;
+      margin-right: 15px;
+      object-fit: cover;
+      border-radius: 50%;
+    }
+    .tool-card.analog .tool-text {
+      flex: 1;
+    }
     /* 余白用（今後追加するツールのためのプレースホルダー） */
     .placeholder {
       width: 300px;
@@ -61,7 +83,6 @@
       font-size: 18px;
       color: #888;
     }
-
     /* スマホ用：縦配置にする */
     @media (max-width: 768px) {
       .tool-list {
@@ -72,8 +93,7 @@
         width: 90%;
       }
     }
-
-    /* フッター（プライバシーポリシー・お問い合わせ） */
+    /* フッター */
     .footer-links {
       position: fixed;
       right: 10px;
@@ -87,8 +107,6 @@
       color: #007BFF;
       font-size: 14px;
     }
-
-    /* スマホでは最下部に配置 */
     @media (max-width: 768px) {
       .footer-links {
         position: static;
@@ -116,11 +134,14 @@
           現在時刻を美しく表示するデジタル時計です。
         </div>
       </a>
-      <!-- アナログ時計 -->
-      <a href="./analogclock.html" class="tool-card">
-        <div class="tool-title">アナログ時計</div>
-        <div class="tool-description">
-          現在時刻を美しく表示するデジタル時計です。
+      <!-- アナログ時計（横並びカード） -->
+      <a href="./analogclock.html" class="tool-card analog">
+        <img src="analogclock.png" alt="アナログ時計" class="tool-image">
+        <div class="tool-text">
+          <div class="tool-title">アナログ時計</div>
+          <div class="tool-description">
+            現在時刻を美しく表示するアナログ時計です。
+          </div>
         </div>
       </a>
       <!-- コンデンサ容量計算 -->
@@ -144,7 +165,7 @@
           作業に集中するためのポモドーロタイマーです。
         </div>
       </a>
-     <!-- ストップウォッチ -->
+      <!-- ストップウォッチ -->
       <a href="./stopwatch.html" class="tool-card">
         <div class="tool-title">ストップウォッチ</div>
         <div class="tool-description">
@@ -162,20 +183,20 @@
       <a href="./relax.html" class="tool-card">
         <div class="tool-title">瞑想リラックス音楽</div>
         <div class="tool-description">
-          アルファ波に関連する周波数を使用
-          432Hz：リラックス、ストレス軽減
-          528Hz：DNA修復、心の安定
+          アルファ波に関連する周波数を使用<br>
+          432Hz：リラックス、ストレス軽減<br>
+          528Hz：DNA修復、心の安定<br>
           10Hz バイノーラルビート：アルファ波を促進し、瞑想に適した状態へ
         </div>
       </a>
-　　　<!-- TODOリスト -->
+      <!-- TODOリスト -->
       <a href="./todo_b.html" class="tool-card">
         <div class="tool-title">TODOリスト</div>
         <div class="tool-description">
           TODOリスト
         </div>
       </a>
-
+    </div>
     <!-- 追加情報 -->
     <div class="additional-info">
       <h2>その他の情報</h2>
@@ -187,7 +208,6 @@
       </ul>
     </div>
   </div>
-
 
   <!-- フッターリンク -->
   <div class="footer-links">
@@ -215,6 +235,5 @@
     }
     setFaviconDate();
   </script>
-
 </body>
 </html>
