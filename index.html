@@ -23,6 +23,12 @@
       margin-bottom: 40px;
       color: #444; /* やや濃いめのグレー */
     }
+    h2 {
+      color: #444;
+      margin: 30px 0 15px;
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 5px;
+    }
     .tool-list {
       display: flex;
       flex-wrap: wrap;
@@ -46,14 +52,14 @@
     .tool-card:hover {
       transform: translateY(-5px);
     }
-    /* 画像部分 */
+    /* 画像部分：丸ではなく角丸の四角形に変更 */
     .tool-image {
       flex-shrink: 0;
       width: 60px;
       height: 60px;
       margin-right: 15px;
       object-fit: cover;
-      border-radius: 50%;
+      border-radius: 8px;
     }
     /* テキスト部分 */
     .tool-text {
@@ -117,121 +123,149 @@
 <body>
   <div class="container">
     <h1>便利ツール集</h1>
-    <div class="tool-list">
-      <!-- 進数変換ツール -->
-      <a href="./converter.html" class="tool-card">
-        <img src="converter.png" alt="進数変換ツール" class="tool-image">
-        <div class="tool-text">
-          <div class="tool-title">進数変換ツール</div>
-          <div class="tool-description">
-            2進数、10進数、16進数などの進数変換を行います。
+    
+    <!-- 計算ツール -->
+    <section id="calculation-tools">
+      <h2>計算ツール</h2>
+      <div class="tool-list">
+        <!-- 進数変換ツール -->
+        <a href="./converter.html" class="tool-card">
+          <img src="converter.png" alt="進数変換ツール" class="tool-image">
+          <div class="tool-text">
+            <div class="tool-title">進数変換ツール</div>
+            <div class="tool-description">
+              2進数、10進数、16進数などの進数変換を行います。
+            </div>
           </div>
-        </div>
-      </a>
-      <!-- デジタル時計 -->
-      <a href="./digitalclock.html" class="tool-card">
-        <img src="analogclock.png" alt="デジタル時計" class="tool-image">
-        <div class="tool-text">
-          <div class="tool-title">デジタル時計</div>
-          <div class="tool-description">
-            現在時刻を美しく表示するデジタル時計です。
+        </a>
+        <!-- コンデンサ容量計算 -->
+        <a href="./condenser.html" class="tool-card">
+          <img src="condenser.png" alt="コンデンサ容量計算" class="tool-image">
+          <div class="tool-text">
+            <div class="tool-title">コンデンサ容量計算</div>
+            <div class="tool-description">
+              コンデンサの表記から容量を計算するツールです。
+            </div>
           </div>
-        </div>
-      </a>
-      <!-- アナログ時計 -->
-      <a href="./analogclock.html" class="tool-card">
-        <img src="analogclock.png" alt="アナログ時計" class="tool-image">
-        <div class="tool-text">
-          <div class="tool-title">アナログ時計</div>
-          <div class="tool-description">
-            現在時刻を美しく表示するアナログ時計です。
+        </a>
+        <!-- 抵抗値計算 -->
+        <a href="./resistor.html" class="tool-card">
+          <img src="resistor.png" alt="抵抗値計算" class="tool-image">
+          <div class="tool-text">
+            <div class="tool-title">抵抗値計算</div>
+            <div class="tool-description">
+              抵抗の表記から抵抗値を計算するツールです。
+            </div>
           </div>
-        </div>
-      </a>
-      <!-- コンデンサ容量計算 -->
-      <a href="./condenser.html" class="tool-card">
-        <img src="condenser.png" alt="コンデンサ容量計算" class="tool-image">
-        <div class="tool-text">
-          <div class="tool-title">コンデンサ容量計算</div>
-          <div class="tool-description">
-            コンデンサの表記から容量を計算するツールです。
+        </a>
+      </div>
+    </section>
+
+    <!-- 時計ツール -->
+    <section id="clock-tools">
+      <h2>時計ツール</h2>
+      <div class="tool-list">
+        <!-- デジタル時計 -->
+        <a href="./digitalclock.html" class="tool-card">
+          <img src="digitalclock.png" alt="デジタル時計" class="tool-image">
+          <div class="tool-text">
+            <div class="tool-title">デジタル時計</div>
+            <div class="tool-description">
+              現在時刻を美しく表示するデジタル時計です。
+            </div>
           </div>
-        </div>
-      </a>
-      <!-- 抵抗値計算 -->
-      <a href="./resistor.html" class="tool-card">
-        <img src="resistor.png" alt="抵抗値計算" class="tool-image">
-        <div class="tool-text">
-          <div class="tool-title">抵抗値計算</div>
-          <div class="tool-description">
-            抵抗の表記から抵抗値を計算するツールです。
+        </a>
+        <!-- アナログ時計 -->
+        <a href="./analogclock.html" class="tool-card">
+          <img src="analogclock.png" alt="アナログ時計" class="tool-image">
+          <div class="tool-text">
+            <div class="tool-title">アナログ時計</div>
+            <div class="tool-description">
+              現在時刻を美しく表示するアナログ時計です。
+            </div>
           </div>
-        </div>
-      </a>
-      <!-- ポモドーロタイマー -->
-      <a href="./timer.html" class="tool-card">
-        <img src="timer.png" alt="ポモドーロタイマー" class="tool-image">
-        <div class="tool-text">
-          <div class="tool-title">ポモドーロタイマー</div>
-          <div class="tool-description">
-            作業に集中するためのポモドーロタイマーです。
+        </a>
+        <!-- ストップウォッチ -->
+        <a href="./stopwatch.html" class="tool-card">
+          <img src="stopwatch.png" alt="ストップウォッチ" class="tool-image">
+          <div class="tool-text">
+            <div class="tool-title">ストップウォッチ</div>
+            <div class="tool-description">
+              ストップウォッチ
+            </div>
           </div>
-        </div>
-      </a>
-      <!-- ストップウォッチ -->
-      <a href="./stopwatch.html" class="tool-card">
-        <img src="stopwatch.png" alt="ストップウォッチ" class="tool-image">
-        <div class="tool-text">
-          <div class="tool-title">ストップウォッチ</div>
-          <div class="tool-description">
-            ストップウォッチ
+        </a>
+        <!-- ポモドーロタイマー -->
+        <a href="./timer.html" class="tool-card">
+          <img src="timer.png" alt="ポモドーロタイマー" class="tool-image">
+          <div class="tool-text">
+            <div class="tool-title">ポモドーロタイマー</div>
+            <div class="tool-description">
+              作業に集中するためのポモドーロタイマーです。
+            </div>
           </div>
-        </div>
-      </a>
-      <!-- FIRE予測～DIE WITH ZERO～ -->
-      <a href="./fire.html" class="tool-card">
-        <img src="fire.png" alt="FIRE予測～DIE WITH ZERO～" class="tool-image">
-        <div class="tool-text">
-          <div class="tool-title">FIRE予測～DIE WITH ZERO～</div>
-          <div class="tool-description">
-           金融資産、インフレ率、将来の年金額などの入力値から「総資産がゼロになるまでの期間」をシミュレーションします。
-　　　　　 </div>
-        </div>
-      </a>
-      <!-- 低音強調ピンクノイズ -->
-      <a href="./white.html" class="tool-card">
-        <img src="white.png" alt="低音強調ピンクノイズ" class="tool-image">
-        <div class="tool-text">
-          <div class="tool-title">低音強調ピンクノイズ</div>
-          <div class="tool-description">
-            低音を強調したピンクノイズを生成し、リラックス効果を提供します。
+        </a>
+      </div>
+    </section>
+
+    <!-- リラクゼーション -->
+    <section id="relaxation-tools">
+      <h2>リラクゼーション</h2>
+      <div class="tool-list">
+        <!-- 低音強調ピンクノイズ -->
+        <a href="./white.html" class="tool-card">
+          <img src="white.png" alt="低音強調ピンクノイズ" class="tool-image">
+          <div class="tool-text">
+            <div class="tool-title">低音強調ピンクノイズ</div>
+            <div class="tool-description">
+              低音を強調したピンクノイズを生成し、リラックス効果を提供します。
+            </div>
           </div>
-        </div>
-      </a>
-      <!-- 瞑想リラックス音楽 -->
-      <a href="./relax.html" class="tool-card">
-        <img src="relax.png" alt="瞑想リラックス音楽" class="tool-image">
-        <div class="tool-text">
-          <div class="tool-title">瞑想リラックス音楽</div>
-          <div class="tool-description">
-            アルファ波に関連する周波数を使用<br>
-            432Hz：リラックス、ストレス軽減<br>
-            528Hz：DNA修復、心の安定<br>
-            10Hz バイノーラルビート：アルファ波を促進し、瞑想に適した状態へ
+        </a>
+        <!-- 瞑想リラックス音楽 -->
+        <a href="./relax.html" class="tool-card">
+          <img src="relax.png" alt="瞑想リラックス音楽" class="tool-image">
+          <div class="tool-text">
+            <div class="tool-title">瞑想リラックス音楽</div>
+            <div class="tool-description">
+              アルファ波に関連する周波数を使用<br>
+              432Hz：リラックス、ストレス軽減<br>
+              528Hz：DNA修復、心の安定<br>
+              10Hz バイノーラルビート：アルファ波促進
+            </div>
           </div>
-        </div>
-      </a>
-      <!-- TODOリスト -->
-      <a href="./todo_b.html" class="tool-card">
-        <img src="todo.png" alt="TODOリスト" class="tool-image">
-        <div class="tool-text">
-          <div class="tool-title">TODOリスト</div>
-          <div class="tool-description">
-            TODOリスト
+        </a>
+      </div>
+    </section>
+
+    <!-- その他 -->
+    <section id="other-tools">
+      <h2>その他</h2>
+      <div class="tool-list">
+        <!-- FIRE予測～DIE WITH ZERO～ -->
+        <a href="./fire.html" class="tool-card">
+          <img src="fire.png" alt="FIRE予測～DIE WITH ZERO～" class="tool-image">
+          <div class="tool-text">
+            <div class="tool-title">FIRE予測～DIE WITH ZERO～</div>
+            <div class="tool-description">
+              入力値から「総資産がゼロになるまでの期間」をシミュレーションします。<br>
+              年ごとに生活費の算出、年金収入、資産の消費と運用の処理を行います。（最大80年シミュレーション）
+            </div>
           </div>
-        </div>
-      </a>
-    </div>
+        </a>
+        <!-- TODOリスト -->
+        <a href="./todo_b.html" class="tool-card">
+          <img src="todo.png" alt="TODOリスト" class="tool-image">
+          <div class="tool-text">
+            <div class="tool-title">TODOリスト</div>
+            <div class="tool-description">
+              TODOリスト
+            </div>
+          </div>
+        </a>
+      </div>
+    </section>
+    
     <!-- 追加情報 -->
     <div class="additional-info">
       <h2>その他の情報</h2>
