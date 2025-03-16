@@ -6,9 +6,11 @@
   <title>便利ツール集</title>
   <link rel="icon" id="dynamic-favicon" type="image/png">
   <style>
+    /* 全体レイアウト */
     body {
       font-family: Arial, sans-serif;
-      background-color: #f5f5f5;
+      background-color: #f8f3ec; /* 柔らかいオフホワイト */
+      color: #555; /* ソフトなグレー */
       margin: 0;
       padding: 20px;
     }
@@ -19,19 +21,20 @@
     h1 {
       text-align: center;
       margin-bottom: 40px;
+      color: #444; /* やや濃いめのグレー */
     }
     .tool-list {
       display: flex;
       flex-wrap: wrap;
       justify-content: space-around;
     }
-    /* 共通のカードスタイル（全カードを横並びレイアウトにする） */
+    /* カード共通スタイル：すべて横並び */
     .tool-card {
       display: flex;
       align-items: center;
       background-color: #fff;
       border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.08); /* 柔らかい影 */
       width: 300px;
       margin: 20px;
       padding: 15px 20px;
@@ -62,7 +65,8 @@
     }
     .tool-description {
       font-size: 16px;
-      color: #555;
+      color: #666;
+      line-height: 1.4;
     }
     /* 余白用（今後追加するツールのためのプレースホルダー） */
     .placeholder {
@@ -98,7 +102,7 @@
     }
     .footer-links a {
       text-decoration: none;
-      color: #007BFF;
+      color: #4a90e2; /* ソフトなブルー */
       font-size: 14px;
     }
     @media (max-width: 768px) {
@@ -126,7 +130,7 @@
       </a>
       <!-- デジタル時計 -->
       <a href="./digitalclock.html" class="tool-card">
-        <img src="digitalclock.png" alt="デジタル時計" class="tool-image">
+        <img src="analogclock.png" alt="デジタル時計" class="tool-image">
         <div class="tool-text">
           <div class="tool-title">デジタル時計</div>
           <div class="tool-description">
@@ -182,6 +186,16 @@
           <div class="tool-description">
             ストップウォッチ
           </div>
+        </div>
+      </a>
+      <!-- FIRE予測～DIE WITH ZERO～ -->
+      <a href="./fire.html" class="tool-card">
+        <img src="fire.png" alt="FIRE予測～DIE WITH ZERO～" class="tool-image">
+        <div class="tool-text">
+          <div class="tool-title">FIRE予測～DIE WITH ZERO～</div>
+          <div class="tool-description">
+           金融資産、インフレ率、将来の年金額などの入力値から「総資産がゼロになるまでの期間」をシミュレーションします。
+　　　　　 </div>
         </div>
       </a>
       <!-- 低音強調ピンクノイズ -->

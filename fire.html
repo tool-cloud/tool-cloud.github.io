@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FIRE予測～DIE WITH ZERO～</title>
+ <style>
+    body {
+      background: #f0f4f8;
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      color: #333;
+      margin: 10px;
+      padding: 0;
+    }
+    h1 {
+      text-align: center;
+      font-size: 2.5em;
+      margin-bottom: 10px;
+      color: #2c3e50;
+    }
+    .description {
+      max-width: 800px;
+      margin: 0 auto 20px;
+      padding: 15px;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      line-height: 1.6;
+    }
+    .description h2 {
+      font-size: 1.5em;
+      color: #2c3e50;
+      border-left: 5px solid #27ae60;
+      padding-left: 10px;
+      margin-bottom: 10px;
+    }
+    .description ul {
+      padding-left: 20px;
+    }
+    .input-section {
+      max-width: 600px;
+      margin: 0 auto 20px;
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    label {
+      font-size: 1.2em;
+      margin-top: 10px;
+      display: block;
+    }
+    input {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      font-size: 1.2em;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      box-sizing: border-box;
+    }
+    button {
+      width: 100%;
+      padding: 15px;
+      font-size: 1.5em;
+      background-color: #27ae60;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      margin-top: 20px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #219150;
+    }
+    .result {
+      text-align: center;
+      font-size: 2em;
+      margin-top: 30px;
+      font-weight: bold;
+      color: #e74c3c;
+    }
+    .breakdown {
+      margin-top: 40px;
+      overflow-x: auto;
+    }
+    .breakdown h2 {
+      text-align: center;
+      font-size: 1.8em;
+      color: #2c3e50;
+    }
+    .breakdown table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .breakdown th, .breakdown td {
+      border: 1px solid #ddd;
+      padding: 10px;
+      text-align: center;
+      font-size: 0.9em;
+    }
+    .breakdown th {
+      background-color: #2980b9;
+      color: #fff;
+    }
+    .breakdown tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+    .note {
+      font-size: 0.9em;
+      color: #7f8c8d;
+    }
+    a { color: #2980b9; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* スマホ用のレスポンシブ調整 */
+    @media (max-width: 600px) {
+      h1 { font-size: 2em; }
+      label, input, button { font-size: 1em; }
+      .input-section { padding: 15px; }
+      .result { font-size: 1.8em; }
+      .breakdown th, .breakdown td { padding: 8px; font-size: 0.8em; }
+    }
+  </style>
+</head>
+<body>
+  <h1>FIRE予測～DIE WITH ZERO～</h1>
+  <div class="description">
+    <h2>このシミュレーションについて</h2>
+    <p>入力値から「総資産がゼロになるまでの期間」をシミュレーションします。年ごとに以下のルールで資産の増減を計算します。</p>
+
+    <h2>計算の流れ</h2>
+    <ul>
+      <li><strong>生活費の算出:</strong> 毎月の生活費を12倍し、インフレ率に応じて毎年増加。</li>
+      <li><strong>年金収入:</strong> 年金受給開始年齢に達するまで年金収入はゼロ。受給開始後は入力した「年金額（年額）」を受け取る。</li>
+      <li><strong>資産の消費と運用:</strong></li>
+      <ul>
+        <li>初期資産は「現金資産」と「投資資産」に分ける。</li>
+        <li>生活費は、まず現金資産から引き出し、足りなければ投資資産から補填。</li>
+        <li>年末には、残った投資資産に投資リターン（年率）を適用。</li>
+        <li>年金収入が生活費を上回る場合、その余剰分は現金資産に加算。</li>
+      </ul>
+    </ul>
+
+    <h2>シミュレーションの条件</h2>
+    <ul>
+      <li>「現在の年齢」から計算を開始。</li>
+      <li>最大80年間のシミュレーションを実行。</li>
+      <li>資産が尽きた時点でシミュレーション終了。</li>
+    </ul>
+  </div>
+
+
+  <div class="input-section">
+    <label for="currentAge">現在の年齢:</label>
+    <input type="number" id="currentAge" value="40">
+    
+    <label for="cashAssets">保有現金資産 (円):</label>
+    <input type="number" id="cashAssets" value="5000000">
+    
+    <label for="investAssets">保有投資資産 (円):</label>
+    <input type="number" id="investAssets" value="5000000">
+    
+    <label for="investmentReturn">投資リターン (％/年):</label>
+    <input type="number" id="investmentReturn" value="5">
+    
+    <label for="inflation">毎年のインフレ率 (％/年):</label>
+    <input type="number" id="inflation" value="2">
+    
+    <label for="monthlyExpense">毎月の生活費 (円):</label>
+    <input type="number" id="monthlyExpense" value="200000">
+    
+    <label for="pensionStart">年金受給開始年齢:</label>
+    <input type="number" id="pensionStart" value="65">
+    
+    <label for="annualPension">年金額 (年額、円):
+      <span class="note">（支給開始年齢による年金額が不明な場合は、年金額のみ入力してください。試算は <a href="https://www.nenkin.go.jp/n_net2/index.html" target="_blank">ねんきんネット</a> より）</span>
+    </label>
+    <input type="number" id="annualPension" value="2400000">
+    
+    <button onclick="simulate()">計算</button>
+  </div>
+  
+  <div class="result" id="result"></div>
+  
+  <div class="breakdown" id="breakdown"></div>
+  
+  <script>
+    function simulate() {
+      // 入力値の取得と数値変換
+      let currentAge = parseFloat(document.getElementById("currentAge").value);
+      let cash = parseFloat(document.getElementById("cashAssets").value);
+      let invest = parseFloat(document.getElementById("investAssets").value);
+      let investmentReturn = parseFloat(document.getElementById("investmentReturn").value) / 100;
+      let inflation = parseFloat(document.getElementById("inflation").value) / 100;
+      let monthlyExpense = parseFloat(document.getElementById("monthlyExpense").value);
+      let pensionStart = parseFloat(document.getElementById("pensionStart").value);
+      let annualPension = parseFloat(document.getElementById("annualPension").value);
+      
+      let maxYears = 80;
+      let simulationYears = 0;
+      let breakdownData = [];
+      
+      // シミュレーションループ
+      for (let year = 0; year < maxYears; year++) {
+        let age = currentAge + year;
+        // 年間生活費：初年度は月額×12、以降は毎年インフレ率で増加
+        let annualExpense = monthlyExpense * 12 * Math.pow(1 + inflation, year);
+        // 年金収入：受給開始年齢に達していれば年金額、それ以外は0
+        let pensionIncome = (age >= pensionStart) ? annualPension : 0;
+        // その年の必要引出額
+        let withdrawal = annualExpense - pensionIncome;
+        if (withdrawal < 0) {
+          // 余剰分は現金に加算
+          cash += Math.abs(withdrawal);
+          withdrawal = 0;
+        }
+        
+        // シミュレーション開始前の現金・投資資産の記録
+        let cashBefore = cash;
+        let investBefore = invest;
+        
+        // 現金から引き出し
+        if (cash >= withdrawal) {
+          cash -= withdrawal;
+          withdrawal = 0;
+        } else {
+          withdrawal -= cash;
+          cash = 0;
+          // 投資資産から引き出し
+          if (invest >= withdrawal) {
+            invest -= withdrawal;
+            withdrawal = 0;
+          } else {
+            // 投資資産も足りない場合は、資産不足として終了
+            withdrawal -= invest;
+            invest = 0;
+            simulationYears = year + 1;
+            breakdownData.push({
+              year: year + 1,
+              age: age,
+              annualExpense: annualExpense,
+              pensionIncome: pensionIncome,
+              cashBefore: cashBefore,
+              investBefore: investBefore,
+              cashAfter: cash,
+              investAfter: invest,
+              totalAssets: cash + invest,
+              note: "資産不足で終了"
+            });
+            break;
+          }
+        }
+        
+        // 年末に投資資産が運用リターンを得る
+        invest = invest * (1 + investmentReturn);
+        
+        simulationYears = year + 1;
+        breakdownData.push({
+          year: year + 1,
+          age: age,
+          annualExpense: annualExpense,
+          pensionIncome: pensionIncome,
+          cashBefore: cashBefore,
+          investBefore: investBefore,
+          cashAfter: cash,
+          investAfter: invest,
+          totalAssets: cash + invest,
+          note: ""
+        });
+      }
+      
+      // 結果の表示
+      let resultText = "";
+      if ((cash + invest) > 0 && simulationYears >= maxYears) {
+        resultText = "シミュレーション期間内（" + maxYears + "年後）でも資産が残っています。残高は " + (cash + invest).toFixed(0) + " 円です。";
+      } else {
+        resultText = "総資産がゼロになるまでの期間: " + simulationYears + " 年";
+      }
+      document.getElementById("result").innerText = resultText;
+      
+      // 計算内訳テーブルの作成
+      let breakdownHTML = "<h2>計算内訳</h2>";
+      breakdownHTML += "<table>";
+      breakdownHTML += "<tr><th>年数</th><th>年齢</th><th>年間生活費 (円)</th><th>年金収入 (円)</th><th>現金 (開始時) (円)</th><th>投資資産 (開始時) (円)</th><th>現金 (終了時) (円)</th><th>投資資産 (終了時) (円)</th><th>総資産 (円)</th><th>備考</th></tr>";
+      breakdownData.forEach(function(item) {
+        breakdownHTML += "<tr>";
+        breakdownHTML += "<td>" + item.year + "</td>";
+        breakdownHTML += "<td>" + item.age + "</td>";
+        breakdownHTML += "<td>" + item.annualExpense.toFixed(0) + "</td>";
+        breakdownHTML += "<td>" + item.pensionIncome.toFixed(0) + "</td>";
+        breakdownHTML += "<td>" + item.cashBefore.toFixed(0) + "</td>";
+        breakdownHTML += "<td>" + item.investBefore.toFixed(0) + "</td>";
+        breakdownHTML += "<td>" + item.cashAfter.toFixed(0) + "</td>";
+        breakdownHTML += "<td>" + item.investAfter.toFixed(0) + "</td>";
+        breakdownHTML += "<td>" + item.totalAssets.toFixed(0) + "</td>";
+        breakdownHTML += "<td>" + item.note + "</td>";
+        breakdownHTML += "</tr>";
+      });
+      breakdownHTML += "</table>";
+      
+      document.getElementById("breakdown").innerHTML = breakdownHTML;
+    }
+  </script>
+</body>
+</html>
