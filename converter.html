@@ -1,229 +1,162 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>進数変換ツール</title>
-  <style>
-    /* テーマ用CSS変数 */
-    :root {
-      --bg-color-light: #f8f3ec;
-      --text-color-light: #555;
-      --border-color-light: white;
-      --input-bg-light: #f8f3ec;
-      --input-text-light: #333;
-      
-      --bg-color-dark: #1e1e1e;
-      --text-color-dark: #ccc;
-      --border-color-dark: white;
-      --input-bg-dark: #1e1e1e;
-      --input-text-dark: limegreen;
-    }
-    
-    /* 共通設定 */
-    html, body {
-      margin: 0;
-      padding: 0;
-      width: 100vw;
-      height: 100vh;
-      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      font-weight: bold;
-      text-align: center;
-      transition: background-color 0.3s, color 0.3s;
-    }
-    
-    /* ライトモード */
-    body.light-mode {
-      background-color: var(--bg-color-light);
-      color: var(--text-color-light);
-    }
-    
-    body.light-mode .input-group input {
-      background-color: var(--input-bg-light);
-      color: var(--input-text-light);
-      border-color: var(--border-color-light);
-    }
-    
-    /* ダークモード */
-    body.dark-mode {
-      background-color: var(--bg-color-dark);
-      color: var(--text-color-dark);
-    }
-    
-    body.dark-mode .input-group input {
-      background-color: var(--input-bg-dark);
-      color: var(--input-text-dark);
-      border-color: var(--border-color-dark);
-    }
-    
-    h1 {
-      font-size: 8vw;
-      margin-bottom: 3vh;
-    }
-    
-    .container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      width: 90%;
-      max-width: 800px;
-    }
-    
-    .input-group {
-      display: flex;
-      width: 100%;
-      align-items: center;
-      margin-bottom: 2vh;
-    }
-    
-    .input-group label {
-      width: 30%;
-      font-size: 4vw;
-      text-align: right;
-      margin-right: 2vw;
-    }
-    
-    .input-group input {
-      width: 60%;
-      font-size: 5vw;
-      padding: 10px;
-      text-align: center;
-      border: 2px solid;
-      font-weight: bold;
-      transition: border-color 0.3s, background-color 0.3s, color 0.3s;
-    }
-    
-    .input-group input:focus {
-      outline: none;
-      border-color: yellow;
-    }
-  </style>
-  <script>
-    // ページ読み込み前にローカルストレージからテーマを確認してbodyにクラスをセット
-    (function() {
-      const theme = localStorage.getItem('theme') || 'dark';  // indexと連動（デフォルトはダークモード）
-      document.addEventListener("DOMContentLoaded", function() {
-        document.body.classList.add(theme + '-mode');
-      });
-    })();
-  </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>進数変換ツール</title>
+    <style>
+        :root {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f8f9fa;
+        }
+
+        body {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+
+        .converter-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .input-group {
+            flex: 1 1 300px;
+            min-width: 250px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 1.1rem;
+        }
+
+        input {
+            width: 100%;
+            padding: 1rem;
+            font-size: 1.4rem;
+            border: 2px solid #3498db;
+            border-radius: 8px;
+            background: white;
+            box-sizing: border-box;
+            transition: border-color 0.3s ease;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #2980b9;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+
+        @media (max-width: 480px) {
+            input {
+                font-size: 1.2rem;
+                padding: 0.8rem;
+            }
+            label {
+                font-size: 1rem;
+            }
+        }
+
+        .description {
+            margin-top: 1rem;
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+    </style>
 </head>
 <body>
-  <h1>進数変換ツール</h1>
-  <div class="container">
-    <!-- 2進数入力 -->
-    <div class="input-group">
-      <label for="binary">2進数</label>
-      <input type="text" id="binary" oninput="convertFromBinary(this.value)" placeholder="0 or 1">
+    <h1>進数変換ツール</h1>
+    
+    <div class="converter-container">
+        <div class="input-group">
+            <label for="binary">2進数（8bit区切り）</label>
+            <input type="text" id="binary" placeholder="例: 01000001 01000010" 
+                   oninput="convertFromBinary(this.value)">
+        </div>
+
+        <div class="input-group">
+            <label for="decimal">10進数（スペース区切り）</label>
+            <input type="text" id="decimal" placeholder="例: 65 66" 
+                   oninput="convertFromDecimal(this.value)">
+        </div>
+
+        <div class="input-group">
+            <label for="hex">16進数（2桁区切り）</label>
+            <input type="text" id="hex" placeholder="例: 41 42" 
+                   oninput="convertFromHex(this.value)">
+        </div>
+
+        <div class="input-group">
+            <label for="ascii">ASCII（最大10文字）</label>
+            <input type="text" id="ascii" placeholder="例: AB" 
+                   oninput="convertFromASCII(this.value)" maxlength="10">
+        </div>
     </div>
-    <!-- 10進数入力 -->
-    <div class="input-group">
-      <label for="decimal">10進数</label>
-      <input type="text" id="decimal" oninput="convertFromDecimal(this.value)" placeholder="0-9">
-    </div>
-    <!-- 16進数入力 -->
-    <div class="input-group">
-      <label for="hexadecimal">16進数</label>
-      <input type="text" id="hexadecimal" oninput="convertFromHex(this.value)" placeholder="0-9, A-F">
-    </div>
-    <!-- ASCII入力（最大10文字） -->
-    <div class="input-group">
-      <label for="ascii">ASCII</label>
-      <input type="text" id="ascii" maxlength="10" oninput="convertFromAscii(this.value)" placeholder="10文字以内">
-    </div>
-  </div>
 
-  <script>
-    // フィールド更新時の無限ループ防止用フラグ
-    let updating = false;
+    <script>
+        function convertFromBinary(value) {
+            const bytes = value.split(' ').filter(b => b !== '');
+            if (!bytes.every(b => /^[01]{1,8}$/.test(b))) return;
+            const decimals = bytes.map(b => parseInt(b, 2));
+            updateAllFields(decimals, 'binary');
+        }
 
-    // 全入力欄を一括更新する関数（数値を中心に各表現へ変換）
-    function updateAllFields(decimal) {
-      updating = true;
-      if(decimal === "" || isNaN(decimal)) {
-        document.getElementById("binary").value = "";
-        document.getElementById("decimal").value = "";
-        document.getElementById("hexadecimal").value = "";
-        document.getElementById("ascii").value = "";
-        updating = false;
-        return;
-      }
-      const num = parseInt(decimal, 10);
-      document.getElementById("binary").value = num.toString(2);
-      document.getElementById("decimal").value = num.toString(10);
-      document.getElementById("hexadecimal").value = num.toString(16).toUpperCase();
-      document.getElementById("ascii").value = decimalToAscii(num);
-      updating = false;
-    }
+        function convertFromDecimal(value) {
+            const numbers = value.split(' ').filter(n => n !== '');
+            if (!numbers.every(n => /^\d+$/.test(n) && parseInt(n) <= 255)) return;
+            const decimals = numbers.map(n => parseInt(n, 10));
+            updateAllFields(decimals, 'decimal');
+        }
 
-    // 数値からASCII文字列へ変換（各文字は2桁の16進数で表現、最大10文字まで）
-    function decimalToAscii(decimal) {
-      let hexStr = decimal.toString(16).toUpperCase();
-      if(hexStr.length % 2 !== 0) {
-        hexStr = "0" + hexStr;
-      }
-      let ascii = "";
-      for(let i = 0; i < hexStr.length; i += 2) {
-        ascii += String.fromCharCode(parseInt(hexStr.substr(i,2), 16));
-      }
-      if(ascii.length > 10) {
-        ascii = ascii.substring(0, 10);
-      }
-      return ascii;
-    }
+        function convertFromHex(value) {
+            const hexValues = value.toUpperCase().split(' ').filter(h => h !== '');
+            if (!hexValues.every(h => /^[0-9A-F]{1,2}$/.test(h))) return;
+            const decimals = hexValues.map(h => parseInt(h, 16));
+            updateAllFields(decimals, 'hex');
+        }
 
-    // ASCII文字列（最大10文字）から数値へ変換
-    function asciiToDecimal(ascii) {
-      let s = ascii.substring(0,10);
-      let hex = "";
-      for(let i = 0; i < s.length; i++){
-        let code = s.charCodeAt(i).toString(16).toUpperCase();
-        if(code.length < 2) code = "0" + code;
-        hex += code;
-      }
-      return parseInt(hex, 16);
-    }
+        function convertFromASCII(value) {
+            const chars = value.slice(0,10).split('');
+            const decimals = chars.map(c => c.charCodeAt(0));
+            updateAllFields(decimals, 'ascii');
+        }
 
-    function convertFromBinary(value) {
-      if(updating) return;
-      if(!/^[01]*$/.test(value)) return;
-      const decimal = value ? parseInt(value, 2) : "";
-      updateAllFields(decimal);
-    }
+        function updateAllFields(decimals, source) {
+            if (!decimals.length) {
+                clearFields();
+                return;
+            }
 
-    function convertFromDecimal(value) {
-      if(updating) return;
-      if(value === "") {
-        updateAllFields("");
-        return;
-      }
-      if(!/^\d+$/.test(value)) return;
-      const decimal = parseInt(value, 10);
-      updateAllFields(decimal);
-    }
+            // 各フィールドの更新
+            if (source !== 'binary') {
+                document.getElementById('binary').value = 
+                    decimals.map(d => d.toString(2).padStart(8, '0')).join(' ');
+            }
+            if (source !== 'decimal') {
+                document.getElementById('decimal').value = 
+                    decimals.join(' ');
+            }
+            if (source !== 'hex') {
+                document.getElementById('hex').value = 
+                    decimals.map(d => d.toString(16).padStart(2, '0').toUpperCase()).join(' ');
+            }
+            if (source !== 'ascii') {
+                document.getElementById('ascii').value = 
+                    decimals.map(d => d >= 32 && d <= 126 ? String.fromCharCode(d) : '?').join('');
+            }
+        }
 
-    function convertFromHex(value) {
-      if(updating) return;
-      if(!/^[0-9A-Fa-f]*$/.test(value)) return;
-      const decimal = value ? parseInt(value, 16) : "";
-      updateAllFields(decimal);
-    }
-
-    function convertFromAscii(value) {
-      if(updating) return;
-      // 先頭10文字のみ対象
-      const ascii = value.substring(0,10);
-      const decimal = asciiToDecimal(ascii);
-      updateAllFields(decimal);
-    }
-
-    window.onload = function() {
-      document.getElementById("binary").focus();
-    };
-  </script>
+        function clearFields() {
+            document.querySelectorAll('input').forEach(input => input.value = '');
+        }
+    </script>
 </body>
 </html>
