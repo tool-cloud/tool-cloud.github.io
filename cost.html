@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>生活費計算フォーム</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      line-height: 1.6;
+    }
+    .section {
+      margin-bottom: 20px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    label {
+      display: block;
+      margin: 5px 0;
+    }
+    input[type="number"] {
+      width: 120px;
+      padding: 5px;
+    }
+    .hidden {
+      display: none;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+    }
+    .instructions {
+      background: #f9f9f9;
+      border: 1px solid #ddd;
+      padding: 15px;
+      margin-bottom: 20px;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <h1>生活費計算フォーム</h1>
+
+  <!-- 使い方の説明 -->
+  <div class="instructions">
+    <h2>使い方の説明</h2>
+    <p>
+      このフォームでは、各項目に月ごとの生活費（食費、家賃、水道光熱費など）を入力してください。車を所有している場合は、チェックボックスにチェックを入れると車関連の費用（自動車税、車両保険、燃料費など）の入力欄が表示されます。すべての項目に費用を入力し、「計算する」ボタンをクリックすると、月間生活費の合計と年間生活費予測（月×12）が表示されます。
+    </p>
+  </div>
+
+  <form id="expenseForm">
+    <!-- 基本の生活費 -->
+    <div class="section">
+      <h2>基本の生活費</h2>
+      <label>食費（月）: <input type="number" id="food" value="0" min="0" step="1"> 円</label>
+      <label>家賃（月）: <input type="number" id="rent" value="0" min="0" step="1"> 円</label>
+      <label>水道・光熱費（月）: <input type="number" id="utilities" value="0" min="0" step="1"> 円</label>
+      <label>通信費（月）: <input type="number" id="communication" value="0" min="0" step="1"> 円</label>
+      <label>交通費（月）: <input type="number" id="transport" value="0" min="0" step="1"> 円</label>
+      <label>日用品費（月）: <input type="number" id="daily" value="0" min="0" step="1"> 円</label>
+      <label>医療・保険費（月）: <input type="number" id="medical" value="0" min="0" step="1"> 円</label>
+      <label>娯楽・交際費（月）: <input type="number" id="entertainment" value="0" min="0" step="1"> 円</label>
+      <label>その他（月）: <input type="number" id="other" value="0" min="0" step="1"> 円</label>
+    </div>
+
+    <!-- 車関連費用 -->
+    <div class="section">
+      <h2>クルマ関連費用</h2>
+      <label><input type="checkbox" id="hasCar"> 車を所有している</label>
+      <div id="carExpenses" class="hidden">
+        <label>自動車税（月割り）: <input type="number" id="carTax" value="0" min="0" step="1"> 円</label>
+        <label>車両保険（月割り）: <input type="number" id="carInsurance" value="0" min="0" step="1"> 円</label>
+        <label>燃料費（月）: <input type="number" id="fuel" value="0" min="0" step="1"> 円</label>
+        <label>その他車費（月）: <input type="number" id="carOther" value="0" min="0" step="1"> 円</label>
+      </div>
+    </div>
+
+    <!-- その他追加したい項目（例：貯金、趣味など） -->
+    <div class="section">
+      <h2>その他オプション</h2>
+      <label>貯金（目標額・毎月）: <input type="number" id="savings" value="0" min="0" step="1"> 円</label>
+      <label>その他（任意の費用）: <input type="number" id="optional" value="0" min="0" step="1"> 円</label>
+    </div>
+
+    <div class="section">
+      <button type="button" onclick="calculateExpenses()">計算する</button>
+    </div>
+  </form>
+
+  <!-- 計算結果 -->
+  <div class="section">
+    <h2>計算結果</h2>
+    <p>月間生活費合計: <span id="monthlyTotal">0</span> 円</p>
+    <p>年間生活費予測: <span id="annualTotal">0</span> 円</p>
+  </div>
+
+  <script>
+    // 車所有のチェックボックスで車関連費用欄の表示・非表示を切り替え
+    document.getElementById('hasCar').addEventListener('change', function() {
+      var carSection = document.getElementById('carExpenses');
+      if (this.checked) {
+        carSection.classList.remove('hidden');
+      } else {
+        carSection.classList.add('hidden');
+      }
+    });
+
+    function calculateExpenses() {
+      let monthlyTotal = 0;
+      
+      // 基本生活費の項目
+      const basicFields = ['food', 'rent', 'utilities', 'communication', 'transport', 'daily', 'medical', 'entertainment', 'other', 'savings', 'optional'];
+      basicFields.forEach(function(field) {
+        const value = parseFloat(document.getElementById(field).value) || 0;
+        monthlyTotal += value;
+      });
+      
+      // 車関連費用（車所有の場合のみ）
+      if (document.getElementById('hasCar').checked) {
+        const carFields = ['carTax', 'carInsurance', 'fuel', 'carOther'];
+        carFields.forEach(function(field) {
+          const value = parseFloat(document.getElementById(field).value) || 0;
+          monthlyTotal += value;
+        });
+      }
+      
+      // 結果表示
+      document.getElementById('monthlyTotal').textContent = monthlyTotal.toLocaleString();
+      document.getElementById('annualTotal').textContent = (monthlyTotal * 12).toLocaleString();
+    }
+  </script>
+</body>
+</html>

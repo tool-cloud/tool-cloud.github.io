@@ -10,7 +10,7 @@
       padding: 0;
       width: 100vw;
       height: 100vh;
-      font-family: 'Arial', sans-serif;
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -21,22 +21,23 @@
       transition: background-color 0.3s ease;
       flex-direction: column;
     }
-
+    
     #status {
       font-size: 8vw;
       margin-bottom: 2vh;
     }
-
+    
     #timer {
       font-size: 18vw;
       margin-bottom: 2vh;
     }
-
+    
     #controls {
       display: flex;
       gap: 10px;
+      margin-bottom: 2vh;
     }
-
+    
     button {
       padding: 15px 30px;
       font-size: 2rem;
@@ -46,9 +47,22 @@
       border-radius: 10px;
       cursor: pointer;
     }
-
+    
     button:hover {
       background-color: #333;
+    }
+    
+    /* ボリューム調整スライダー */
+    #volumeControl {
+      margin-top: 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1.5rem;
+    }
+    
+    #volumeSlider {
+      width: 200px;
     }
   </style>
 </head>
@@ -59,10 +73,15 @@
     <button id="startButton">開始</button>
     <button id="pipButton">PiP</button>
   </div>
-
+  <!-- ボリューム調整用 -->
+  <div id="volumeControl">
+    <label for="volumeSlider">音量</label>
+    <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="0.5">
+  </div>
+  
   <canvas id="pipCanvas" width="300" height="200" style="display:none;"></canvas>
   <video id="pipVideo" style="display:none;" autoplay muted></video>
-
+  
   <script>
     let isWorkTime = true;
     let timeLeft = 25 * 60;
@@ -74,14 +93,36 @@
     const pipCanvas = document.getElementById("pipCanvas");
     const pipVideo = document.getElementById("pipVideo");
     const ctx = pipCanvas.getContext("2d");
-
+    
+    // 音量設定（初期値 0.5）
+    let volumeLevel = 0.5;
+    const volumeSlider = document.getElementById("volumeSlider");
+    volumeSlider.addEventListener("input", (e) => {
+      volumeLevel = parseFloat(e.target.value);
+    });
+    
+    // Web Audio API で通知音を生成
+    function playNotificationSound() {
+      const context = new (window.AudioContext || window.webkitAudioContext)();
+      const oscillator = context.createOscillator();
+      const gainNode = context.createGain();
+      oscillator.connect(gainNode);
+      gainNode.connect(context.destination);
+      
+      gainNode.gain.value = volumeLevel; // スライダーで設定した音量
+      oscillator.type = "sine";
+      oscillator.frequency.value = 1000; // 1kHzの音
+      oscillator.start();
+      oscillator.stop(context.currentTime + 0.2); // 0.2秒再生
+    }
+    
     function updateTimer() {
       const minutes = Math.floor(timeLeft / 60);
       const seconds = timeLeft % 60;
       timerDisplay.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
       drawCanvas();
     }
-
+    
     function drawCanvas() {
       ctx.clearRect(0, 0, pipCanvas.width, pipCanvas.height);
       ctx.fillStyle = isWorkTime ? "#4CAF50" : "#FF6347";
@@ -91,20 +132,23 @@
       ctx.textAlign = "center";
       ctx.fillText(timerDisplay.textContent, pipCanvas.width / 2, pipCanvas.height / 2);
     }
-
+    
     function startTimer() {
       if (timerInterval) return;
       startButton.style.display = "none";
       updateTimer();
-
+    
       timerInterval = setInterval(() => {
         timeLeft--;
         updateTimer();
-
+    
         if (timeLeft <= 0) {
           clearInterval(timerInterval);
           timerInterval = null;
-
+    
+          // モード切替時に通知音を再生
+          playNotificationSound();
+    
           isWorkTime = !isWorkTime;
           timeLeft = isWorkTime ? 25 * 60 : 5 * 60;
           statusDisplay.textContent = isWorkTime ? "作業中" : "休憩中";
@@ -113,9 +157,9 @@
         }
       }, 1000);
     }
-
+    
     startButton.addEventListener("click", startTimer);
-
+    
     // Canvasの映像をPiPにする
     async function startPiP() {
       try {
@@ -126,7 +170,7 @@
         console.error("PiPエラー", error);
       }
     }
-
+    
     pipButton.addEventListener("click", startPiP);
   </script>
 </body>

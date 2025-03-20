@@ -5,41 +5,71 @@
   <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, user-scalable=no">
   <title>コンデンサ容量計算</title>
   <style>
-    /* 全画面表示の基本設定 */
+    /* ユニバーサルデザインフォント */
     html, body {
       margin: 0;
       padding: 0;
       width: 100vw;
       height: 100vh;
-      font-family: 'Arial', sans-serif;
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      color: white;
       font-weight: bold;
       text-align: center;
-      background-color: black;
+      transition: background-color 0.3s, color 0.3s;
     }
-
-    /* タイトルのサイズを動的に調整 */
+    
+    /* ダークモード（デフォルト・indexから引き継ぎ） */
+    body.dark-mode {
+      background-color: #1e1e1e;
+      color: #ccc;
+    }
+    
+    body.dark-mode .container {
+      background: #222;
+    }
+    
+    body.dark-mode .input-group input {
+      background-color: #1e1e1e;
+      color: limegreen;
+      border-color: white;
+    }
+    
+    /* ライトモード */
+    body.light-mode {
+      background-color: #f8f3ec;
+      color: #555;
+    }
+    
+    body.light-mode .container {
+      background: #fff;
+    }
+    
+    body.light-mode .input-group input {
+      background-color: #f8f3ec;
+      color: #333;
+      border-color: #555;
+    }
+    
+    /* タイトル */
     h1 {
       font-size: min(5vw, 3rem);
       margin-bottom: 3vh;
     }
-
-    /* コンテンツエリアのデザイン */
+    
+    /* コンテンツエリア */
     .container {
       display: flex;
       flex-direction: column;
       align-items: center;
       width: 90vw;
       max-width: 500px;
-      background: #222;
       padding: 3vh;
       border-radius: 2vh;
     }
-
+    
     /* 入力グループ */
     .input-group {
       display: flex;
@@ -47,29 +77,28 @@
       width: 100%;
       margin-bottom: 2vh;
     }
-
+    
     .input-group label {
       font-size: min(4vw, 2rem);
       margin-bottom: 1vh;
     }
-
+    
     .input-group input {
       width: 100%;
       font-size: min(4vw, 2rem);
       padding: 1.5vh;
       text-align: center;
-      border: 3px solid white;
-      background-color: black;
-      color: limegreen;
+      border: 3px solid;
       font-weight: bold;
       border-radius: 1vh;
+      transition: border-color 0.3s, background-color 0.3s, color 0.3s;
     }
-
+    
     .input-group input:focus {
       outline: none;
       border-color: yellow;
     }
-
+    
     /* 結果表示エリア */
     .output {
       font-size: min(4vw, 2rem);
@@ -77,31 +106,40 @@
       color: cyan;
       text-align: left;
     }
-
+    
     /* モバイル対応 */
     @media (max-width: 600px) {
       h1 {
         font-size: 6vw;
       }
-
+    
       .container {
         width: 95vw;
         padding: 4vw;
       }
-
+    
       .input-group label {
         font-size: 5vw;
       }
-
+    
       .input-group input {
         font-size: 5vw;
       }
-
+    
       .output {
         font-size: 5vw;
       }
     }
   </style>
+  <script>
+    // ページ読み込み前にローカルストレージからテーマを確認し、bodyにクラスをセット
+    (function() {
+      const theme = localStorage.getItem('theme') || 'dark'; // デフォルトはダークモード
+      document.addEventListener('DOMContentLoaded', function() {
+        document.body.classList.add(theme + '-mode');
+      });
+    })();
+  </script>
 </head>
 <body>
   <h1>コンデンサ容量計算</h1>
@@ -163,7 +201,7 @@
       }
     }
 
-    // **ページを開いたら入力欄に自動でフォーカス**
+    // ページ読み込み完了後、入力欄にフォーカス
     window.onload = function() {
       document.getElementById("code").focus();
     };

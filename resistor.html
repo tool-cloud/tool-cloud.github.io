@@ -1,51 +1,118 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SMD抵抗値計算</title>
-    <style>
-        body { font-family: Arial, sans-serif; text-align: center; margin: 20px; }
-        input { width: 150px; padding: 10px; font-size: 1.5em; text-align: center; }
-        #result { font-size: 2em; margin-top: 20px; }
-    </style>
-    <script>
-        function calculateResistance() {
-            let code = document.getElementById("resistorCode").value.toUpperCase();
-            let resistance;
-            
-            if (/^\d{3}$/.test(code)) {
-                let significant = parseInt(code[0] + code[1], 10);
-                let multiplier = Math.pow(10, parseInt(code[2], 10));
-                resistance = significant * multiplier;
-            } else if (/^\d{4}$/.test(code)) {
-                let significant = parseInt(code[0] + code[1] + code[2], 10);
-                let multiplier = Math.pow(10, parseInt(code[3], 10));
-                resistance = significant * multiplier;
-            } else if (/^\d*R\d*$/.test(code)) {
-                resistance = parseFloat(code.replace("R", "."));
-            } else {
-                document.getElementById("result").textContent = "無効なコードです";
-                return;
-            }
-            
-            let displayValue;
-            if (resistance >= 1e6) {
-                displayValue = `${resistance / 1e6} MΩ`;
-            } else if (resistance >= 1e3) {
-                displayValue = `${resistance / 1e3} kΩ`;
-            } else {
-                displayValue = `${resistance} Ω`;
-            }
-            
-            document.getElementById("result").textContent = `抵抗値: ${displayValue}`;
-        }
-    </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SMD抵抗値計算</title>
+  <style>
+    /* ユニバーサルデザインフォント */
+    html, body {
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      text-align: center;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    
+    /* ダークモード（デフォルト・indexから引き継ぎ） */
+    body.dark-mode {
+      background-color: #1e1e1e;
+      color: #ccc;
+    }
+    
+    /* ライトモード */
+    body.light-mode {
+      background-color: #f8f3ec;
+      color: #555;
+    }
+    
+    /* コンテンツエリア */
+    body {
+      margin: 20px;
+    }
+    
+    h1 {
+      font-size: min(6vw, 3rem);
+      margin-bottom: 3vh;
+    }
+    
+    p {
+      font-size: min(4vw, 1.8rem);
+      margin-bottom: 2vh;
+    }
+    
+    input {
+      width: 150px;
+      padding: 10px;
+      font-size: min(4vw, 2rem);
+      text-align: center;
+      border: 2px solid currentColor;
+      border-radius: 4px;
+      transition: border-color 0.3s;
+    }
+    
+    input:focus {
+      outline: none;
+      border-color: yellow;
+    }
+    
+    #result {
+      font-size: min(4vw, 2rem);
+      margin-top: 20px;
+    }
+    
+    /* モバイル対応（必要に応じて微調整） */
+    @media (max-width: 600px) {
+      input {
+        width: 80%;
+      }
+    }
+  </style>
+  <script>
+    // ページ読み込み前にローカルストレージからテーマを確認し、bodyにクラスをセット
+    (function() {
+      const theme = localStorage.getItem('theme') || 'dark'; // デフォルトはダークモード
+      document.addEventListener('DOMContentLoaded', function() {
+        document.body.classList.add(theme + '-mode');
+      });
+    })();
+
+    function calculateResistance() {
+      let code = document.getElementById("resistorCode").value.toUpperCase();
+      let resistance;
+      
+      if (/^\d{3}$/.test(code)) {
+        let significant = parseInt(code[0] + code[1], 10);
+        let multiplier = Math.pow(10, parseInt(code[2], 10));
+        resistance = significant * multiplier;
+      } else if (/^\d{4}$/.test(code)) {
+        let significant = parseInt(code[0] + code[1] + code[2], 10);
+        let multiplier = Math.pow(10, parseInt(code[3], 10));
+        resistance = significant * multiplier;
+      } else if (/^\d*R\d*$/.test(code)) {
+        resistance = parseFloat(code.replace("R", "."));
+      } else {
+        document.getElementById("result").textContent = "無効なコードです";
+        return;
+      }
+      
+      let displayValue;
+      if (resistance >= 1e6) {
+        displayValue = `${resistance / 1e6} MΩ`;
+      } else if (resistance >= 1e3) {
+        displayValue = `${resistance / 1e3} kΩ`;
+      } else {
+        displayValue = `${resistance} Ω`;
+      }
+      
+      document.getElementById("result").textContent = `抵抗値: ${displayValue}`;
+    }
+  </script>
 </head>
 <body>
-    <h1>SMD抵抗値計算機</h1>
-    <p>3桁または4桁のEIAコードを入力してください</p>
-    <input type="text" id="resistorCode" placeholder="例: 103, 4701, 1R5" oninput="calculateResistance()">
-    <div id="result"></div>
+  <h1>SMD抵抗値計算機</h1>
+  <p>3桁または4桁のEIAコードを入力してください</p>
+  <input type="text" id="resistorCode" placeholder="例: 103, 4701, 1R5" oninput="calculateResistance()">
+  <div id="result"></div>
 </body>
 </html>
