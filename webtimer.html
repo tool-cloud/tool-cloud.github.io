@@ -253,6 +253,7 @@
       } else {
         isRunning = false;
         updateButtonStates();
+        showControls(); // タイマー終了後にコントロールを表示
       }
     }
 
@@ -291,7 +292,9 @@
     // ユーザー操作の検知
     ['mousemove', 'touchstart'].forEach(event => {
       document.addEventListener(event, () => {
-        if (isRunning || isSettingsOpen) showControls();
+        if (controls.classList.contains('hidden')) {
+          showControls();
+        }
       });
     });
 
