@@ -27,8 +27,8 @@
       display: flex;
       flex-direction: column;
     }
-    /* 表示部 */
-    .display {
+    /* 入力表示部 */
+    .input-display {
       background: #000;
       color: #0f0;
       font-size: 2.5rem;
@@ -38,6 +38,17 @@
       border-top-left-radius: 10px;
       border-top-right-radius: 10px;
       min-height: 60px;
+    }
+    /* 計算結果表示部 */
+    .result-display {
+      background: #000;
+      color: #ff0;
+      font-size: 1.8rem;
+      padding: 10px 20px;
+      text-align: right;
+      word-wrap: break-word;
+      border-bottom: 1px solid #333;
+      min-height: 40px;
     }
     /* ボタン群 */
     .buttons {
@@ -74,9 +85,13 @@
       background: #ff9c66;
     }
     @media (max-width: 500px) {
-      .display {
+      .input-display {
         font-size: 2rem;
         padding: 15px;
+      }
+      .result-display {
+        font-size: 1.5rem;
+        padding: 10px 15px;
       }
       .btn {
         font-size: 1.3rem;
@@ -87,7 +102,10 @@
 </head>
 <body>
   <div class="calc-container">
-    <div class="display" id="display">0</div>
+    <!-- 入力式表示 -->
+    <div class="input-display" id="inputDisplay">0</div>
+    <!-- 計算結果自動表示 -->
+    <div class="result-display" id="resultDisplay"></div>
     <div class="buttons">
       <!-- 上段：括弧、クリア、Backspace -->
       <button class="btn func" data-value="(">(</button>
@@ -95,14 +113,14 @@
       <button class="btn func" id="clear">C</button>
       <button class="btn func" id="back">←</button>
       <!-- 次段：三角関数 -->
-      <button class="btn func" data-value="sin(">sin</button>
-      <button class="btn func" data-value="cos(">cos</button>
-      <button class="btn func" data-value="tan(">tan</button>
+      <button class="btn func" data-value="sin">sin</button>
+      <button class="btn func" data-value="cos">cos</button>
+      <button class="btn func" data-value="tan">tan</button>
       <button class="btn func" data-value="/">÷</button>
       <!-- 次段：対数、平方根、定数 -->
-      <button class="btn func" data-value="ln(">ln</button>
-      <button class="btn func" data-value="log(">log</button>
-      <button class="btn func" data-value="√(">√</button>
+      <button class="btn func" data-value="ln">ln</button>
+      <button class="btn func" data-value="log">log</button>
+      <button class="btn func" data-value="√">√</button>
       <button class="btn func" data-value="*">×</button>
       <!-- 数字と演算子 -->
       <button class="btn" data-value="7">7</button>
@@ -127,7 +145,8 @@
   </div>
 
   <script>
-    const display = document.getElementById('display');
+    const inputDisplay = document.getElementById('inputDisplay');
+    const resultDisplay = document.getElementById('resultDisplay');
     const buttons = document.querySelectorAll('.btn');
     let expression = '';
 
@@ -137,15 +156,19 @@
         const value = btn.getAttribute('data-value');
         if(btn.id === 'clear'){
           expression = '';
-          updateDisplay('0');
+          updateDisplays();
         } else if(btn.id === 'back'){
           expression = expression.slice(0, -1);
-          updateDisplay(expression || '0');
+          updateDisplays();
         } else if(btn.id === 'equals'){
-          calculate();
+          // equalsを押したら最終評価を行い、式を結果に置き換え
+          const res = evaluateExpression(expression);
+          expression = res.toString();
+          updateDisplays();
         } else {
+          // 機能ボタン（sin, cos, …）の場合はそのまま文字列として追加
           expression += value;
-          updateDisplay(expression);
+          updateDisplays();
         }
       });
     });
@@ -153,51 +176,77 @@
     // キーボード入力対応（テンキー含む）
     document.addEventListener('keydown', (e) => {
       const key = e.key;
-      if ((/\d/).test(key) || "+-*/().".includes(key)) {
+      if ((/\d/).test(key) || "+-*/().^".includes(key)) {
         expression += key;
-        updateDisplay(expression);
+        updateDisplays();
       } else if (key === "Enter") {
-        calculate();
+        const res = evaluateExpression(expression);
+        expression = res.toString();
+        updateDisplays();
       } else if (key === "Backspace") {
         expression = expression.slice(0, -1);
-        updateDisplay(expression || '0');
+        updateDisplays();
       }
     });
 
-    function updateDisplay(text) {
-      display.textContent = text;
+    // 入力式と計算結果を更新
+    function updateDisplays() {
+      inputDisplay.textContent = expression || '0';
+      try {
+        let res = evaluateExpression(expression);
+        // 数値として評価できたら結果を表示
+        resultDisplay.textContent = res;
+      } catch (e) {
+        // 評価できない場合は空欄
+        resultDisplay.textContent = '';
+      }
     }
 
-    // 式の前処理と評価
-    function calculate() {
-      try {
-        // 前処理：関数や記号をJSのMath関数に変換
-        let exp = expression;
-        // 定数
-        exp = exp.replace(/π/g, 'Math.PI');
-        exp = exp.replace(/e/g, 'Math.E');
-        // 関数（引数はラジアン・またはそのまま）
-        exp = exp.replace(/sin\(/g, 'Math.sin(');
-        exp = exp.replace(/cos\(/g, 'Math.cos(');
-        exp = exp.replace(/tan\(/g, 'Math.tan(');
-        exp = exp.replace(/ln\(/g, 'Math.log(');
-        // 対数は常用対数（Math.log10は存在しない場合もあるので自作）
-        exp = exp.replace(/log\(/g, 'log10(');
-        // 平方根
-        exp = exp.replace(/√\(/g, 'Math.sqrt(');
-        // 指数演算子：^ を ** に変換
-        exp = exp.replace(/\^/g, '**');
+    // 式を評価する関数
+    function evaluateExpression(expr) {
+      if(!expr) return '';
+      let exp = expr;
 
-        // 自作関数 log10
-        window.log10 = function(x){ return Math.log(x) / Math.LN10; };
+      // 定数の変換
+      exp = exp.replace(/π/g, 'Math.PI');
+      exp = exp.replace(/e/g, 'Math.E');
 
-        let result = Function('"use strict"; return (' + exp + ')')();
-        updateDisplay(result);
-        expression = result.toString();
-      } catch (error) {
-        updateDisplay("Error");
-        expression = '';
-      }
+      // すでに括弧付きの関数呼び出し変換
+      exp = exp.replace(/sin\(/g, 'Math.sin(');
+      exp = exp.replace(/cos\(/g, 'Math.cos(');
+      exp = exp.replace(/tan\(/g, 'Math.tan(');
+      exp = exp.replace(/ln\(/g, 'Math.log(');
+      exp = exp.replace(/log\(/g, 'log10(');
+      exp = exp.replace(/√\(/g, 'Math.sqrt(');
+
+      // 括弧なしの場合：例 sin60 → Math.sin(60)
+      exp = exp.replace(/\bsin(?=[0-9.])([0-9.]+)/g, function(match, p1){
+        return 'Math.sin(' + p1 + ')';
+      });
+      exp = exp.replace(/\bcos(?=[0-9.])([0-9.]+)/g, function(match, p1){
+        return 'Math.cos(' + p1 + ')';
+      });
+      exp = exp.replace(/\btan(?=[0-9.])([0-9.]+)/g, function(match, p1){
+        return 'Math.tan(' + p1 + ')';
+      });
+      exp = exp.replace(/\bln(?=[0-9.])([0-9.]+)/g, function(match, p1){
+        return 'Math.log(' + p1 + ')';
+      });
+      exp = exp.replace(/\blog(?=[0-9.])([0-9.]+)/g, function(match, p1){
+        return 'log10(' + p1 + ')';
+      });
+      exp = exp.replace(/√(?=[0-9.])([0-9.]+)/g, function(match, p1){
+        return 'Math.sqrt(' + p1 + ')';
+      });
+
+      // 指数演算子：^ を ** に変換
+      exp = exp.replace(/\^/g, '**');
+
+      // 自作関数 log10（Math.log10 が存在しない環境用）
+      window.log10 = function(x){ return Math.log(x) / Math.LN10; };
+
+      // 評価
+      return Function('"use strict"; return (' + exp + ')')();
     }
   </script>
 </body>
