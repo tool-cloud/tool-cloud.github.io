@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>関数電卓</title>
+  <style>
+    /* 全体レイアウト */
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      background: #f4f4f4;
+      align-items: center;
+      justify-content: center;
+    }
+    /* 電卓本体 */
+    .calc-container {
+      width: 95vw;
+      max-width: 500px;
+      background: #222;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.3);
+      display: flex;
+      flex-direction: column;
+    }
+    /* 表示部 */
+    .display {
+      background: #000;
+      color: #0f0;
+      font-size: 2.5rem;
+      padding: 20px;
+      text-align: right;
+      word-wrap: break-word;
+      border-top-left-radius: 10px;
+      border-top-right-radius: 10px;
+      min-height: 60px;
+    }
+    /* ボタン群 */
+    .buttons {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      grid-gap: 1px;
+      background: #444;
+    }
+    .btn {
+      background: #333;
+      color: #fff;
+      font-size: 1.5rem;
+      padding: 20px;
+      border: none;
+      outline: none;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn:hover {
+      background: #555;
+    }
+    /* 機能ボタンは色分け */
+    .btn.func {
+      background: #0066cc;
+    }
+    .btn.func:hover {
+      background: #0080ff;
+    }
+    .btn.equal {
+      background: #e67e22;
+      grid-column: span 2;
+    }
+    .btn.equal:hover {
+      background: #ff9c66;
+    }
+    @media (max-width: 500px) {
+      .display {
+        font-size: 2rem;
+        padding: 15px;
+      }
+      .btn {
+        font-size: 1.3rem;
+        padding: 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="calc-container">
+    <div class="display" id="display">0</div>
+    <div class="buttons">
+      <!-- 上段：括弧、クリア、Backspace -->
+      <button class="btn func" data-value="(">(</button>
+      <button class="btn func" data-value=")">)</button>
+      <button class="btn func" id="clear">C</button>
+      <button class="btn func" id="back">←</button>
+      <!-- 次段：三角関数 -->
+      <button class="btn func" data-value="sin(">sin</button>
+      <button class="btn func" data-value="cos(">cos</button>
+      <button class="btn func" data-value="tan(">tan</button>
+      <button class="btn func" data-value="/">÷</button>
+      <!-- 次段：対数、平方根、定数 -->
+      <button class="btn func" data-value="ln(">ln</button>
+      <button class="btn func" data-value="log(">log</button>
+      <button class="btn func" data-value="√(">√</button>
+      <button class="btn func" data-value="*">×</button>
+      <!-- 数字と演算子 -->
+      <button class="btn" data-value="7">7</button>
+      <button class="btn" data-value="8">8</button>
+      <button class="btn" data-value="9">9</button>
+      <button class="btn func" data-value="-">−</button>
+      <button class="btn" data-value="4">4</button>
+      <button class="btn" data-value="5">5</button>
+      <button class="btn" data-value="6">6</button>
+      <button class="btn func" data-value="+">+</button>
+      <button class="btn" data-value="1">1</button>
+      <button class="btn" data-value="2">2</button>
+      <button class="btn" data-value="3">3</button>
+      <button class="btn func" data-value="^">^</button>
+      <button class="btn" data-value="0">0</button>
+      <button class="btn" data-value=".">.</button>
+      <button class="btn func" data-value="π">π</button>
+      <button class="btn func" data-value="e">e</button>
+      <!-- 最下段：イコール -->
+      <button class="btn equal" id="equals">=</button>
+    </div>
+  </div>
+
+  <script>
+    const display = document.getElementById('display');
+    const buttons = document.querySelectorAll('.btn');
+    let expression = '';
+
+    // 各ボタンのクリックイベント
+    buttons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const value = btn.getAttribute('data-value');
+        if(btn.id === 'clear'){
+          expression = '';
+          updateDisplay('0');
+        } else if(btn.id === 'back'){
+          expression = expression.slice(0, -1);
+          updateDisplay(expression || '0');
+        } else if(btn.id === 'equals'){
+          calculate();
+        } else {
+          expression += value;
+          updateDisplay(expression);
+        }
+      });
+    });
+
+    // キーボード入力対応（テンキー含む）
+    document.addEventListener('keydown', (e) => {
+      const key = e.key;
+      if ((/\d/).test(key) || "+-*/().".includes(key)) {
+        expression += key;
+        updateDisplay(expression);
+      } else if (key === "Enter") {
+        calculate();
+      } else if (key === "Backspace") {
+        expression = expression.slice(0, -1);
+        updateDisplay(expression || '0');
+      }
+    });
+
+    function updateDisplay(text) {
+      display.textContent = text;
+    }
+
+    // 式の前処理と評価
+    function calculate() {
+      try {
+        // 前処理：関数や記号をJSのMath関数に変換
+        let exp = expression;
+        // 定数
+        exp = exp.replace(/π/g, 'Math.PI');
+        exp = exp.replace(/e/g, 'Math.E');
+        // 関数（引数はラジアン・またはそのまま）
+        exp = exp.replace(/sin\(/g, 'Math.sin(');
+        exp = exp.replace(/cos\(/g, 'Math.cos(');
+        exp = exp.replace(/tan\(/g, 'Math.tan(');
+        exp = exp.replace(/ln\(/g, 'Math.log(');
+        // 対数は常用対数（Math.log10は存在しない場合もあるので自作）
+        exp = exp.replace(/log\(/g, 'log10(');
+        // 平方根
+        exp = exp.replace(/√\(/g, 'Math.sqrt(');
+        // 指数演算子：^ を ** に変換
+        exp = exp.replace(/\^/g, '**');
+
+        // 自作関数 log10
+        window.log10 = function(x){ return Math.log(x) / Math.LN10; };
+
+        let result = Function('"use strict"; return (' + exp + ')')();
+        updateDisplay(result);
+        expression = result.toString();
+      } catch (error) {
+        updateDisplay("Error");
+        expression = '';
+      }
+    }
+  </script>
+</body>
+</html>
