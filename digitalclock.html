@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>デジタル時計</title>
+  <title>デジタル時計 (PinP機能付き)</title>
   <style>
     /* 全体の背景と文字色 */
     body {
@@ -13,6 +13,7 @@
       margin: 0;
       padding: 0;
       display: flex;
+      flex-direction: column;
       justify-content: center;
       align-items: center;
       height: 100vh; /* 画面いっぱい */
@@ -21,17 +22,26 @@
       font-weight: bold;
       overflow: hidden; /* 画面外にはみ出ないように */
     }
-
     /* 日付のスタイル */
     #date {
-      font-size: 8vw; /* ビューポート幅に応じて日付の文字サイズを調整 */
-      margin: 0; /* 余白を完全にゼロに */
+      font-size: 8vw;
+      margin: 0;
     }
-
     /* 時計部分のスタイル */
     #clock {
-      font-size: 16vw; /* ビューポート幅と高さに応じて時計の文字サイズを調整 */
-      margin: 0; /* 余白を完全にゼロに */
+      font-size: 16vw;
+      margin: 0;
+    }
+    /* PinPボタンのスタイル */
+    #pipButton {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 1.2em;
+      cursor: pointer;
+    }
+    /* 非表示のcanvas */
+    #clockCanvas {
+      display: none;
     }
   </style>
 </head>
@@ -40,8 +50,27 @@
     <div id="date"></div>
     <div id="clock"></div>
   </div>
+  <!-- PinP用のボタン -->
+  <button id="pipButton">PinP切替</button>
+  <!-- 描画用canvas (非表示) -->
+  <canvas id="clockCanvas" width="800" height="400"></canvas>
 
   <script>
+    // DOM要素取得
+    const dateElem = document.getElementById("date");
+    const clockElem = document.getElementById("clock");
+    const canvas = document.getElementById("clockCanvas");
+    const ctx = canvas.getContext("2d");
+    const pipButton = document.getElementById("pipButton");
+
+    // offscreenのvideo要素を作成
+    const video = document.createElement('video');
+    // canvasのストリームを取得 (30fps)
+    video.srcObject = canvas.captureStream(30);
+    video.muted = true;
+    video.play();
+
+    // 時計更新関数
     function updateClock() {
       const now = new Date();
       const year = now.getFullYear();
@@ -53,18 +82,48 @@
       const minutes = now.getMinutes().toString().padStart(2, "0");
       const seconds = now.getSeconds().toString().padStart(2, "0");
 
-      // 日付の表示
-      document.getElementById("date").innerText = `${year}/${month}/${day} (${weekDay})`;
-      
-      // 時計の表示
-      document.getElementById("clock").innerText = `${hours}:${minutes}:${seconds}`;
+      // 日付・時計のDOM更新
+      dateElem.innerText = `${year}/${month}/${day} (${weekDay})`;
+      clockElem.innerText = `${hours}:${minutes}:${seconds}`;
+
+      // canvasにも描画
+      updateCanvasClock(`${year}/${month}/${day} (${weekDay})`, `${hours}:${minutes}:${seconds}`);
     }
 
-    // 秒ごとにupdateClockを呼び出して、時計を更新
+    // canvasに時計を描画する関数
+    function updateCanvasClock(dateText, clockText) {
+      // 背景描画
+      ctx.fillStyle = "black";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // 日付描画
+      ctx.fillStyle = "limegreen";
+      ctx.font = "64px Arial";
+      ctx.fillText(dateText, 50, 100);
+
+      // 時計描画
+      ctx.font = "128px Arial";
+      ctx.fillText(clockText, 50, 250);
+    }
+
+    // 1秒ごとに時計を更新
     setInterval(updateClock, 1000);
-    
-    // 初期表示
     updateClock();
+
+    // PinPボタンのクリック処理
+    pipButton.addEventListener('click', async function() {
+      try {
+        if (!document.pictureInPictureElement) {
+          await video.requestPictureInPicture();
+          pipButton.innerText = "PinP終了";
+        } else {
+          await document.exitPictureInPicture();
+          pipButton.innerText = "PinP切替";
+        }
+      } catch (error) {
+        console.error('PinPエラー:', error);
+      }
+    });
   </script>
 </body>
 </html>
