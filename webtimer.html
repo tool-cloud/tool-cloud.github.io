@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>タイマー</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: #f0f0f0;
+      font-family: Arial, sans-serif;
+    }
+
+    .container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+      position: relative;
+    }
+
+    .timer-display {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10vmin;
+      font-weight: bold;
+      transition: font-size 0.3s;
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.9);
+      box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.1);
+      transition: opacity 0.3s, transform 0.3s;
+    }
+
+    .controls.hidden {
+      opacity: 0;
+      transform: translateY(100%);
+    }
+
+    button {
+      padding: 15px;
+      font-size: 4vmin;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      color: white;
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .set-btn { background: #ffc107; color: #212529; }
+    .start-btn { background: #28a745; }
+    .stop-btn { background: #dc3545; }
+    .reset-btn { background: #6c757d; }
+
+    .settings-panel {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+      display: none;
+      opacity: 0;
+      transition: opacity 0.3s;
+      z-index: 1000;
+      width: 80%;
+      max-width: 400px;
+    }
+
+    .settings-panel.open {
+      display: block;
+      opacity: 1;
+    }
+
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      display: none;
+      z-index: 999;
+    }
+
+    .overlay.show {
+      display: block;
+    }
+
+    .control-group {
+      margin: 15px 0;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      margin: 10px 0;
+    }
+
+    .value-display {
+      float: right;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="timer-display" id="timerDisplay">00:00:00</div>
+    <div class="controls" id="controls">
+      <button class="set-btn" id="setBtn">設定</button>
+      <button class="start-btn" id="startBtn">開始</button>
+      <button class="stop-btn" id="stopBtn" disabled>停止</button>
+      <button class="reset-btn" id="resetBtn">リセット</button>
+    </div>
+    <div class="overlay" id="overlay"></div>
+    <div class="settings-panel" id="settingsPanel">
+      <div class="control-group">
+        <label>時間: <span id="hoursVal" class="value-display">0</span></label>
+        <input type="range" id="hours" min="0" max="23" value="0">
+      </div>
+      <div class="control-group">
+        <label>分: <span id="minutesVal" class="value-display">0</span></label>
+        <input type="range" id="minutes" min="0" max="59" value="0">
+      </div>
+      <div class="control-group">
+        <label>秒: <span id="secondsVal" class="value-display">0</span></label>
+        <input type="range" id="seconds" min="0" max="59" value="0">
+      </div>
+      <div class="control-group">
+        <label>音量: <span id="volumeVal" class="value-display">0.5</span></label>
+        <input type="range" id="volume" min="0" max="1" step="0.01" value="0.5">
+      </div>
+      <div class="control-group">
+        <label>繰り返し回数: <input type="number" id="repeatCount" min="0" value="0"></label>
+        <label><input type="checkbox" id="infiniteRepeat"> 常に繰り返し</label>
+      </div>
+    </div>
+  </div>
+
+  <audio id="alarmAudio">
+    <source src="https://www.soundjay.com/buttons/sounds/beep-01a.mp3" type="audio/mp3">
+  </audio>
+
+  <script>
+    const timerDisplay = document.getElementById('timerDisplay');
+    const controls = document.getElementById('controls');
+    const settingsPanel = document.getElementById('settingsPanel');
+    const overlay = document.getElementById('overlay');
+    const setBtn = document.getElementById('setBtn');
+    const startBtn = document.getElementById('startBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const alarmAudio = document.getElementById('alarmAudio');
+
+    let isRunning = false;
+    let isSettingsOpen = false;
+    let totalTime = 0;
+    let remainingTime = 0;
+    let timerInterval;
+    let inactivityTimer;
+    const INACTIVITY_TIMEOUT = 3000; // 3秒後にコントロールを非表示
+
+    // 設定パネルの開閉
+    setBtn.addEventListener('click', () => {
+      isSettingsOpen = !isSettingsOpen;
+      settingsPanel.classList.toggle('open', isSettingsOpen);
+      overlay.classList.toggle('show', isSettingsOpen);
+      updateButtonStates();
+      if (isSettingsOpen) showControls();
+    });
+
+    // オーバーレイクリックで閉じる
+    overlay.addEventListener('click', () => {
+      isSettingsOpen = false;
+      settingsPanel.classList.remove('open');
+      overlay.classList.remove('show');
+      updateButtonStates();
+    });
+
+    // タイマー開始
+    startBtn.addEventListener('click', () => {
+      if (isRunning || isSettingsOpen) return;
+      const hours = parseInt(document.getElementById('hours').value);
+      const minutes = parseInt(document.getElementById('minutes').value);
+      const seconds = parseInt(document.getElementById('seconds').value);
+      totalTime = remainingTime = (hours * 3600 + minutes * 60 + seconds) * 1000;
+
+      if (totalTime <= 0) return;
+
+      isRunning = true;
+      timerInterval = setInterval(updateTimer, 1000);
+      showControls();
+      updateButtonStates();
+      updateDisplay();
+    });
+
+    // タイマー停止
+    stopBtn.addEventListener('click', () => {
+      clearInterval(timerInterval);
+      isRunning = false;
+      updateButtonStates();
+    });
+
+    // タイマーリセット
+    resetBtn.addEventListener('click', () => {
+      clearInterval(timerInterval);
+      isRunning = false;
+      remainingTime = totalTime;
+      updateDisplay();
+      updateButtonStates();
+      showControls();
+    });
+
+    // タイマー更新
+    function updateTimer() {
+      remainingTime -= 1000;
+      if (remainingTime <= 0) {
+        clearInterval(timerInterval);
+        alarmAudio.play();
+        handleRepeat();
+        return;
+      }
+      updateDisplay();
+    }
+
+    // 繰り返し処理
+    function handleRepeat() {
+      const repeatCount = parseInt(document.getElementById('repeatCount').value);
+      const infiniteRepeat = document.getElementById('infiniteRepeat').checked;
+
+      if (infiniteRepeat || repeatCount > 0) {
+        if (!infiniteRepeat) document.getElementById('repeatCount').value = repeatCount - 1;
+        remainingTime = totalTime;
+        isRunning = true;
+        timerInterval = setInterval(updateTimer, 1000);
+        updateDisplay();
+      } else {
+        isRunning = false;
+        updateButtonStates();
+      }
+    }
+
+    // 表示更新
+    function updateDisplay() {
+      const totalSeconds = Math.floor(remainingTime / 1000);
+      const hours = String(Math.floor(totalSeconds / 3600)).padStart(2, '0');
+      const minutes = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, '0');
+      const seconds = String(totalSeconds % 60).padStart(2, '0');
+      timerDisplay.textContent = `${hours}:${minutes}:${seconds}`;
+    }
+
+    // ボタンの状態更新
+    function updateButtonStates() {
+      startBtn.disabled = isRunning || isSettingsOpen;
+      stopBtn.disabled = !isRunning || isSettingsOpen;
+      resetBtn.disabled = isSettingsOpen;
+    }
+
+    // コントロールの表示
+    function showControls() {
+      clearTimeout(inactivityTimer);
+      controls.classList.remove('hidden');
+      timerDisplay.style.fontSize = '10vmin';
+      if (isRunning && !isSettingsOpen) {
+        inactivityTimer = setTimeout(hideControls, INACTIVITY_TIMEOUT);
+      }
+    }
+
+    // コントロールの非表示
+    function hideControls() {
+      controls.classList.add('hidden');
+      timerDisplay.style.fontSize = '40vmin';
+    }
+
+    // ユーザー操作の検知
+    ['mousemove', 'touchstart'].forEach(event => {
+      document.addEventListener(event, () => {
+        if (isRunning || isSettingsOpen) showControls();
+      });
+    });
+
+    // 設定値の表示更新
+    document.querySelectorAll('input[type="range"]').forEach(input => {
+      input.addEventListener('input', () => {
+        document.getElementById(`${input.id}Val`).textContent = input.value;
+        if (input.id === 'volume') alarmAudio.volume = input.value;
+      });
+    });
+
+    // 初期表示更新
+    document.getElementById('hoursVal').textContent = document.getElementById('hours').value;
+    document.getElementById('minutesVal').textContent = document.getElementById('minutes').value;
+    document.getElementById('secondsVal').textContent = document.getElementById('seconds').value;
+    document.getElementById('volumeVal').textContent = document.getElementById('volume').value;
+    alarmAudio.volume = document.getElementById('volume').value;
+  </script>
+</body>
+</html>
