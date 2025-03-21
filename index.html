@@ -9,18 +9,18 @@
   <style>
     /* カラーテーマ用CSS変数 */
     :root {
-      --bg-color: #f8f3ec;        /* ライトモード背景 */
-      --text-color: #555;         /* ライトモード文字色 */
-      --card-bg: #fff;            /* カード背景 */
-      --heading-color: #444;      /* 見出し文字 */
+      --bg-color: #f8f3ec;
+      --text-color: #555;
+      --card-bg: #fff;
+      --heading-color: #444;
       --border-color: #ddd;
       --link-color: #4a90e2;
     }
     .dark-mode {
-      --bg-color: #1e1e1e;        /* ダークモード背景 */
-      --text-color: #ccc;         /* ダークモード文字色 */
-      --card-bg: #2e2e2e;         /* ダークモードカード背景 */
-      --heading-color: #ddd;      
+      --bg-color: #1e1e1e;
+      --text-color: #ccc;
+      --card-bg: #2e2e2e;
+      --heading-color: #ddd;
       --border-color: #555;
       --link-color: #8ab4f8;
     }
@@ -31,91 +31,68 @@
       background-color: var(--bg-color);
       color: var(--text-color);
       margin: 0;
-      padding: 20px;
+      padding: 10px;
       transition: background-color 0.3s, color 0.3s;
     }
     .container {
-      max-width: 1000px;
+      max-width: 1200px;
       margin: 0 auto;
     }
     h1 {
       text-align: center;
-      margin-bottom: 40px;
+      margin-bottom: 20px;
       color: var(--heading-color);
     }
     h2 {
       color: var(--heading-color);
-      margin: 30px 0 15px;
+      margin: 20px 0 10px;
       border-bottom: 1px solid var(--border-color);
-      padding-bottom: 5px;
+      padding-bottom: 3px;
+      font-size: 1.2em;
     }
+    /* グリッドレイアウト：デフォルトで2列固定 */
     .tool-list {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-around;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
     }
-    /* カード共通スタイル：すべて横並び */
+    /* カード共通スタイル */
     .tool-card {
       display: flex;
       align-items: center;
       background-color: var(--card-bg);
       border-radius: 8px;
       box-shadow: 0 2px 4px rgba(0,0,0,0.08);
-      width: 300px;
-      margin: 20px;
-      padding: 15px 20px;
+      padding: 10px;
       text-decoration: none;
       color: var(--text-color);
       transition: transform 0.2s;
       text-align: left;
+      overflow: hidden;
     }
     .tool-card:hover {
-      transform: translateY(-5px);
+      transform: translateY(-3px);
     }
-    /* 画像部分：角丸の四角形 */
+    /* 画像部分 */
     .tool-image {
       flex-shrink: 0;
-      width: 60px;
-      height: 60px;
-      margin-right: 15px;
+      width: 50px;
+      height: 50px;
+      margin-right: 10px;
       object-fit: cover;
-      border-radius: 8px;
+      border-radius: 6px;
     }
     /* テキスト部分 */
     .tool-text {
       flex: 1;
+      font-size: 0.9em;
     }
     .tool-title {
-      font-size: 20px;
-      margin-bottom: 10px;
+      font-size: 1.1em;
+      margin-bottom: 5px;
     }
     .tool-description {
-      font-size: 16px;
-      color: var(--text-color);
-      line-height: 1.4;
-    }
-    /* 余白用プレースホルダー */
-    .placeholder {
-      width: 300px;
-      margin: 20px;
-      padding: 20px;
-      visibility: hidden;
-    }
-    .future-tools {
-      margin-top: 40px;
-      text-align: center;
-      font-size: 18px;
-      color: #888;
-    }
-    /* スマホ用：縦配置 */
-    @media (max-width: 768px) {
-      .tool-list {
-        flex-direction: column;
-        align-items: center;
-      }
-      .tool-card {
-        width: 90%;
-      }
+      line-height: 1.3;
     }
     /* フッター */
     .footer-links {
@@ -124,26 +101,30 @@
       bottom: 10px;
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 8px;
     }
     .footer-links a {
       text-decoration: none;
       color: var(--link-color);
-      font-size: 14px;
+      font-size: 12px;
     }
+    /* スマホ用：1列表示 */
     @media (max-width: 768px) {
+      .tool-list {
+        grid-template-columns: 1fr;
+      }
       .footer-links {
         position: static;
         text-align: center;
-        margin-top: 40px;
+        margin-top: 20px;
       }
     }
     /* テーマ切替ボタン */
     .theme-toggle-btn {
       position: fixed;
-      top: 20px;
-      right: 20px;
-      padding: 8px 12px;
+      top: 10px;
+      right: 10px;
+      padding: 6px 10px;
       border: none;
       border-radius: 4px;
       background-color: var(--card-bg);
@@ -151,6 +132,7 @@
       cursor: pointer;
       box-shadow: 0 2px 4px rgba(0,0,0,0.15);
       transition: background-color 0.3s, color 0.3s;
+      font-size: 0.9em;
     }
   </style>
 </head>
@@ -163,34 +145,30 @@
     <section id="calculation-tools">
       <h2>計算ツール</h2>
       <div class="tool-list">
-        <!-- 進数変換ツール -->
         <a href="./converter.html" class="tool-card">
           <img src="converter.png" alt="進数変換ツール" class="tool-image">
           <div class="tool-text">
             <div class="tool-title">進数変換ツール</div>
             <div class="tool-description">
-              2進数、10進数、16進数、ASCIIを相互に変換できるツールです。<br>計算ミスを防ぎ、リアルタイムに素早く変換可能です。
+              2進数、10進数、16進数、ASCIIを相互にリアルタイム変換可能。
             </div>
           </div>
         </a>
-        <!-- コンデンサ容量計算 -->
         <a href="./condenser.html" class="tool-card">
           <img src="condenser.png" alt="コンデンサ容量計算" class="tool-image">
           <div class="tool-text">
             <div class="tool-title">コンデンサ容量計算</div>
             <div class="tool-description">
-              コンデンサの表記を入力するだけで、簡単に実際の容量値を算出できる計算ツールです。<br>
+              静電容量値を表す3桁の数字を入力することで3種類の単位で容量値をリアルタイム算出。<br>末尾のアルファベット入力で誤差も表示。
             </div>
           </div>
         </a>
-        <!-- 抵抗値計算 -->
         <a href="./resistor.html" class="tool-card">
           <img src="resistor.png" alt="抵抗値計算" class="tool-image">
           <div class="tool-text">
             <div class="tool-title">抵抗値計算</div>
             <div class="tool-description">
-              抵抗の表記を入力するだけで、簡単に実際の抵抗値を算出できる計算ツールです。<br>
-電子回路設計に役立つ便利な計算機能付き。
+              表記入力で抵抗値を簡単算出。電子回路設計に最適。
             </div>
           </div>
         </a>
@@ -201,44 +179,39 @@
     <section id="clock-tools">
       <h2>時計ツール</h2>
       <div class="tool-list">
-        <!-- デジタル時計 -->
         <a href="./digitalclock.html" class="tool-card">
           <img src="digitalclock.png" alt="デジタル時計" class="tool-image">
           <div class="tool-text">
             <div class="tool-title">デジタル時計</div>
             <div class="tool-description">
-              シンプルで見やすいデジタル時計です。日付と現在時刻の表示します。<br>
+              シンプルで見やすいデジタル時計。日付と時刻を表示。
             </div>
           </div>
         </a>
-        <!-- アナログ時計 -->
         <a href="./analogclock.html" class="tool-card">
           <img src="analogclock.png" alt="アナログ時計" class="tool-image">
           <div class="tool-text">
             <div class="tool-title">アナログ時計</div>
             <div class="tool-description">
-              シンプルで見やすいアナログ時計です。日付と現在時刻の表示します。<br>
-
+              シンプルなアナログ時計。日付と時刻を表示。
             </div>
           </div>
         </a>
-        <!-- ストップウォッチ -->
         <a href="./stopwatch.html" class="tool-card">
           <img src="stopwatch.png" alt="ストップウォッチ" class="tool-image">
           <div class="tool-text">
             <div class="tool-title">ストップウォッチ</div>
             <div class="tool-description">
-              ラップ機能付きのシンプルなストップウォッチ。作業時間の計測や運動記録に便利です。
+              ラップ機能付きのシンプルなストップウォッチ。
             </div>
           </div>
         </a>
-        <!-- ポモドーロタイマー -->
         <a href="./timer.html" class="tool-card">
           <img src="timer.png" alt="ポモドーロタイマー" class="tool-image">
           <div class="tool-text">
             <div class="tool-title">ポモドーロタイマー</div>
             <div class="tool-description">
-              25分作業＋5分休憩のサイクルで集中力を高めるタイマー。生産性向上に最適です。<br>PinP機能付き。サイクル切り替え時のアラーム付き
+              25分作業＋5分休憩のサイクルで生産性向上。PinP機能付き。
             </div>
           </div>
         </a>
@@ -249,23 +222,21 @@
     <section id="relaxation-tools">
       <h2>リラクゼーション</h2>
       <div class="tool-list">
-        <!-- 低音強調ピンクノイズ -->
         <a href="./white.html" class="tool-card">
           <img src="white.png" alt="低音強調ピンクノイズ" class="tool-image">
           <div class="tool-text">
             <div class="tool-title">低音強調ピンクノイズ</div>
             <div class="tool-description">
-              低音を強調したピンクノイズを生成し、リラックス効果を提供します。<br>リラックスや集中力アップに役立つピンクノイズを生成。環境音として活用可能。
+              低音強調のピンクノイズでリラックス効果を提供。
             </div>
           </div>
         </a>
-        <!-- 瞑想リラックス音楽 -->
         <a href="./relax.html" class="tool-card">
           <img src="relax.png" alt="瞑想リラックス音楽" class="tool-image">
           <div class="tool-text">
             <div class="tool-title">瞑想リラックス音楽</div>
             <div class="tool-description">
-              アルファ波に関連する周波数を使用<br>432Hz：リラックス、ストレス軽減<br>528Hz：DNA修復、心の安定<br>10Hzバイノーラルビート：アルファ波促進
+              アルファ波促進のリラックス音楽。432Hz、528Hz、10Hzバイノーラルビートを使用。
             </div>
           </div>
         </a>
@@ -276,45 +247,41 @@
     <section id="other-tools">
       <h2>その他</h2>
       <div class="tool-list">
-        <!-- FIRE予測～DIE WITH ZERO～ -->
         <a href="./fire.html" class="tool-card">
           <img src="fire.png" alt="FIRE予測～DIE WITH ZERO～" class="tool-image">
           <div class="tool-text">
             <div class="tool-title">FIRE予測～DIE WITH ZERO～</div>
             <div class="tool-description">
-              入力値から「総資産がゼロになるまでの期間」をシミュレーションします。<br>年ごとに生活費の算出、年金収入、資産の消費と運用の処理を行います。（最大80年シミュレーション）
+              総資産がゼロになるまでの期間をシミュレーション（最大80年）。
             </div>
           </div>
         </a>
-        <!-- TODOリスト -->
         <a href="./todo_b.html" class="tool-card">
           <img src="todo.png" alt="TODOリスト" class="tool-image">
           <div class="tool-text">
             <div class="tool-title">TODOリスト</div>
             <div class="tool-description">
-              シンプルなタスク管理ツール。やるべきことを可視化し、効率的に管理できる。
+              シンプルなタスク管理ツールでやるべきことを可視化。
             </div>
           </div>
         </a>
-        <!-- 月の生活費計算 -->
         <a href="./cost.html" class="tool-card">
           <img src="cost.png" alt="月の生活費計算" class="tool-image">
           <div class="tool-text">
             <div class="tool-title">月の生活費計算</div>
             <div class="tool-description">
-              月ごとの生活費を入力すると、合計金額と年間の支出を自動計算できます。<br>食費や家賃、水道光熱費などの基本項目に加え、車の有無に応じた費用も簡単に管理できるので、家計の見直しや将来の支出計画に役立ちます。
+              生活費を入力して合計金額や年間支出を自動計算。家計見直しに役立ちます。
             </div>
           </div>
         </a>
-
       </div>
     </section>
     
     <!-- 追加情報 -->
-    <div class="additional-info">
+    <div class="additional-info" style="margin:10px 0; font-size:0.9em;">
       <h2>その他の情報</h2>
       <ul>
-        <li>ファビコン（タブに表示される小さいアイコン画像）は本日の日付です。</li>
+        <li>ファビコンは本日の日付です。</li>
         <li>各ツールは無料でご利用いただけます。</li>
         <li>今後も便利なツールを追加予定です。</li>
         <li>リクエストやご意見はお問い合わせページからお願いします。</li>
@@ -344,32 +311,23 @@
       ctx.fillStyle = "black";
       ctx.font = "bold 40px Arial";
       ctx.fillText(dayString, 10, 50);
-      const favicon = document.getElementById("dynamic-favicon");
-      favicon.href = canvas.toDataURL("image/png");
+      document.getElementById("dynamic-favicon").href = canvas.toDataURL("image/png");
     }
     setFaviconDate();
 
     // テーマ切替機能
     const toggleBtn = document.getElementById('theme-toggle');
     const currentTheme = localStorage.getItem('theme');
-
-    // ページ読み込み時にテーマ適用
     if (currentTheme === 'dark') {
       document.body.classList.add('dark-mode');
       toggleBtn.textContent = 'ライトモードに切替';
     } else {
       toggleBtn.textContent = 'ダークモードに切替';
     }
-
     toggleBtn.addEventListener('click', () => {
       document.body.classList.toggle('dark-mode');
-      let theme = 'light';
-      if (document.body.classList.contains('dark-mode')) {
-        theme = 'dark';
-        toggleBtn.textContent = 'ライトモードに切替';
-      } else {
-        toggleBtn.textContent = 'ダークモードに切替';
-      }
+      let theme = document.body.classList.contains('dark-mode') ? 'dark' : 'light';
+      toggleBtn.textContent = theme === 'dark' ? 'ライトモードに切替' : 'ダークモードに切替';
       localStorage.setItem('theme', theme);
     });
   </script>
