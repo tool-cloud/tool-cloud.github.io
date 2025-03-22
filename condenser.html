@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, user-scalable=no">
   <title>コンデンサ容量計算</title>
   <style>
-    /* ユニバーサルデザインフォント */
     html, body {
       margin: 0;
       padding: 0;
@@ -14,127 +13,144 @@
       font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
       display: flex;
       flex-direction: column;
-      justify-content: center;
-      align-items: center;
       font-weight: bold;
-      text-align: center;
       transition: background-color 0.3s, color 0.3s;
+      overflow: hidden;
     }
-    
-    /* ダークモード（デフォルト・indexから引き継ぎ） */
+
+    /* ダークモード */
     body.dark-mode {
       background-color: #1e1e1e;
       color: #ccc;
     }
-    
     body.dark-mode .container {
       background: #222;
     }
-    
     body.dark-mode .input-group input {
       background-color: #1e1e1e;
       color: limegreen;
       border-color: white;
     }
-    
+
     /* ライトモード */
     body.light-mode {
       background-color: #f8f3ec;
       color: #555;
     }
-    
     body.light-mode .container {
       background: #fff;
     }
-    
     body.light-mode .input-group input {
       background-color: #f8f3ec;
       color: #333;
       border-color: #555;
     }
-    
-    /* タイトル */
+
     h1 {
       font-size: min(5vw, 3rem);
-      margin-bottom: 3vh;
+      margin: 2vh 0;
+      flex-shrink: 0;
     }
-    
-    /* コンテンツエリア */
-    .container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      width: 90vw;
-      max-width: 500px;
-      padding: 3vh;
-      border-radius: 2vh;
-    }
-    
-    /* 入力グループ */
-    .input-group {
+
+    .main-container {
+      flex: 1;
       display: flex;
       flex-direction: column;
       width: 100%;
+      overflow: hidden;
+    }
+
+    .input-container {
+      width: 90vw;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 2vh 0;
+      flex-shrink: 0;
+    }
+
+    .table-container {
+      flex: 1;
+      width: 90vw;
+      max-width: 800px;
+      margin: 0 auto;
+      overflow-y: auto;
+      padding-bottom: 3vh;
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
       margin-bottom: 2vh;
     }
-    
+
     .input-group label {
       font-size: min(4vw, 2rem);
       margin-bottom: 1vh;
     }
-    
+
     .input-group input {
       width: 100%;
       font-size: min(4vw, 2rem);
       padding: 1.5vh;
       text-align: center;
       border: 3px solid;
-      font-weight: bold;
       border-radius: 1vh;
-      transition: border-color 0.3s, background-color 0.3s, color 0.3s;
+      font-weight: bold;
+      transition: all 0.3s;
     }
-    
+
     .input-group input:focus {
       outline: none;
       border-color: yellow;
     }
-    
-    /* 結果表示エリア */
+
     .output {
       font-size: min(4vw, 2rem);
-      margin-top: 2vh;
+      margin: 2vh 0;
       color: cyan;
       text-align: left;
     }
-    
-    /* モバイル対応 */
+
+    .capacitor-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: min(3vw, 1.2rem);
+      table-layout: fixed;
+      margin-top: 2vh;
+    }
+
+    .capacitor-table th,
+    .capacitor-table td {
+      padding: 1.5vh 1vw;
+      border: 2px solid;
+      position: relative;
+    }
+
+    .capacitor-table td:nth-child(4),
+    .capacitor-table th:nth-child(4) {
+      border-left: 3px double;
+    }
+
+    .capacitor-table tr:nth-child(even) {
+      background-color: rgba(255,255,255,0.05);
+    }
+    .light-mode .capacitor-table tr:nth-child(even) {
+      background-color: rgba(0,0,0,0.05);
+    }
+
     @media (max-width: 600px) {
-      h1 {
-        font-size: 6vw;
+      .capacitor-table {
+        font-size: 3.5vw;
+        min-width: 600px;
       }
-    
-      .container {
-        width: 95vw;
-        padding: 4vw;
-      }
-    
-      .input-group label {
-        font-size: 5vw;
-      }
-    
       .input-group input {
-        font-size: 5vw;
-      }
-    
-      .output {
         font-size: 5vw;
       }
     }
   </style>
   <script>
-    // ページ読み込み前にローカルストレージからテーマを確認し、bodyにクラスをセット
     (function() {
-      const theme = localStorage.getItem('theme') || 'dark'; // デフォルトはダークモード
+      const theme = localStorage.getItem('theme') || 'dark';
       document.addEventListener('DOMContentLoaded', function() {
         document.body.classList.add(theme + '-mode');
       });
@@ -143,68 +159,98 @@
 </head>
 <body>
   <h1>コンデンサ容量計算</h1>
-  <div class="container">
-    <div class="input-group">
-      <label for="code">コンデンサ表記</label>
-      <input type="text" id="code" oninput="calculateCapacitance()" placeholder="例: 473K">
+  <div class="main-container">
+    <div class="input-container">
+      <div class="input-group">
+        <label for="code">コンデンサ表記</label>
+        <input type="text" id="code" oninput="calculateCapacitance()" placeholder="例: 473K" autofocus>
+      </div>
+      <div class="output" id="result">
+        <div id="cap_pf">-</div>
+        <div id="cap_nf">-</div>
+        <div id="cap_uf">-</div>
+        <div id="tolerance">-</div>
+      </div>
     </div>
-    <div class="output" id="result">
-      <div id="cap_pf">-</div>
-      <div id="cap_nf">-</div>
-      <div id="cap_uf">-</div>
-      <div id="tolerance">-</div>
+
+    <div class="table-container">
+      <table class="capacitor-table">
+         <thead>
+          <tr>
+            <th>表示</th>
+            <th>計算式</th>
+            <th>容量値</th>
+            <th>記号</th>
+            <th>10pF以下許容差</th>
+            <th>10pF以上許容差</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>R15</td><td>-</td><td>0.15 pF</td><td>B</td><td>±0.1pF</td><td>±0.1%</td></tr>
+          <tr><td>R47</td><td>-</td><td>0.47 pF</td><td>C</td><td>±0.25pF</td><td>±0.25%</td></tr>
+          <tr><td>R50</td><td>-</td><td>0.50 pF</td><td>D</td><td>±0.5pF</td><td>±0.5%</td></tr>
+          <tr><td>1</td><td>-</td><td>1 pF</td><td>E</td><td>±1pF</td><td>±1%</td></tr>
+          <tr><td>2</td><td>-</td><td>2 pF</td><td>F</td><td>±2pF</td><td>±2%</td></tr>
+          <tr><td>4</td><td>-</td><td>4 pF</td><td>G</td><td>±5pF</td><td>±5%</td></tr>
+          <tr><td>10</td><td>-</td><td>10 pF</td><td>H</td><td>±10pF</td><td>±10%</td></tr>
+          <tr><td>22</td><td>-</td><td>22 pF</td><td>J</td><td>-</td><td>±5%</td></tr>
+          <tr><td>47</td><td>-</td><td>47 pF</td><td>K</td><td>-</td><td>±10%</td></tr>
+          <tr><td>101</td><td>10×10¹</td><td>100 pF</td><td>M</td><td>-</td><td>±20%</td></tr>
+          <tr><td>151</td><td>15×10¹</td><td>150 pF</td><td>N</td><td>-</td><td>±30%</td></tr>
+          <tr><td>221</td><td>22×10¹</td><td>220 pF</td><td>Q</td><td>-</td><td>-10%～+30%</td></tr>
+          <tr><td>331</td><td>33×10¹</td><td>330 pF</td><td>S</td><td>-</td><td>-20%～+50%</td></tr>
+          <tr><td>471</td><td>47×10¹</td><td>470 pF</td><td>Z</td><td>-</td><td>-20%～+80%</td></tr>
+          <tr><td>681</td><td>68×10¹</td><td>680 pF</td><td></td><td></td><td></td></tr>
+          <tr><td>102</td><td>10×10²</td><td>1000 pF</td><td></td><td></td><td></td></tr>
+          <tr><td>152</td><td>15×10²</td><td>1500 pF</td><td></td><td></td><td></td></tr>
+          <tr><td>222</td><td>22×10²</td><td>2200 pF</td><td></td><td></td><td></td></tr>
+          <tr><td>332</td><td>33×10²</td><td>3300 pF</td><td></td><td></td><td></td></tr>
+          <tr><td>472</td><td>47×10²</td><td>4700 pF</td><td></td><td></td><td></td></tr>
+          <tr><td>682</td><td>68×10²</td><td>6800 pF</td><td></td><td></td><td></td></tr>
+          <tr><td>103</td><td>10×10³</td><td>10000 pF</td><td></td><td></td><td></td></tr>
+          <tr><td>153</td><td>15×10³</td><td>15000 pF</td><td></td><td></td><td></td></tr>
+          <tr><td>223</td><td>22×10³</td><td>22000 pF</td><td></td><td></td><td></td></tr>
+          <tr><td>333</td><td>33×10³</td><td>33000 pF</td><td></td><td></td><td></td></tr>
+          <tr><td>473</td><td>47×10³</td><td>47000 pF</td><td></td><td></td><td></td></tr>
+          <tr><td>683</td><td>68×10³</td><td>68000 pF</td><td></td><td></td><td></td></tr>
+          <tr><td>104</td><td>10×10⁴</td><td>100000 pF</td><td></td><td></td><td></td></tr>
+          <tr><td>154</td><td>15×10⁴</td><td>150000 pF</td><td></td><td></td><td></td></tr>
+          <tr><td>224</td><td>22×10⁴</td><td>220000 pF</td><td></td><td></td><td></td></tr>
+          <tr><td>334</td><td>33×10⁴</td><td>330000 pF</td><td></td><td></td><td></td></tr>
+          <tr><td>474</td><td>47×10⁴</td><td>470000 pF</td><td></td><td></td><td></td></tr>
+          <tr><td>684</td><td>68×10⁴</td><td>680000 pF</td><td></td><td></td><td></td></tr>
+        </tbody>
+      </table>
     </div>
   </div>
 
   <script>
     function calculateCapacitance() {
-      let input = document.getElementById("code").value.trim().toUpperCase();
-      const capPf = document.getElementById("cap_pf");
-      const capNf = document.getElementById("cap_nf");
-      const capUf = document.getElementById("cap_uf");
-      const toleranceDisplay = document.getElementById("tolerance");
+      const input = document.getElementById("code").value.trim().toUpperCase();
+      const [capPf, capNf, capUf, toleranceDisplay] = 
+        ['cap_pf', 'cap_nf', 'cap_uf', 'tolerance'].map(id => document.getElementById(id));
+
+      let value = input.replace(/[JKM]$/, (match) => {
+        const tolerances = {J:'±5%', K:'±10%', M:'±20%'};
+        toleranceDisplay.textContent = `誤差: ${tolerances[match]}`;
+        return '';
+      });
 
       let capacitance = null;
-      let tolerance = "";
-
-      // 誤差判定（最後の文字が J/K/M の場合）
-      if (/[JKM]$/.test(input)) {
-        const lastChar = input.slice(-1);
-        if (lastChar === "J") tolerance = "±5%";
-        if (lastChar === "K") tolerance = "±10%";
-        if (lastChar === "M") tolerance = "±20%";
-        input = input.slice(0, -1); // 誤差記号を削除
+      if (/^\d{2}$/.test(value)) {
+        capacitance = parseInt(value, 10);
+      } else if (/^\d{3}$/.test(value)) {
+        capacitance = parseInt(value.slice(0,2),10) * (10 ** parseInt(value[2],10));
       }
 
-      // 2桁ならそのままpF
-      if (/^\d{2}$/.test(input)) {
-        capacitance = parseInt(input, 10);
-      }
-      // 3桁 (例: 473)
-      else if (/^\d{3}$/.test(input)) {
-        const base = parseInt(input.slice(0, 2), 10);
-        const exponent = parseInt(input.charAt(2), 10);
-        capacitance = base * Math.pow(10, exponent);
-      }
-
-      // 結果表示
-      if (capacitance !== null) {
+      if (capacitance) {
         capPf.textContent = `${capacitance} pF`;
-        capNf.textContent = `${(capacitance / 1000)} nF`;
-        capUf.textContent = `${(capacitance / 1000000)} μF`;
-        toleranceDisplay.textContent = tolerance ? `誤差: ${tolerance}` : "-";
+        capNf.textContent = `${(capacitance/1e3).toFixed(3)} nF`.replace(/\.?0+$/, '');
+        capUf.textContent = `${(capacitance/1e6).toFixed(6)} μF`.replace(/\.?0+$/, '');
       } else {
-        capPf.textContent = "-";
-        capNf.textContent = "-";
-        capUf.textContent = "-";
-        toleranceDisplay.textContent = "-";
+        ['-','-','-','-'].forEach((v,i) => [capPf, capNf, capUf, toleranceDisplay][i].textContent = v);
       }
     }
-
-    // ページ読み込み完了後、入力欄にフォーカス
-    window.onload = function() {
-      document.getElementById("code").focus();
-    };
   </script>
 </body>
 </html>
