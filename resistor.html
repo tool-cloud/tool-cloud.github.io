@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SMD抵抗値計算</title>
   <style>
-    /* ユニバーサルデザインフォント */
     html, body {
       margin: 0;
       padding: 0;
@@ -13,55 +12,48 @@
       text-align: center;
       transition: background-color 0.3s, color 0.3s;
     }
-    
-    /* ダークモード（デフォルト・indexから引き継ぎ） */
     body.dark-mode {
       background-color: #1e1e1e;
       color: #ccc;
     }
-    
-    /* ライトモード */
     body.light-mode {
       background-color: #f8f3ec;
       color: #555;
     }
-    
-    /* コンテンツエリア */
     body {
       margin: 20px;
     }
-    
     h1 {
       font-size: min(6vw, 3rem);
       margin-bottom: 3vh;
     }
-    
     p {
       font-size: min(4vw, 1.8rem);
       margin-bottom: 2vh;
     }
-    
     input {
       width: 150px;
       padding: 10px;
-      font-size: min(4vw, 2rem);
+      font-size: min(4vw, 1.8rem);
       text-align: center;
       border: 2px solid currentColor;
       border-radius: 4px;
       transition: border-color 0.3s;
+      margin: 5px;
     }
-    
     input:focus {
       outline: none;
       border-color: yellow;
     }
-    
-    #result {
-      font-size: min(4vw, 2rem);
-      margin-top: 20px;
+    #resultTable {
+      margin: 20px auto;
+      border-collapse: collapse;
+      font-size: min(4vw, 1.6rem);
     }
-    
-    /* モバイル対応（必要に応じて微調整） */
+    #resultTable th, #resultTable td {
+      border: 1px solid currentColor;
+      padding: 8px 12px;
+    }
     @media (max-width: 600px) {
       input {
         width: 80%;
@@ -69,50 +61,112 @@
     }
   </style>
   <script>
-    // ページ読み込み前にローカルストレージからテーマを確認し、bodyにクラスをセット
+    // テーマ設定（デフォルトはダークモード）
     (function() {
-      const theme = localStorage.getItem('theme') || 'dark'; // デフォルトはダークモード
+      const theme = localStorage.getItem('theme') || 'dark';
       document.addEventListener('DOMContentLoaded', function() {
         document.body.classList.add(theme + '-mode');
       });
     })();
 
     function calculateResistance() {
-      let code = document.getElementById("resistorCode").value.toUpperCase();
-      let resistance;
+      const code = document.getElementById("resistorCode").value.toUpperCase().trim();
+      let R; // 抵抗値（オーム）
       
+      // EIAコード（3桁または4桁）の判定
       if (/^\d{3}$/.test(code)) {
-        let significant = parseInt(code[0] + code[1], 10);
-        let multiplier = Math.pow(10, parseInt(code[2], 10));
-        resistance = significant * multiplier;
+        let significant = parseInt(code.slice(0,2), 10);
+        let multiplier = Math.pow(10, parseInt(code.slice(2), 10));
+        R = significant * multiplier;
       } else if (/^\d{4}$/.test(code)) {
-        let significant = parseInt(code[0] + code[1] + code[2], 10);
-        let multiplier = Math.pow(10, parseInt(code[3], 10));
-        resistance = significant * multiplier;
+        let significant = parseInt(code.slice(0,3), 10);
+        let multiplier = Math.pow(10, parseInt(code.slice(3), 10));
+        R = significant * multiplier;
       } else if (/^\d*R\d*$/.test(code)) {
-        resistance = parseFloat(code.replace("R", "."));
+        // 例: 1R5 → 1.5Ω
+        R = parseFloat(code.replace("R", "."));
       } else {
         document.getElementById("result").textContent = "無効なコードです";
+        document.getElementById("resultTableContainer").innerHTML = "";
         return;
       }
       
-      let displayValue;
-      if (resistance >= 1e6) {
-        displayValue = `${resistance / 1e6} MΩ`;
-      } else if (resistance >= 1e3) {
-        displayValue = `${resistance / 1e3} kΩ`;
-      } else {
-        displayValue = `${resistance} Ω`;
+      // 各入力パラメータの取得
+      const tolInput = parseFloat(document.getElementById("tolerance").value) || 5; // %
+      const tol = tolInput / 100; // 比率
+      const tcr = parseFloat(document.getElementById("tcr").value) || 100; // ppm/℃
+      const tMax = parseFloat(document.getElementById("tMax").value) || 80; // ℃
+      const tMin = parseFloat(document.getElementById("tMin").value) || -40; // ℃
+      
+      // 基準温度25℃を前提とした温度変化倍率
+      const factorMin = 1 + tcr * (tMin - 25) * 1e-6;
+      const factorMax = 1 + tcr * (tMax - 25) * 1e-6;
+      
+      // 各値の計算
+      const typ = R;
+      const tolMin = typ * (1 - tol);
+      const tolMax = typ * (1 + tol);
+      const minTempMin = typ * factorMin * (1 - tol);
+      const maxTempMax = typ * factorMax * (1 + tol);
+      
+      // 単位表示（1e6以上: MΩ、1e3以上: kΩ、下: Ω）
+      function formatValue(value) {
+        if (value >= 1e6) {
+          return (value/1e6).toFixed(3) + " MΩ";
+        } else if (value >= 1e3) {
+          return (value/1e3).toFixed(3) + " kΩ";
+        } else {
+          return value.toFixed(2) + " Ω";
+        }
       }
       
-      document.getElementById("result").textContent = `抵抗値: ${displayValue}`;
+      // 結果を表形式で出力
+      const tableHTML = `
+        <table id="resultTable">
+          <tr>
+            <th>抵抗値 (TYP)</th>
+            <th>最低温度含めた公差MIN</th>
+            <th>公差MIN</th>
+            <th>TYP</th>
+            <th>公差MAX</th>
+            <th>最大温度含めた公差MAX</th>
+          </tr>
+          <tr>
+            <td>${formatValue(typ)}</td>
+            <td>${formatValue(minTempMin)}</td>
+            <td>${formatValue(tolMin)}</td>
+            <td>${formatValue(typ)}</td>
+            <td>${formatValue(tolMax)}</td>
+            <td>${formatValue(maxTempMax)}</td>
+          </tr>
+        </table>
+      `;
+      
+      document.getElementById("result").textContent = `計算結果`;
+      document.getElementById("resultTableContainer").innerHTML = tableHTML;
     }
+    
+    // 各入力項目変更時に再計算
+    function setupListeners() {
+      const inputs = document.querySelectorAll("input");
+      inputs.forEach(input => {
+        input.addEventListener("input", calculateResistance);
+      });
+    }
+    
+    document.addEventListener("DOMContentLoaded", setupListeners);
   </script>
 </head>
 <body>
   <h1>SMD抵抗値計算機</h1>
   <p>3桁または4桁のEIAコードを入力してください</p>
-  <input type="text" id="resistorCode" placeholder="例: 103, 4701, 1R5" oninput="calculateResistance()">
+  <input type="text" id="resistorCode" placeholder="例: 103, 4701, 1R5">
+  <br>
+  <p>抵抗公差 (%): <input type="number" id="tolerance" value="5"></p>
+  <p>抵抗温度係数 (ppm/℃): <input type="number" id="tcr" value="100"></p>
+  <p>最大温度 (℃): <input type="number" id="tMax" value="80"></p>
+  <p>最低温度 (℃): <input type="number" id="tMin" value="-40"></p>
   <div id="result"></div>
+  <div id="resultTableContainer"></div>
 </body>
 </html>

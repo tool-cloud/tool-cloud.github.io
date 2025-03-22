@@ -2,133 +2,280 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>生活費計算フォーム</title>
   <style>
+    :root {
+      --primary-color: #4CAF50;
+      --secondary-color: #f8f9fa;
+    }
+    
     body {
-      font-family: Arial, sans-serif;
-      margin: 20px;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      margin: 0;
+      padding: 20px;
       line-height: 1.6;
+      color: #333;
+      background-color: #fff;
     }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      color: var(--primary-color);
+      border-left: 4px solid var(--primary-color);
+      padding-left: 10px;
+      margin: 30px 0;
+      font-size: 1.8rem;
+    }
+
     .section {
-      margin-bottom: 20px;
-      padding: 10px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
+      margin-bottom: 25px;
+      padding: 20px;
+      background: var(--secondary-color);
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
     }
+
+    .section-title {
+      color: var(--primary-color);
+      margin: 0 0 15px 0;
+      padding-bottom: 5px;
+      border-bottom: 2px solid var(--primary-color);
+      font-size: 1.3rem;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
     label {
       display: block;
-      margin: 5px 0;
+      margin: 10px 0 5px;
+      font-weight: 500;
+      color: #444;
     }
+
     input[type="number"] {
-      width: 120px;
-      padding: 5px;
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      box-sizing: border-box;
+      font-size: 1rem;
     }
+
     .hidden {
       display: none;
     }
+
     button {
-      padding: 10px 20px;
-      font-size: 16px;
-    }
-    .instructions {
-      background: #f9f9f9;
-      border: 1px solid #ddd;
+      width: 100%;
       padding: 15px;
-      margin-bottom: 20px;
+      background: var(--primary-color);
+      color: white;
+      border: none;
       border-radius: 4px;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background: #45a049;
+    }
+
+    .instructions {
+      background: #e8f5e9;
+      border-left: 4px solid var(--primary-color);
+      padding: 20px;
+      margin: 30px 0;
+      border-radius: 4px;
+    }
+
+    .instructions h2 {
+      margin-top: 0;
+      color: var(--primary-color);
+    }
+
+    .result {
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: var(--primary-color);
+    }
+
+    @media (min-width: 768px) {
+      .form-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      body {
+        padding: 10px;
+      }
+      
+      h1 {
+        font-size: 1.5rem;
+      }
+      
+      .section {
+        padding: 15px;
+      }
     }
   </style>
 </head>
 <body>
-  <h1>生活費計算フォーム</h1>
+  <div class="container">
+    <h1>生活費計算フォーム</h1>
 
-  <!-- 使い方の説明 -->
-  <div class="instructions">
-    <h2>使い方の説明</h2>
-    <p>
-      このフォームでは、各項目に月ごとの生活費（食費、家賃、水道光熱費など）を入力してください。車を所有している場合は、チェックボックスにチェックを入れると車関連の費用（自動車税、車両保険、燃料費など）の入力欄が表示されます。すべての項目に費用を入力し、「計算する」ボタンをクリックすると、月間生活費の合計と年間生活費予測（月×12）が表示されます。
-    </p>
-  </div>
+    <div class="instructions">
+      <h2>このツールについて</h2>
+      <p>毎月の生活費を項目別に計算し、年間の総支出を予測できるツールです。家計管理や予算計画にお役立てください。</p>
+      
+      <h2>計算の流れ</h2>
+      <ul>
+        <li>基本の生活費を入力</li>
+        <li>車所有の場合はチェックを入れて詳細入力</li>
+        <li>オプション項目を必要に応じて入力</li>
+        <li>「計算する」ボタンをクリック</li>
+      </ul>
 
-  <form id="expenseForm">
-    <!-- 基本の生活費 -->
-    <div class="section">
-      <h2>基本の生活費</h2>
-      <label>食費（月）: <input type="number" id="food" value="0" min="0" step="1"> 円</label>
-      <label>家賃（月）: <input type="number" id="rent" value="0" min="0" step="1"> 円</label>
-      <label>水道・光熱費（月）: <input type="number" id="utilities" value="0" min="0" step="1"> 円</label>
-      <label>通信費（月）: <input type="number" id="communication" value="0" min="0" step="1"> 円</label>
-      <label>交通費（月）: <input type="number" id="transport" value="0" min="0" step="1"> 円</label>
-      <label>日用品費（月）: <input type="number" id="daily" value="0" min="0" step="1"> 円</label>
-      <label>医療・保険費（月）: <input type="number" id="medical" value="0" min="0" step="1"> 円</label>
-      <label>娯楽・交際費（月）: <input type="number" id="entertainment" value="0" min="0" step="1"> 円</label>
-      <label>その他（月）: <input type="number" id="other" value="0" min="0" step="1"> 円</label>
+      <h2>入力条件</h2>
+      <ul>
+        <li>全ての金額は月単位で入力</li>
+        <li>0円の項目は未入力可</li>
+        <li>数値のみ入力可能（カンマ不要）</li>
+      </ul>
     </div>
 
-    <!-- 車関連費用 -->
-    <div class="section">
-      <h2>クルマ関連費用</h2>
-      <label><input type="checkbox" id="hasCar"> 車を所有している</label>
-      <div id="carExpenses" class="hidden">
-        <label>自動車税（月割り）: <input type="number" id="carTax" value="0" min="0" step="1"> 円</label>
-        <label>車両保険（月割り）: <input type="number" id="carInsurance" value="0" min="0" step="1"> 円</label>
-        <label>燃料費（月）: <input type="number" id="fuel" value="0" min="0" step="1"> 円</label>
-        <label>その他車費（月）: <input type="number" id="carOther" value="0" min="0" step="1"> 円</label>
+    <form id="expenseForm">
+      <div class="section">
+        <h2 class="section-title">基本の生活費</h2>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>食費（月）</label>
+            <input type="number" id="food" value="0" min="0" step="1">
+          </div>
+          <div class="form-group">
+            <label>家賃（月）</label>
+            <input type="number" id="rent" value="0" min="0" step="1">
+          </div>
+          <div class="form-group">
+            <label>水道・光熱費（月）</label>
+            <input type="number" id="utilities" value="0" min="0" step="1">
+          </div>
+          <div class="form-group">
+            <label>通信費（月）</label>
+            <input type="number" id="communication" value="0" min="0" step="1">
+          </div>
+          <div class="form-group">
+            <label>交通費（月）</label>
+            <input type="number" id="transport" value="0" min="0" step="1">
+          </div>
+          <div class="form-group">
+            <label>日用品費（月）</label>
+            <input type="number" id="daily" value="0" min="0" step="1">
+          </div>
+          <div class="form-group">
+            <label>医療・保険費（月）</label>
+            <input type="number" id="medical" value="0" min="0" step="1">
+          </div>
+          <div class="form-group">
+            <label>娯楽・交際費（月）</label>
+            <input type="number" id="entertainment" value="0" min="0" step="1">
+          </div>
+          <div class="form-group">
+            <label>その他（月）</label>
+            <input type="number" id="other" value="0" min="0" step="1">
+          </div>
+        </div>
       </div>
-    </div>
 
-    <!-- その他追加したい項目（例：貯金、趣味など） -->
+      <div class="section">
+        <h2 class="section-title">クルマ関連費用</h2>
+        <div class="form-group">
+          <label><input type="checkbox" id="hasCar"> 車を所有している</label>
+        </div>
+        <div id="carExpenses" class="hidden">
+          <div class="form-grid">
+            <div class="form-group">
+              <label>自動車税（月割）</label>
+              <input type="number" id="carTax" value="0" min="0" step="1">
+            </div>
+            <div class="form-group">
+              <label>車両保険（月割）</label>
+              <input type="number" id="carInsurance" value="0" min="0" step="1">
+            </div>
+            <div class="form-group">
+              <label>燃料費（月）</label>
+              <input type="number" id="fuel" value="0" min="0" step="1">
+            </div>
+            <div class="form-group">
+              <label>その他車費（月）</label>
+              <input type="number" id="carOther" value="0" min="0" step="1">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2 class="section-title">オプション項目</h2>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>貯金目標額（月）</label>
+            <input type="number" id="savings" value="0" min="0" step="1">
+          </div>
+          <div class="form-group">
+            <label>その他費用（月）</label>
+            <input type="number" id="optional" value="0" min="0" step="1">
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <button type="button" onclick="calculateExpenses()">計算する</button>
+      </div>
+    </form>
+
     <div class="section">
-      <h2>その他オプション</h2>
-      <label>貯金（目標額・毎月）: <input type="number" id="savings" value="0" min="0" step="1"> 円</label>
-      <label>その他（任意の費用）: <input type="number" id="optional" value="0" min="0" step="1"> 円</label>
+      <h2 class="section-title">計算結果</h2>
+      <p class="result">月間生活費合計: <span id="monthlyTotal">0</span> 円</p>
+      <p class="result">年間生活費予測: <span id="annualTotal">0</span> 円</p>
     </div>
-
-    <div class="section">
-      <button type="button" onclick="calculateExpenses()">計算する</button>
-    </div>
-  </form>
-
-  <!-- 計算結果 -->
-  <div class="section">
-    <h2>計算結果</h2>
-    <p>月間生活費合計: <span id="monthlyTotal">0</span> 円</p>
-    <p>年間生活費予測: <span id="annualTotal">0</span> 円</p>
   </div>
 
   <script>
-    // 車所有のチェックボックスで車関連費用欄の表示・非表示を切り替え
     document.getElementById('hasCar').addEventListener('change', function() {
-      var carSection = document.getElementById('carExpenses');
-      if (this.checked) {
-        carSection.classList.remove('hidden');
-      } else {
-        carSection.classList.add('hidden');
-      }
+      document.getElementById('carExpenses').classList.toggle('hidden', !this.checked);
     });
 
     function calculateExpenses() {
       let monthlyTotal = 0;
-      
-      // 基本生活費の項目
-      const basicFields = ['food', 'rent', 'utilities', 'communication', 'transport', 'daily', 'medical', 'entertainment', 'other', 'savings', 'optional'];
-      basicFields.forEach(function(field) {
-        const value = parseFloat(document.getElementById(field).value) || 0;
-        monthlyTotal += value;
-      });
-      
-      // 車関連費用（車所有の場合のみ）
-      if (document.getElementById('hasCar').checked) {
-        const carFields = ['carTax', 'carInsurance', 'fuel', 'carOther'];
-        carFields.forEach(function(field) {
-          const value = parseFloat(document.getElementById(field).value) || 0;
-          monthlyTotal += value;
-        });
+
+      const getValue = id => parseFloat(document.getElementById(id).value) || 0;
+
+      // 基本項目
+      const basicFields = ['food', 'rent', 'utilities', 'communication', 
+                         'transport', 'daily', 'medical', 'entertainment', 
+                         'other', 'savings', 'optional'];
+      basicFields.forEach(id => monthlyTotal += getValue(id));
+
+      // 車関連
+      if(document.getElementById('hasCar').checked) {
+        ['carTax', 'carInsurance', 'fuel', 'carOther']
+          .forEach(id => monthlyTotal += getValue(id));
       }
-      
+
       // 結果表示
-      document.getElementById('monthlyTotal').textContent = monthlyTotal.toLocaleString();
-      document.getElementById('annualTotal').textContent = (monthlyTotal * 12).toLocaleString();
+      const format = num => num.toLocaleString() + ' 円';
+      document.getElementById('monthlyTotal').textContent = format(monthlyTotal);
+      document.getElementById('annualTotal').textContent = format(monthlyTotal * 12);
     }
   </script>
 </body>
