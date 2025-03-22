@@ -298,11 +298,28 @@
       });
     });
 
+    // 音量テスト再生用のデバウンス関数
+    let volumeTestTimeout;
+    function testVolume() {
+      clearTimeout(volumeTestTimeout);
+      volumeTestTimeout = setTimeout(() => {
+        alarmAudio.currentTime = 0; // 音声の再生位置を最初に戻す
+        alarmAudio.play();
+        setTimeout(() => {
+          alarmAudio.pause(); // 短時間だけ再生して停止
+          alarmAudio.currentTime = 0;
+        }, 200); // 200msだけ再生
+      }, 100); // 100msのデバウンス
+    }
+
     // 設定値の表示更新
     document.querySelectorAll('input[type="range"]').forEach(input => {
       input.addEventListener('input', () => {
         document.getElementById(`${input.id}Val`).textContent = input.value;
-        if (input.id === 'volume') alarmAudio.volume = input.value;
+        if (input.id === 'volume') {
+          alarmAudio.volume = input.value;
+          testVolume(); // 音量変更時にテスト再生
+        }
       });
     });
 
