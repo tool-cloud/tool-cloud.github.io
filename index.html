@@ -17,7 +17,7 @@
       --link-color: #4a90e2;
     }
     .dark-mode {
-      --bg-color: #1e1e1e; /* ダークモードの背景を暗く */
+      --bg-color: #1e1e1e;
       --text-color: #ccc;
       --card-bg: #2e2e2e;
       --heading-color: #ddd;
@@ -42,7 +42,7 @@
       text-align: center;
       margin-bottom: 20px;
       color: var(--heading-color);
-      font-size: 1.2em; /* タイトルを小さく */
+      font-size: 1.2em;
     }
     h2 {
       color: var(--heading-color);
@@ -120,7 +120,7 @@
         margin-top: 20px;
       }
     }
-    /* テーマ切替ボタン */
+    /* テーマ切替ボタン：デスクトップ用 */
     .theme-toggle-btn {
       position: fixed;
       top: 10px;
@@ -135,10 +135,36 @@
       transition: background-color 0.3s, color 0.3s;
       font-size: 0.9em;
     }
+    /* テーマ切替ボタン：スマホ用（アイコン表示） */
+    .theme-toggle {
+      display: none; /* デフォルトは非表示 */
+    }
+    @media (max-width: 768px) {
+      .theme-toggle {
+        display: block;
+        position: fixed;
+        top: 10px;
+        right: 10px;
+        padding: 6px 10px;
+        background-color: var(--card-bg);
+        color: var(--text-color);
+        cursor: pointer;
+        border-radius: 4px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+        font-size: 0.9em;
+      }
+      .theme-toggle-btn {
+        display: none;
+      }
+    }
   </style>
 </head>
 <body>
-  <button id="theme-toggle" class="theme-toggle-btn">テーマ切替</button>
+  <!-- デスクトップ用：テキスト付きボタン -->
+  <button id="theme-toggle-desktop" class="theme-toggle-btn">テーマ切替</button>
+  <!-- スマホ用：アイコンのみ -->
+  <div id="theme-toggle-mobile" class="theme-toggle">🌓</div>
+
   <div class="container">
     <h1>便利ツール集</h1>
     
@@ -195,7 +221,7 @@
           <div class="tool-text">
             <div class="tool-title">デジタル時計</div>
             <div class="tool-description">
-            日付、曜日と時刻を表示するデジタル時計。PinP機能付き
+              日付、曜日と時刻を表示するデジタル時計。PinP機能付き
             </div>
           </div>
         </a>
@@ -204,7 +230,7 @@
           <div class="tool-text">
             <div class="tool-title">アナログ時計</div>
             <div class="tool-description">
-            日付、曜日と時刻を表示するデジタル時計。PinP機能付き
+              日付、曜日と時刻を表示するデジタル時計。PinP機能付き
             </div>
           </div>
         </a>
@@ -217,7 +243,7 @@
             </div>
           </div>
         </a>
-       <a href="./webtimer.html" class="tool-card">
+        <a href="./webtimer.html" class="tool-card">
           <img src="webtimer.png" alt="タイマー" class="tool-image">
           <div class="tool-text">
             <div class="tool-title">タイマー</div>
@@ -226,7 +252,6 @@
             </div>
           </div>
         </a>
-
         <a href="./timer.html" class="tool-card">
           <img src="timer.png" alt="ポモドーロタイマー" class="tool-image">
           <div class="tool-text">
@@ -336,21 +361,36 @@
     }
     setFaviconDate();
 
-    // テーマ切替機能
-    const toggleBtn = document.getElementById('theme-toggle');
+    // テーマ切替処理を共通関数として定義
+    function toggleTheme() {
+      document.body.classList.toggle('dark-mode');
+      const theme = document.body.classList.contains('dark-mode') ? 'dark' : 'light';
+      localStorage.setItem('theme', theme);
+      // デスクトップ用ボタンのテキスト更新（スマホ用はアイコンのみ）
+      const desktopToggle = document.getElementById('theme-toggle-desktop');
+      if (desktopToggle) {
+        desktopToggle.textContent = theme === 'dark' ? 'ライトモードに切替' : 'ダークモードに切替';
+      }
+    }
+
+    // 初期テーマの適用
     const currentTheme = localStorage.getItem('theme');
     if (currentTheme === 'dark') {
       document.body.classList.add('dark-mode');
-      toggleBtn.textContent = 'ライトモードに切替';
+      const desktopToggle = document.getElementById('theme-toggle-desktop');
+      if (desktopToggle) {
+        desktopToggle.textContent = 'ライトモードに切替';
+      }
     } else {
-      toggleBtn.textContent = 'ダークモードに切替';
+      const desktopToggle = document.getElementById('theme-toggle-desktop');
+      if (desktopToggle) {
+        desktopToggle.textContent = 'ダークモードに切替';
+      }
     }
-    toggleBtn.addEventListener('click', () => {
-      document.body.classList.toggle('dark-mode');
-      let theme = document.body.classList.contains('dark-mode') ? 'dark' : 'light';
-      toggleBtn.textContent = theme === 'dark' ? 'ライトモードに切替' : 'ダークモードに切替';
-      localStorage.setItem('theme', theme);
-    });
+
+    // イベントリスナーの設定（デスクトップ・スマホ両方）
+    document.getElementById('theme-toggle-desktop').addEventListener('click', toggleTheme);
+    document.getElementById('theme-toggle-mobile').addEventListener('click', toggleTheme);
   </script>
 </body>
 </html>
