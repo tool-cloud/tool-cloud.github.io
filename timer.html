@@ -94,6 +94,9 @@
     const pipVideo = document.getElementById("pipVideo");
     const ctx = pipCanvas.getContext("2d");
     
+    // グローバルな AudioContext を作成（ユーザー操作後に開始）
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    
     // 音量設定（初期値 0.5）
     let volumeLevel = 0.5;
     const volumeSlider = document.getElementById("volumeSlider");
@@ -108,19 +111,18 @@
       playNotificationSound();
     });
     
-    // Web Audio API で通知音を生成
+    // Web Audio API で通知音を生成（グローバルな AudioContext を使用）
     function playNotificationSound() {
-      const context = new (window.AudioContext || window.webkitAudioContext)();
-      const oscillator = context.createOscillator();
-      const gainNode = context.createGain();
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
       oscillator.connect(gainNode);
-      gainNode.connect(context.destination);
+      gainNode.connect(audioContext.destination);
       
       gainNode.gain.value = volumeLevel; // 現在の音量
       oscillator.type = "sine";
       oscillator.frequency.value = 1000; // 1kHzの音
       oscillator.start();
-      oscillator.stop(context.currentTime + 0.2); // 0.2秒再生
+      oscillator.stop(audioContext.currentTime + 0.2); // 0.2秒再生
     }
     
     function updateTimer() {
