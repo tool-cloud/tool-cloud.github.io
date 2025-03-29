@@ -97,8 +97,15 @@
     // 音量設定（初期値 0.5）
     let volumeLevel = 0.5;
     const volumeSlider = document.getElementById("volumeSlider");
+    
+    // ドラッグ中は音量更新のみ
     volumeSlider.addEventListener("input", (e) => {
       volumeLevel = parseFloat(e.target.value);
+    });
+    
+    // ドラッグ終了（変更確定）時にサンプル音を再生
+    volumeSlider.addEventListener("change", () => {
+      playNotificationSound();
     });
     
     // Web Audio API で通知音を生成
@@ -109,7 +116,7 @@
       oscillator.connect(gainNode);
       gainNode.connect(context.destination);
       
-      gainNode.gain.value = volumeLevel; // スライダーで設定した音量
+      gainNode.gain.value = volumeLevel; // 現在の音量
       oscillator.type = "sine";
       oscillator.frequency.value = 1000; // 1kHzの音
       oscillator.start();
