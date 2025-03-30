@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="高度で使いやすいテキスト読み上げツール">
+  <meta name="theme-color" content="#2c7a7b">
+  <title>音声読み上げツール</title>
+  <style>
+    :root {
+      --primary-color: #2c7a7b;
+      --secondary-color: #3182ce;
+      --danger-color: #e53e3e;
+      --success-color: #48bb78;
+      --warning-color: #ecc94b;
+      --background-color: #f7fafc;
+      --text-color: #2d3748;
+      --card-bg: rgba(255, 255, 255, 0.1);
+      --border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --background-color: #1a202c;
+        --text-color: #e2e8f0;
+        --card-bg: rgba(255, 255, 255, 0.05);
+      }
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      margin: 0;
+      background-color: var(--background-color);
+      color: var(--text-color);
+      transition: background-color 0.3s ease;
+      background-image: radial-gradient(circle at 30% 20%, rgba(44, 122, 123, 0.1) 0%, transparent 40%),
+                       radial-gradient(circle at 70% 80%, rgba(49, 130, 206, 0.1) 0%, transparent 40%);
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 2rem auto;
+      padding: 2rem;
+      background: var(--card-bg);
+      backdrop-filter: blur(10px);
+      border-radius: 12px;
+      box-shadow: 0 4px 20px -5px rgba(0, 0, 0, 0.15);
+      border: 1px solid var(--border-color);
+    }
+    .feature-grid {
+      display: grid;
+      grid-template-columns: 1fr; /* 1列に設定 */
+      gap: 1rem;
+    }
+
+    .feature-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .feature-item svg {
+      flex-shrink: 0;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 2rem;
+      font-size: 2.2rem;
+      color: var(--primary-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .tab-container {
+      margin-bottom: 2rem;
+    }
+
+    .tab-buttons {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .tab-button {
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 6px 6px 0 0;
+      background: rgba(255, 255, 255, 0.05);
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .tab-button.active {
+      background: var(--primary-color);
+      color: white;
+    }
+
+    .tab-content {
+      display: none;
+      padding: 1.5rem;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 0 6px 6px 6px;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .input-section {
+      position: relative;
+      margin-bottom: 2rem;
+    }
+
+    textarea {
+      width: 100%;
+      height: 250px;
+      padding: 1.5rem;
+      border: 2px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 1.1rem;
+      line-height: 1.6;
+      resize: vertical;
+      transition: all 0.3s ease;
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-color);
+      box-sizing: border-box;
+    }
+
+    textarea:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(44, 122, 123, 0.2);
+    }
+
+    .highlight {
+      background-color: rgba(44, 122, 123, 0.2);
+      transition: all 0.2s ease;
+    }
+
+    .progress-container {
+      position: absolute;
+      bottom: 10px;
+      left: 0;
+      width: 100%;
+      height: 6px;
+      background: rgba(0, 0, 0, 0.05);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .progress-bar {
+      height: 100%;
+      background: var(--primary-color);
+      width: 0%;
+      transition: width 0.2s ease-out;
+    }
+
+    .text-stats {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 0.5rem;
+      font-size: 0.9rem;
+      color: #718096;
+      padding: 0.5rem;
+      background: rgba(0, 0, 0, 0.03);
+      border-radius: 4px;
+    }
+
+    .controls-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .control-group {
+      background: var(--card-bg);
+      padding: 1.5rem;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .control-group:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.1);
+    }
+
+    .slider-container label {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      height: 6px;
+      background: #e2e8f0;
+      border-radius: 3px;
+      -webkit-appearance: none;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 20px;
+      height: 20px;
+      background: var(--primary-color);
+      border-radius: 50%;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+
+    input[type="range"]:hover::-webkit-slider-thumb {
+      transform: scale(1.1);
+    }
+
+    .voice-select {
+      width: 100%;
+      padding: 0.75rem;
+      border-radius: 6px;
+      border: 1px solid #e2e8f0;
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-color);
+    }
+
+    .button-group {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    button {
+      padding: 0.8rem 1.5rem;
+      font-size: 1rem;
+      font-weight: 600;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    #speakButton { background: var(--primary-color); color: white; }
+    #speakButton:hover { background: #285e61; }
+    #pauseButton { background: var(--warning-color); color: #744210; }
+    #pauseButton:hover { background: #d6ad32; }
+    #stopButton { background: var(--danger-color); color: white; }
+    #stopButton:hover { background: #c53030; }
+    #bookmarkButton { background: var(--secondary-color); color: white; }
+    #bookmarkButton:hover { background: #2a69ac; }
+
+    .bookmark-item, .history-item {
+      padding: 0.5rem 1rem;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .bookmark-item:hover, .history-item:hover {
+      background: var(--primary-color);
+      color: white;
+    }
+
+    @media (max-width: 640px) {
+      .container { margin: 1rem; padding: 1.5rem; }
+      h1 { font-size: 1.8rem; }
+      textarea { height: 180px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>
+      <svg viewBox="0 0 24 24" width="32" height="32" fill="currentColor">
+        <path d="M15.536 3.464a5 5 0 0 1 0 7.072M18.364 5.636a8 8 0 0 1 0 11.314M5.636 5.636a8 8 0 0 0 0 11.314M8.464 3.464a5 5 0 0 0 0 7.072M13 17a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z"/>
+      </svg>
+      音声読み上げツール
+    </h1>
+
+<!-- ツールの説明 -->
+    <div class="description-section">
+      <p class="app-description">
+        <svg class="icon" viewBox="0 0 24 24" width="20" height="20">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+        </svg>
+        このツールは、入力したテキストを音声で読み上げる機能を提供します。以下に主な機能と使い方を説明します。
+      </p>
+      <div class="feature-grid">
+        <div class="feature-item">
+          <svg class="icon" viewBox="0 0 24 24" width="18" height="18">
+            <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/>
+          </svg>
+          <span style="font-weight: 500;">テキスト入力</span>：下のテキストエリアに読み上げたいテキストを入力してください。
+        </div>
+        <div class="feature-item">
+          <svg class="icon" viewBox="0 0 24 24" width="18" height="18">
+            <path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/>
+          </svg>
+          <span style="font-weight: 500;">音声設定</span>：速度、音の高さ、音量をスライダーで調整できます。
+        </div>
+        <div class="feature-item">
+          <svg class="icon" viewBox="0 0 24 24" width="18" height="18">
+            <path d="M8 5v14l11-7z"/>
+          </svg>
+          <span style="font-weight: 500;">再生</span>：再生ボタンを押すと、テキストの読み上げが開始されます。
+        </div>
+        <div class="feature-item">
+          <svg class="icon" viewBox="0 0 24 24" width="18" height="18">
+            <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+          </svg>
+          <span style="font-weight: 500;">一時停止/停止</span>：一時停止や停止ボタンで読み上げを制御できます。
+        </div>
+        <div class="feature-item">
+          <svg class="icon" viewBox="0 0 24 24" width="18" height="18">
+            <path d="M17 3H7c-1.1 0-1.99.9-1.99 2L5 21l7-3 7 3V5c0-1.1-.9-2-2-2z"/>
+          </svg>
+          <span style="font-weight: 500;">ブックマーク</span>：現在位置を保存し、後でその位置に素早く戻れます。
+        </div>
+        <div class="feature-item">
+          <svg class="icon" viewBox="0 0 24 24" width="18" height="18">
+            <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14zM8 15.02h3V19H8zm5 0h3V19h-3zm-5-5.01h3v1.5H8zm5 0h3v1.5h-3zM8 5h3v4H8zm5 0h3v4h-3z"/>
+          </svg>
+          <span style="font-weight: 500;">履歴</span>：過去に入力したテキストを保存し、再度利用できます。
+        </div>
+        <div class="feature-item">
+          <svg class="icon" viewBox="0 0 24 24" width="18" height="18">
+            <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+          </svg>
+          <span style="font-weight: 500;">読み上げ位置ハイライト</span>：読み上げ中のテキストがハイライトされます。
+        </div>
+        <div class="feature-item">
+          <svg class="icon" viewBox="0 0 24 24" width="18" height="18">
+            <path d="M20 12l-1.41-1.41L13 16.17V4h-2v12.17l-5.58-5.59L4 12l8 8 8-8z"/>
+          </svg>
+          <span style="font-weight: 500;">テキスト解析</span>：文字数と推定読み上げ時間が表示されます。
+        </div>
+        <div class="feature-item">
+          <svg class="icon" viewBox="0 0 24 24" width="18" height="18">
+            <path d="M20 18v-2h-4v-2h4V2h2v16h2v2h-6v-2h2zM4 4h10v2H4zm0 6h10v2H4zm0 6h10v2H4z"/>
+          </svg>
+          <span style="font-weight: 500;">キーボードショートカット</span>：Ctrl+Enterで再生/停止が可能です。
+        </div>
+      </div>
+    </div>
+      <p class="app-description">
+        <svg class="icon" viewBox="0 0 24 24" width="20" height="20">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+        </svg>
+        <span style="font-weight: 500;">商用利用（業務利用）が可能です。</span>
+        <br>
+        <span style="font-weight: 500;">実用的な推奨値：</span>
+        <br>
+        - 快適な動作：50,000文字以下
+        <br>
+        - 許容範囲：100,000文字以下
+      </p>
+    </div>
+
+    <!-- タブ -->
+    <div class="tab-container">
+      <div class="tab-buttons">
+        <button class="tab-button active" data-tab="editor">エディタ</button>
+        <button class="tab-button" data-tab="bookmarks">ブックマーク</button>
+        <button class="tab-button" data-tab="history">履歴</button>
+      </div>
+
+      <div class="tab-content active" id="editor-tab">
+        <div class="input-section">
+          <textarea id="textInput" placeholder="ここに読み上げたいテキストを入力..." aria-label="読み上げテキスト入力"></textarea>
+          <div class="progress-container">
+            <div class="progress-bar" id="progressBar"></div>
+          </div>
+          <div class="text-stats">
+            <span id="charCount">0文字</span>
+            <span id="timeEstimate">0秒</span>
+            <span id="progress">0%</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="tab-content" id="bookmarks-tab">
+        <p>ブックマークした位置に簡単に戻れます。</p>
+        <div id="bookmark-list"></div>
+      </div>
+
+      <div class="tab-content" id="history-tab">
+        <p>過去に読み上げたテキストを表示します。</p>
+        <div id="history-list"></div>
+      </div>
+    </div>
+
+    <!-- コントロール -->
+    <div class="controls-grid">
+      <div class="control-group">
+        <div class="slider-container">
+          <label for="rate">速度 <span id="rateValue">1.0</span></label>
+          <input type="range" id="rate" min="0.5" max="2" step="0.1" value="1" aria-label="読み上げ速度">
+        </div>
+        <div class="slider-container">
+          <label for="pitch">音程 <span id="pitchValue">1.0</span></label>
+          <input type="range" id="pitch" min="0" max="2" step="0.1" value="1" aria-label="音程調整">
+        </div>
+      </div>
+      <div class="control-group">
+        <div class="slider-container">
+          <label for="voiceSelect">音声</label>
+          <select id="voiceSelect" class="voice-select" aria-label="音声選択"></select>
+        </div>
+        <div class="slider-container">
+          <label for="volume">音量 <span id="volumeValue">1.0</span></label>
+          <input type="range" id="volume" min="0" max="1" step="0.1" value="1" aria-label="音量調整">
+        </div>
+      </div>
+    </div>
+
+    <!-- ボタン -->
+    <div class="button-group">
+      <button id="speakButton">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+          <path d="M8 5v14l11-7z"/>
+        </svg>
+        再生
+      </button>
+      <button id="pauseButton">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+          <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+        </svg>
+        一時停止
+      </button>
+      <button id="stopButton">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+          <path d="M6 6h12v12H6z"/>
+        </svg>
+        停止
+      </button>
+      <button id="bookmarkButton">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+          <path d="M17 3H7c-1.1 0-1.99.9-1.99 2L5 21l7-3 7 3V5c0-1.1-.9-2-2-2z"/>
+        </svg>
+        ブックマーク
+      </button>
+    </div>
+  </div>
+
+  <script>
+    const elements = {
+      textInput: document.getElementById('textInput'),
+      speakButton: document.getElementById('speakButton'),
+      pauseButton: document.getElementById('pauseButton'),
+      stopButton: document.getElementById('stopButton'),
+      bookmarkButton: document.getElementById('bookmarkButton'),
+      rate: document.getElementById('rate'),
+      pitch: document.getElementById('pitch'),
+      volume: document.getElementById('volume'),
+      voiceSelect: document.getElementById('voiceSelect'),
+      rateValue: document.getElementById('rateValue'),
+      pitchValue: document.getElementById('pitchValue'),
+      volumeValue: document.getElementById('volumeValue'),
+      progressBar: document.getElementById('progressBar'),
+      charCount: document.getElementById('charCount'),
+      timeEstimate: document.getElementById('timeEstimate'),
+      progress: document.getElementById('progress'),
+      bookmarkList: document.getElementById('bookmark-list'),
+      historyList: document.getElementById('history-list'),
+      tabButtons: document.querySelectorAll('.tab-button'),
+      tabContents: document.querySelectorAll('.tab-content')
+    };
+
+    let utterance = null;
+    let voices = [];
+    let currentPosition = 0;
+    let bookmarks = [];
+    let history = [];
+
+    // 音声合成の初期化
+    function loadVoices() {
+      voices = speechSynthesis.getVoices();
+      elements.voiceSelect.innerHTML = voices.map(voice => 
+        `<option value="${voice.name}">${voice.name} (${voice.lang})</option>`
+      ).join('');
+    }
+    speechSynthesis.onvoiceschanged = loadVoices;
+    loadVoices();
+
+    // テキスト解析
+    elements.textInput.addEventListener('input', () => {
+      const text = elements.textInput.value;
+      const rate = parseFloat(elements.rate.value);
+      const charCount = text.length;
+      const estimatedTime = Math.round((charCount / 200) * (1 / rate) * 60); // 200文字/分を基準に速度を考慮
+      elements.charCount.textContent = `${charCount}文字`;
+      elements.timeEstimate.textContent = `${estimatedTime}秒`;
+    });
+
+    // 再生
+    elements.speakButton.addEventListener('click', () => {
+      if (speechSynthesis.speaking && !speechSynthesis.paused) {
+        speechSynthesis.pause();
+      } else {
+        utterance = new SpeechSynthesisUtterance(elements.textInput.value);
+        utterance.rate = parseFloat(elements.rate.value);
+        utterance.pitch = parseFloat(elements.pitch.value);
+        utterance.volume = parseFloat(elements.volume.value);
+        const selectedVoice = voices.find(v => v.name === elements.voiceSelect.value);
+        if (selectedVoice) utterance.voice = selectedVoice;
+
+        utterance.onboundary = (event) => {
+          currentPosition = event.charIndex;
+          const progress = (currentPosition / elements.textInput.value.length) * 100;
+          elements.progressBar.style.width = `${progress}%`;
+          elements.progress.textContent = `${Math.round(progress)}%`;
+          elements.textInput.setSelectionRange(currentPosition, currentPosition + 1);
+        };
+
+        speechSynthesis.speak(utterance);
+        history.push(elements.textInput.value);
+        updateHistory();
+      }
+    });
+
+    // 一時停止
+    elements.pauseButton.addEventListener('click', () => {
+      if (speechSynthesis.paused) speechSynthesis.resume();
+      else speechSynthesis.pause();
+    });
+
+    // 停止
+    elements.stopButton.addEventListener('click', () => {
+      speechSynthesis.cancel();
+      elements.progressBar.style.width = '0%';
+      elements.progress.textContent = '0%';
+    });
+
+    // ブックマーク
+    elements.bookmarkButton.addEventListener('click', () => {
+      bookmarks.push(currentPosition);
+      updateBookmarks();
+    });
+
+    // スライダー値の更新
+    [elements.rate, elements.pitch, elements.volume].forEach(slider => {
+      slider.addEventListener('input', () => {
+        elements[`${slider.id}Value`].textContent = slider.value;
+      });
+    });
+
+    // タブ切り替え
+    elements.tabButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        elements.tabButtons.forEach(btn => btn.classList.remove('active'));
+        elements.tabContents.forEach(content => content.classList.remove('active'));
+        button.classList.add('active');
+        document.getElementById(`${button.dataset.tab}-tab`).classList.add('active');
+      });
+    });
+
+    // ブックマークと履歴の更新
+    function updateBookmarks() {
+      elements.bookmarkList.innerHTML = bookmarks.map(pos => 
+        `<div class="bookmark-item" onclick="elements.textInput.setSelectionRange(${pos}, ${pos})">${pos}</div>`
+      ).join('') || 'ブックマークなし';
+    }
+
+    function updateHistory() {
+      elements.historyList.innerHTML = history.map((text, i) => 
+        `<div class="history-item" onclick="elements.textInput.value = '${text}'">${text.slice(0, 20)}...</div>`
+      ).join('') || '履歴なし';
+    }
+
+    // キーボードショートカット
+    document.addEventListener('keydown', (e) => {
+      if (e.ctrlKey && e.key === 'Enter') {
+        if (speechSynthesis.speaking) {
+          speechSynthesis.cancel();
+        } else {
+          elements.speakButton.click();
+        }
+      }
+    });
+  </script>
+</body>
+</html>
