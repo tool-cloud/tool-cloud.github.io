@@ -57,7 +57,7 @@
       padding: 10px;
       transition: background-color 0.3s, color 0.3s;
     }
-    /* ヘッダー（固定表示は解除、スマホでもタイトルは1行表示） */
+    /* ヘッダー：固定表示は解除し、スマホでもタイトルは1行表示 */
     header {
       width: 100%;
       padding: 10px 20px;
@@ -66,12 +66,11 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      /* 横書きに固定 */
       writing-mode: horizontal-tb;
     }
     header h1 {
       font-size: 1.4rem;
-      white-space: nowrap; /* スマホでも改行させない */
+      white-space: nowrap; /* 改行させない */
       overflow: hidden;
       text-overflow: ellipsis;
     }
@@ -86,7 +85,7 @@
       font-weight: bold;
       white-space: nowrap;
     }
-    /* モード切替：アイコンのみ */
+    /* モード切替：指定通り <div class="theme-toggle">🌓</div> */
     .theme-toggle {
       cursor: pointer;
       font-size: 1.8rem;
@@ -98,9 +97,10 @@
     .theme-toggle:hover {
       background-color: rgba(0,0,0,0.05);
     }
-    /* メインコンテンツ */
+    /* メインコンテンツ：ヘッダーと被らないように余白追加 */
     main {
       padding: 0 20px;
+      margin-top: 20px;
     }
     /* セクション見出し */
     h2 {
@@ -119,7 +119,7 @@
       gap: 15px;
       margin-bottom: 40px;
     }
-    /* 上段のツールカード：枠あり */
+    /* 上段のツールカード（枠あり、ホバー時に上に移動） */
     .tool-card {
       display: flex;
       flex-direction: row;
@@ -129,12 +129,13 @@
       color: inherit;
       border: 1px solid #ccc;
       border-radius: 8px;
-      transition: background-color 0.2s;
+      transition: transform 0.2s, background-color 0.2s;
     }
     .tool-card:hover {
+      transform: translateY(-3px);
       background-color: rgba(0,0,0,0.03);
     }
-    /* 下段（「その他」セクション）のツールカード：枠なし */
+    /* 下段（「その他」セクション）のツールカード：初期は枠なし */
     .tool-card.no-border {
       border: none;
       padding: 10px 0;
@@ -159,18 +160,17 @@
       font-size: 0.95rem;
       line-height: 1.4;
     }
-    /* 下段のツール説明：読点「、」で改行 */
+    /* 下段のツール説明：読点「、」ごとに改行（JavaScriptで自動挿入します） */
     .tool-description.break-at-comma {
       white-space: pre-wrap;
     }
-    /* フッター */
+    /* フッター：横並びに収まるように */
     footer {
       text-align: center;
       padding: 20px;
       border-top: 1px solid #ccc;
       margin-top: 40px;
       font-size: 0.9rem;
-      /* 横並びに収まるように */
       white-space: nowrap;
       overflow-x: auto;
     }
@@ -179,7 +179,7 @@
       gap: 10px;
       align-items: center;
     }
-    /* 追加情報 */
+    /* 追加情報：枠なし */
     .info-section {
       padding: 15px;
       margin: 20px 0;
@@ -330,11 +330,11 @@
       </div>
     </section>
     
-    <!-- 下段：その他（ツールカードは枠なし、説明文は読点で改行） -->
+    <!-- 下段：その他（枠ありのカード：ファイア予測、TODOリスト、月の生活費計算、テキスト読み上げ） -->
     <section id="other-tools">
       <h2>その他</h2>
       <div class="tool-list">
-        <a href="./fire.html" class="tool-card no-border">
+        <a href="./fire.html" class="tool-card">
           <img src="fire.png" alt="FIRE予測～DIE WITH ZERO～" class="tool-image">
           <div class="tool-text">
             <div class="tool-title">FIRE予測～DIE WITH ZERO～</div>
@@ -343,7 +343,7 @@
             </div>
           </div>
         </a>
-        <a href="./todo_b.html" class="tool-card no-border">
+        <a href="./todo_b.html" class="tool-card">
           <img src="todo.png" alt="TODOリスト" class="tool-image">
           <div class="tool-text">
             <div class="tool-title">TODOリスト</div>
@@ -352,7 +352,7 @@
             </div>
           </div>
         </a>
-        <a href="./cost.html" class="tool-card no-border">
+        <a href="./cost.html" class="tool-card">
           <img src="cost.png" alt="月の生活費計算" class="tool-image">
           <div class="tool-text">
             <div class="tool-title">月の生活費計算</div>
@@ -361,7 +361,7 @@
             </div>
           </div>
         </a>
-        <a href="./read.html" class="tool-card no-border">
+        <a href="./read.html" class="tool-card">
           <img src="read.png" alt="テキスト読み上げ" class="tool-image">
           <div class="tool-text">
             <div class="tool-title">テキスト読み上げ</div>
@@ -373,7 +373,7 @@
       </div>
     </section>
     
-    <!-- 追加情報 -->
+    <!-- 追加情報（枠なし） -->
     <section class="info-section">
       <p>各ツールはすべて無料でご利用いただけます。今後も便利なツールを随時追加予定です。ご意見・ご要望はお問い合わせページよりお知らせください。</p>
     </section>
@@ -390,17 +390,23 @@
   </footer>
   
   <script>
+    // テーマ切替処理
     document.addEventListener('DOMContentLoaded', function () {
       const themeToggle = document.getElementById('theme-toggle');
-      // 初期テーマ（localStorage から取得、なければ "light"）
       const savedTheme = localStorage.getItem('theme') || 'light';
       document.body.setAttribute('data-theme', savedTheme);
-      // モード切替のクリックイベント
+      
       themeToggle.addEventListener('click', function () {
         const currentTheme = document.body.getAttribute('data-theme');
         const newTheme = currentTheme === 'light' ? 'dark' : 'light';
         document.body.setAttribute('data-theme', newTheme);
         localStorage.setItem('theme', newTheme);
+      });
+      
+      // 下段のツール説明内で「。」ごとに改行を入れる
+      document.querySelectorAll('.break-at-comma').forEach(function(elem) {
+        // 既に <br> が入っていない場合のみ処理
+        elem.innerHTML = elem.innerHTML.replace(/。/g, "、<br>");
       });
     });
   </script>
