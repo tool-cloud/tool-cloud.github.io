@@ -5,8 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="google-site-verification" content="HS009yaXdkFBD7o-i6UjSnYj9v4HdYxJzNLgCylRPRE" />
   <meta name="google-adsense-account" content="ca-pub-8536456976562388">
-  <title>便利ツール集</title>
-  <link rel="icon" id="dynamic-favicon" type="image/png">
+  <title>スマートツール・コネクト</title>
+  <!-- 丸みを帯びたファビコンを両方設定 -->
+  <link rel="icon" id="rounded-favicon" type="image/png">
+  <link rel="shortcut icon" id="rounded-shortcut-icon" type="image/png">
   <style>
     /* カラーテーマ用CSS変数 */
     :root {
@@ -32,143 +34,213 @@
       background-color: var(--bg-color);
       color: var(--text-color);
       margin: 0;
-      padding: 10px;
+      padding: 20px;
       transition: background-color 0.3s, color 0.3s;
     }
     .container {
       max-width: 1200px;
       margin: 0 auto;
     }
-    h1 {
-      text-align: center;
-      margin-bottom: 20px;
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background-color: var(--card-bg);
+      border-bottom: 2px solid var(--border-color);
+      padding: 10px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 1000;
+    }
+    /* タイトルの文字サイズを少し小さくし、幅の制限を解除 */
+    header h1 {
+      margin: 0;
+      font-size: 1.4em;
       color: var(--heading-color);
-      font-size: 1.2em;
+      /* 最大幅の指定を削除して全文表示 */
+      white-space: normal;
+    }
+    nav {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+    nav a {
+      text-decoration: none;
+      color: var(--link-color);
+      font-weight: bold;
+    }
+    /* テーマ切替スイッチとそのラベル */
+    .theme-container {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .theme-label {
+      font-size: 0.9em;
+      color: var(--text-color);
+    }
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 50px;
+      height: 26px;
+    }
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: var(--border-color);
+      transition: 0.4s;
+      border-radius: 34px;
+    }
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 20px;
+      width: 20px;
+      left: 3px;
+      bottom: 3px;
+      background-color: var(--card-bg);
+      transition: 0.4s;
+      border-radius: 50%;
+    }
+    input:checked + .slider {
+      background-color: var(--link-color);
+    }
+    input:checked + .slider:before {
+      transform: translateX(24px);
+    }
+    /* 固定ヘッダーの影響を避けるためのマージン */
+    main {
+      margin-top: 100px;
+    }
+    section {
+      margin-bottom: 40px;
+      scroll-margin-top: 110px;
     }
     h2 {
       color: var(--heading-color);
       margin: 20px 0 10px;
-      border-bottom: 1px solid var(--border-color);
-      padding-bottom: 3px;
-      font-size: 1.2em;
+      padding: 10px;
+      font-size: 1.3em;
+      /* 半透明な背景で、固定ヘッダー下でも見えるように */
+      background-color: rgba(248, 243, 236, 0.9);
     }
-    /* グリッドレイアウト：デフォルトで2列固定 */
+    .dark-mode h2 {
+      background-color: rgba(30, 30, 30, 0.9);
+    }
+    /* レスポンシブなグリッドレイアウト */
     .tool-list {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 10px;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
     }
     /* カード共通スタイル */
     .tool-card {
       display: flex;
+      flex-direction: row;
       align-items: center;
       background-color: var(--card-bg);
       border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.08);
-      padding: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      padding: 15px;
       text-decoration: none;
       color: var(--text-color);
-      transition: transform 0.2s;
-      text-align: left;
-      overflow: hidden;
+      transition: transform 0.2s, box-shadow 0.2s;
     }
     .tool-card:hover {
       transform: translateY(-3px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     }
     /* 画像部分 */
     .tool-image {
       flex-shrink: 0;
-      width: 50px;
-      height: 50px;
-      margin-right: 10px;
+      width: 60px;
+      height: 60px;
+      margin-right: 15px;
       object-fit: cover;
-      border-radius: 6px;
+      border-radius: 8px;
     }
     /* テキスト部分 */
     .tool-text {
       flex: 1;
-      font-size: 0.9em;
+      font-size: 1em;
     }
     .tool-title {
-      font-size: 1.1em;
-      margin-bottom: 5px;
+      font-size: 1.2em;
+      margin-bottom: 8px;
+      font-weight: bold;
     }
     .tool-description {
-      line-height: 1.3;
+      line-height: 1.4;
     }
     /* フッター */
-    .footer-links {
-      position: fixed;
-      right: 10px;
-      bottom: 10px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-    .footer-links a {
-      text-decoration: none;
-      color: var(--link-color);
-      font-size: 12px;
-    }
-    /* スマホ用：1列表示 */
-    @media (max-width: 768px) {
-      .tool-list {
-        grid-template-columns: 1fr;
-      }
-      .footer-links {
-        position: static;
-        text-align: center;
-        margin-top: 20px;
-      }
-    }
-    /* テーマ切替ボタン：デスクトップ用 */
-    .theme-toggle-btn {
-      position: fixed;
-      top: 10px;
-      right: 10px;
-      padding: 6px 10px;
-      border: none;
-      border-radius: 4px;
-      background-color: var(--card-bg);
-      color: var(--text-color);
-      cursor: pointer;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.15);
-      transition: background-color 0.3s, color 0.3s;
+    footer {
+      text-align: center;
+      padding: 20px 0;
+      border-top: 2px solid var(--border-color);
+      margin-top: 40px;
       font-size: 0.9em;
     }
-    /* テーマ切替ボタン：スマホ用（アイコン表示） */
-    .theme-toggle {
-      display: none; /* デフォルトは非表示 */
+    footer a {
+      text-decoration: none;
+      color: var(--link-color);
+      margin: 0 10px;
+    }
+    /* 追加情報セクション（ユーザーに親切な情報提供） */
+    .info-section {
+      background-color: var(--card-bg);
+      padding: 15px;
+      margin: 20px 0;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      font-size: 0.9em;
+      line-height: 1.5;
     }
     @media (max-width: 768px) {
-      .theme-toggle {
-        display: block;
-        position: fixed;
-        top: 10px;
-        right: 10px;
-        padding: 6px 10px;
-        background-color: var(--card-bg);
-        color: var(--text-color);
-        cursor: pointer;
-        border-radius: 4px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.15);
-        font-size: 0.9em;
+      header {
+        flex-direction: column;
+        align-items: flex-start;
       }
-      .theme-toggle-btn {
-        display: none;
+      nav {
+        margin-top: 10px;
+        flex-wrap: wrap;
+        gap: 10px;
       }
     }
   </style>
 </head>
 <body>
-  <!-- デスクトップ用：テキスト付きボタン -->
-  <button id="theme-toggle-desktop" class="theme-toggle-btn">テーマ切替</button>
-  <!-- スマホ用：アイコンのみ -->
-  <div id="theme-toggle-mobile" class="theme-toggle">🌓</div>
+  <header>
+    <h1>スマートツール・コネクト</h1>
+    <nav>
+      <a href="https://tool-cloud.github.io/blog/">ブログ</a>
+      <a href="about.html">運営者情報</a>
+      <a href="privacy-policy.html">プライバシーポリシー</a>
+      <a href="contact.html">お問い合わせ</a>
+      <a href="contact.html#request" style="color:#e67e22;">ツールリクエスト</a>
+      <div class="theme-container">
+        <span class="theme-label">テーマ切替</span>
+        <label class="switch">
+          <input type="checkbox" id="theme-toggle-checkbox">
+          <span class="slider"></span>
+        </label>
+      </div>
+    </nav>
+  </header>
 
-  <div class="container">
-    <h1>便利ツール集</h1>
-    
+  <main class="container">
     <!-- 計算ツール -->
     <section id="calculation-tools">
       <h2>計算ツール</h2>
@@ -178,7 +250,8 @@
           <div class="tool-text">
             <div class="tool-title">関数電卓</div>
             <div class="tool-description">
-              基本演算に加え、括弧、三角関数（sin, cos, tan）、自然対数（ln）、常用対数（log）、平方根（√）、べき乗（^）、定数π、定数eを実装。<br>現在の式とリアルタイム計算結果を同時に表示
+              基本演算に加え、括弧、三角関数（sin, cos, tan）、自然対数（ln）、常用対数（log）、平方根（√）、べき乗（^）、定数π、定数eを実装。<br>
+              現在の式とリアルタイム計算結果を同時に表示
             </div>
           </div>
         </a>
@@ -191,7 +264,6 @@
             </div>
           </div>
         </a>
-
         <a href="./condenser.html" class="tool-card">
           <img src="condenser.png" alt="コンデンサ容量計算" class="tool-image">
           <div class="tool-text">
@@ -206,7 +278,7 @@
           <div class="tool-text">
             <div class="tool-title">抵抗値計算</div>
             <div class="tool-description">
-              抵抗値を表す3桁または4桁のEIAコードを入力することでで抵抗値をリアルタイム算出。
+              抵抗値を表す3桁または4桁のEIAコードを入力することで抵抗値をリアルタイム算出。
             </div>
           </div>
         </a>
@@ -262,7 +334,7 @@
             </div>
           </div>
         </a>
-         <a href="./metoro.html" class="tool-card">
+        <a href="./metoro.html" class="tool-card">
           <img src="metoro.png" alt="メトロノーム" class="tool-image">
           <div class="tool-text">
             <div class="tool-title">メトロノーム</div>
@@ -283,7 +355,9 @@
           <div class="tool-text">
             <div class="tool-title">低音強調ピンクノイズ</div>
             <div class="tool-description">
-              低音強調のピンクノイズで周囲の雑音をマスキング。<br>ランダムゆらぎでリラックス感UP<br>ホワイトノイズより耳に優しく、長時間聞いても疲れにくい。
+              低音強調のピンクノイズで周囲の雑音をマスキング。<br>
+              ランダムゆらぎでリラックス感UP<br>
+              ホワイトノイズより耳に優しく、長時間聞いても疲れにくい。
             </div>
           </div>
         </a>
@@ -308,7 +382,7 @@
           <div class="tool-text">
             <div class="tool-title">FIRE予測～DIE WITH ZERO～</div>
             <div class="tool-description">
-              総資産がゼロになるまでの期間をシミュレーション（最大80年）<br>
+              総資産がゼロになるまでの期間をシミュレーション（最大80年）
             </div>
           </div>
         </a>
@@ -335,82 +409,79 @@
           <div class="tool-text">
             <div class="tool-title">テキスト読み上げ</div>
             <div class="tool-description">
-ハイライト機能付きテキストの読み上げ。音声の種類、速度、音程の調整。文字数解析/読み上げ時間予測。商用利用可能。
+              ハイライト機能付きテキストの読み上げ。音声の種類、速度、音程の調整。文字数解析/読み上げ時間予測。商用利用可能。
             </div>
           </div>
         </a>
-
       </div>
     </section>
     
-    <!-- 追加情報 -->
-    <div class="additional-info" style="margin:10px 0; font-size:0.9em;">
-      <h2>その他の情報</h2>
-      <ul>
-        <li>ファビコン(ブラウザのタブに表示される小さな画像)は本日の日付です。</li>
-        <li>各ツールは無料でご利用いただけます。</li>
-        <li>今後も便利なツールを追加予定です。</li>
-        <li>リクエストやご意見はお問い合わせページからお願いします。</li>
-      </ul>
-    </div>
-  </div>
+    <!-- 追加情報（ユーザーへの案内） -->
+    <section class="info-section">
+      <p>各ツールはすべて無料でご利用いただけます。今後も便利なツールを随時追加予定です。ご意見・ご要望はお問い合わせページよりお知らせください。</p>
+    </section>
+  </main>
 
-  <!-- フッターリンク -->
-  <div class="footer-links">
-    <a href="https://tool-cloud.github.io/blog/">ブログ</a>
-    <a href="about.html">運営者情報</a>
-    <a href="privacy-policy.html">プライバシーポリシー</a>
-    <a href="contact.html">お問い合わせ</a>
-  </div>
+  <footer>
+    <p>&copy; 2025 スマートツール・コネクト. All rights reserved.</p>
+    <nav>
+      <a href="https://tool-cloud.github.io/blog/">ブログ</a> |
+      <a href="about.html">運営者情報</a> |
+      <a href="privacy-policy.html">プライバシーポリシー</a> |
+      <a href="contact.html">お問い合わせ</a>
+    </nav>
+  </footer>
 
   <script>
-    // ファビコンに本日の日付を設定
-    function setFaviconDate() {
-      const today = new Date();
-      const dayString = today.getDate().toString();
-      const canvas = document.createElement("canvas");
-      canvas.width = 64;
-      canvas.height = 64;
-      const ctx = canvas.getContext("2d");
-      ctx.fillStyle = "white";
-      ctx.fillRect(0, 0, 64, 64);
-      ctx.fillStyle = "black";
-      ctx.font = "bold 40px Arial";
-      ctx.fillText(dayString, 10, 50);
-      document.getElementById("dynamic-favicon").href = canvas.toDataURL("image/png");
-    }
-    setFaviconDate();
-
-    // テーマ切替処理を共通関数として定義
-    function toggleTheme() {
-      document.body.classList.toggle('dark-mode');
-      const theme = document.body.classList.contains('dark-mode') ? 'dark' : 'light';
-      localStorage.setItem('theme', theme);
-      // デスクトップ用ボタンのテキスト更新（スマホ用はアイコンのみ）
-      const desktopToggle = document.getElementById('theme-toggle-desktop');
-      if (desktopToggle) {
-        desktopToggle.textContent = theme === 'dark' ? 'ライトモードに切替' : 'ダークモードに切替';
+    // ファビコンを丸みを帯びた形に加工して設定する関数（icon, shortcut icon両方）
+    function setRoundedFavicon() {
+      const img = new Image();
+      img.src = "favicon.png";
+      img.crossOrigin = "anonymous"; // 必要に応じて
+      img.onload = function() {
+        const canvas = document.createElement("canvas");
+        const size = 64;
+        canvas.width = size;
+        canvas.height = size;
+        const ctx = canvas.getContext("2d");
+        
+        const radius = 12;
+        ctx.beginPath();
+        ctx.moveTo(radius, 0);
+        ctx.lineTo(size - radius, 0);
+        ctx.quadraticCurveTo(size, 0, size, radius);
+        ctx.lineTo(size, size - radius);
+        ctx.quadraticCurveTo(size, size, size - radius, size);
+        ctx.lineTo(radius, size);
+        ctx.quadraticCurveTo(0, size, 0, size - radius);
+        ctx.lineTo(0, radius);
+        ctx.quadraticCurveTo(0, 0, radius, 0);
+        ctx.closePath();
+        ctx.clip();
+        
+        ctx.drawImage(img, 0, 0, size, size);
+        const dataURL = canvas.toDataURL("image/png");
+        document.getElementById("rounded-favicon").href = dataURL;
+        document.getElementById("rounded-shortcut-icon").href = dataURL;
       }
     }
+    setRoundedFavicon();
 
+    // テーマ切替処理（チェックボックスの切替でライト⇔ダーク）
+    const themeToggleCheckbox = document.getElementById("theme-toggle-checkbox");
+    themeToggleCheckbox.addEventListener("change", function() {
+      if (this.checked) {
+        document.body.classList.add("dark-mode");
+      } else {
+        document.body.classList.remove("dark-mode");
+      }
+      localStorage.setItem("theme", document.body.classList.contains("dark-mode") ? "dark" : "light");
+    });
     // 初期テーマの適用
-    const currentTheme = localStorage.getItem('theme');
-    if (currentTheme === 'dark') {
-      document.body.classList.add('dark-mode');
-      const desktopToggle = document.getElementById('theme-toggle-desktop');
-      if (desktopToggle) {
-        desktopToggle.textContent = 'ライトモードに切替';
-      }
-    } else {
-      const desktopToggle = document.getElementById('theme-toggle-desktop');
-      if (desktopToggle) {
-        desktopToggle.textContent = 'ダークモードに切替';
-      }
+    if (localStorage.getItem("theme") === "dark") {
+      document.body.classList.add("dark-mode");
+      themeToggleCheckbox.checked = true;
     }
-
-    // イベントリスナーの設定（デスクトップ・スマホ両方）
-    document.getElementById('theme-toggle-desktop').addEventListener('click', toggleTheme);
-    document.getElementById('theme-toggle-mobile').addEventListener('click', toggleTheme);
   </script>
 </body>
 </html>
