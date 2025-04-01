@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>スマートツール・コネクト</title>
-  <!-- ファビコンは透過部分を含む画像で、丸みのある見た目にしてください -->
+  <!-- ファビコンは透過部分を含む画像（例：favicon.png）をご用意ください -->
   <link rel="icon" href="favicon.png" type="image/png">
   <style>
     /* リセット */
@@ -13,20 +13,18 @@
       padding: 0;
       box-sizing: border-box;
     }
-    
     /* カラーテーマ用変数 */
     :root {
       --bg-light: #ffffff;
       --text-light: #333333;
-      --bg-card-light: #f8f3ec;
+      --card-light: #f8f3ec;
       --link-light: #4a90e2;
       
       --bg-dark: #1e1e1e;
       --text-dark: #cccccc;
-      --bg-card-dark: #2e2e2e;
+      --card-dark: #2e2e2e;
       --link-dark: #8ab4f8;
     }
-    
     /* 初期テーマ：ライト */
     body[data-theme="light"] {
       background-color: var(--bg-light);
@@ -35,12 +33,11 @@
     body[data-theme="light"] header,
     body[data-theme="light"] nav,
     body[data-theme="light"] footer {
-      background-color: var(--bg-card-light);
+      background-color: var(--card-light);
     }
     body[data-theme="light"] a {
       color: var(--link-light);
     }
-    
     /* ダークテーマ */
     body[data-theme="dark"] {
       background-color: var(--bg-dark);
@@ -49,20 +46,18 @@
     body[data-theme="dark"] header,
     body[data-theme="dark"] nav,
     body[data-theme="dark"] footer {
-      background-color: var(--bg-card-dark);
+      background-color: var(--card-dark);
     }
     body[data-theme="dark"] a {
       color: var(--link-dark);
     }
-    
     body {
       font-family: Arial, sans-serif;
       line-height: 1.6;
       padding: 10px;
       transition: background-color 0.3s, color 0.3s;
     }
-    
-    /* ヘッダー：固定表示は解除し、横並びのレイアウト */
+    /* ヘッダー（固定表示は解除、スマホでもタイトルは1行表示） */
     header {
       width: 100%;
       padding: 10px 20px;
@@ -71,12 +66,14 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      /* ヘッダー内のテキストが縦書きにならないように */
+      /* 横書きに固定 */
       writing-mode: horizontal-tb;
     }
     header h1 {
       font-size: 1.4rem;
-      white-space: normal;
+      white-space: nowrap; /* スマホでも改行させない */
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     nav {
       display: flex;
@@ -89,34 +86,22 @@
       font-weight: bold;
       white-space: nowrap;
     }
-    
-    /* モード切替ボタン（モードアイコン風） */
-    #theme-toggle {
-      background-color: transparent;
-      border: none;
+    /* モード切替：アイコンのみ */
+    .theme-toggle {
       cursor: pointer;
+      font-size: 1.8rem;
+      user-select: none;
       padding: 5px;
       border-radius: 50%;
-      width: 40px;
-      height: 40px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
       transition: background-color 0.3s;
     }
-    #theme-toggle:hover {
+    .theme-toggle:hover {
       background-color: rgba(0,0,0,0.05);
     }
-    #theme-icon {
-      width: 24px;
-      height: 24px;
-    }
-    
     /* メインコンテンツ */
     main {
       padding: 0 20px;
     }
-    
     /* セクション見出し */
     h2 {
       font-size: 1.3rem;
@@ -127,7 +112,6 @@
     body[data-theme="dark"] h2 {
       background-color: rgba(30, 30, 30, 0.9);
     }
-    
     /* ツール一覧：グリッドレイアウト */
     .tool-list {
       display: grid;
@@ -135,8 +119,7 @@
       gap: 15px;
       margin-bottom: 40px;
     }
-    
-    /* ツールカード： 枠なし、テキストは読点で改行 */
+    /* 上段のツールカード：枠あり */
     .tool-card {
       display: flex;
       flex-direction: row;
@@ -144,9 +127,17 @@
       padding: 10px;
       text-decoration: none;
       color: inherit;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      transition: background-color 0.2s;
     }
     .tool-card:hover {
       background-color: rgba(0,0,0,0.03);
+    }
+    /* 下段（「その他」セクション）のツールカード：枠なし */
+    .tool-card.no-border {
+      border: none;
+      padding: 10px 0;
     }
     .tool-image {
       width: 60px;
@@ -158,7 +149,6 @@
     .tool-text {
       flex: 1;
       font-size: 1rem;
-      /* 改行は読点で行うため、手動で<br>タグを入れる */
     }
     .tool-title {
       font-size: 1.1rem;
@@ -169,7 +159,10 @@
       font-size: 0.95rem;
       line-height: 1.4;
     }
-    
+    /* 下段のツール説明：読点「、」で改行 */
+    .tool-description.break-at-comma {
+      white-space: pre-wrap;
+    }
     /* フッター */
     footer {
       text-align: center;
@@ -177,6 +170,7 @@
       border-top: 1px solid #ccc;
       margin-top: 40px;
       font-size: 0.9rem;
+      /* 横並びに収まるように */
       white-space: nowrap;
       overflow-x: auto;
     }
@@ -185,16 +179,14 @@
       gap: 10px;
       align-items: center;
     }
-    
-    /* 追加情報（ユーザー案内） */
+    /* 追加情報 */
     .info-section {
       padding: 15px;
       margin: 20px 0;
       font-size: 0.9rem;
       line-height: 1.5;
     }
-    
-    /* レスポンシブ調整：スマホ用 */
+    /* レスポンシブ調整 */
     @media (max-width: 768px) {
       header h1 {
         font-size: 1.2rem;
@@ -202,9 +194,8 @@
       nav a {
         font-size: 0.9rem;
       }
-      #theme-icon {
-        width: 20px;
-        height: 20px;
+      .theme-toggle {
+        font-size: 1.6rem;
       }
       .tool-text {
         font-size: 0.9rem;
@@ -230,14 +221,12 @@
       <a href="privacy-policy.html">プライバシーポリシー</a>
       <a href="contact.html">お問い合わせ</a>
       <a href="contact.html#request" style="color:#e67e22;">ツールリクエスト</a>
-      <button id="theme-toggle" aria-label="テーマ切替">
-        <img id="theme-icon" src="sun-icon.png" alt="ライトモード">
-      </button>
+      <div class="theme-toggle" id="theme-toggle">🌓</div>
     </nav>
   </header>
   
   <main>
-    <!-- 計算ツール -->
+    <!-- 上段：計算ツール、時計ツールなど（枠あり） -->
     <section id="calculation-tools">
       <h2>計算ツール</h2>
       <div class="tool-list">
@@ -246,9 +235,7 @@
           <div class="tool-text">
             <div class="tool-title">関数電卓</div>
             <div class="tool-description">
-              基本演算に加え、括弧、三角関数（sin, cos, tan）、<br>
-              自然対数（ln）、常用対数（log）、平方根（√）、<br>
-              べき乗（^）、定数π、定数eを実装。<br>
+              基本演算に加え、括弧、三角関数（sin, cos, tan）、自然対数（ln）、常用対数（log）、平方根（√）、べき乗（^）、定数π、定数eを実装。<br>
               現在の式とリアルタイム計算結果を同時に表示。
             </div>
           </div>
@@ -267,9 +254,7 @@
           <div class="tool-text">
             <div class="tool-title">コンデンサ容量計算</div>
             <div class="tool-description">
-              静電容量値を表す3桁の数字を入力することで、<br>
-              3種類の単位で容量値をリアルタイム算出、<br>
-              末尾のアルファベット入力で誤差も表示。
+              静電容量値を表す3桁の数字を入力することで、3種類の単位で容量値をリアルタイム算出、末尾のアルファベット入力で誤差も表示。
             </div>
           </div>
         </a>
@@ -278,15 +263,13 @@
           <div class="tool-text">
             <div class="tool-title">抵抗値計算</div>
             <div class="tool-description">
-              抵抗値を表す3桁または4桁のEIAコードを入力することで、<br>
-              抵抗値をリアルタイム算出。
+              抵抗値を表す3桁または4桁のEIAコードを入力することで、抵抗値をリアルタイム算出。
             </div>
           </div>
         </a>
       </div>
     </section>
     
-    <!-- 時計ツール -->
     <section id="clock-tools">
       <h2>時計ツール</h2>
       <div class="tool-list">
@@ -295,8 +278,7 @@
           <div class="tool-text">
             <div class="tool-title">デジタル時計</div>
             <div class="tool-description">
-              日付、曜日と時刻を表示するデジタル時計、<br>
-              PinP機能付き。
+              日付、曜日と時刻を表示するデジタル時計、PinP機能付き。
             </div>
           </div>
         </a>
@@ -305,8 +287,7 @@
           <div class="tool-text">
             <div class="tool-title">アナログ時計</div>
             <div class="tool-description">
-              日付、曜日と時刻を表示するデジタル時計、<br>
-              PinP機能付き。
+              日付、曜日と時刻を表示するデジタル時計、PinP機能付き。
             </div>
           </div>
         </a>
@@ -324,8 +305,7 @@
           <div class="tool-text">
             <div class="tool-title">タイマー</div>
             <div class="tool-description">
-              時、分、秒をカスタム設定、<br>
-              繰り返し、アラーム設定可能。
+              時、分、秒をカスタム設定、繰り返し、アラーム設定可能。
             </div>
           </div>
         </a>
@@ -334,8 +314,7 @@
           <div class="tool-text">
             <div class="tool-title">ポモドーロタイマー</div>
             <div class="tool-description">
-              25分作業＋5分休憩のサイクルで生産性向上、<br>
-              PinP機能付き、サイクル切り替え時のアラーム付き。
+              25分作業＋5分休憩のサイクルで生産性向上、PinP機能付き、サイクル切り替え時のアラーム付き。
             </div>
           </div>
         </a>
@@ -344,37 +323,50 @@
           <div class="tool-text">
             <div class="tool-title">メトロノーム</div>
             <div class="tool-description">
-              タップテンポ、プリセットBPM、音量調整、<br>
-              音色の選択が可能。
+              タップテンポ、プリセットBPM、音量調整、音色の選択が可能。
             </div>
           </div>
         </a>
       </div>
     </section>
     
-    <!-- リラクゼーション -->
-    <section id="relaxation-tools">
-      <h2>リラクゼーション</h2>
+    <!-- 下段：その他（ツールカードは枠なし、説明文は読点で改行） -->
+    <section id="other-tools">
+      <h2>その他</h2>
       <div class="tool-list">
-        <a href="./white.html" class="tool-card">
-          <img src="white.png" alt="低音強調ピンクノイズ" class="tool-image">
+        <a href="./fire.html" class="tool-card no-border">
+          <img src="fire.png" alt="FIRE予測～DIE WITH ZERO～" class="tool-image">
           <div class="tool-text">
-            <div class="tool-title">低音強調ピンクノイズ</div>
-            <div class="tool-description">
-              低音強調のピンクノイズで周囲の雑音をマスキング、<br>
-              ランダムゆらぎでリラックス感UP、<br>
-              ホワイトノイズより耳に優しく、長時間聞いても疲れにくい。
+            <div class="tool-title">FIRE予測～DIE WITH ZERO～</div>
+            <div class="tool-description break-at-comma">
+              総資産がゼロになるまでの期間をシミュレーション（最大80年）
             </div>
           </div>
         </a>
-        <a href="./relax.html" class="tool-card">
-          <img src="relax.png" alt="瞑想リラックス音楽" class="tool-image">
+        <a href="./todo_b.html" class="tool-card no-border">
+          <img src="todo.png" alt="TODOリスト" class="tool-image">
           <div class="tool-text">
-            <div class="tool-title">瞑想リラックス音楽</div>
-            <div class="tool-description">
-              アルファ波促進のリラックス音楽、<br>
-              432Hz、528Hz、10Hzバイノーラルビートを使用、<br>
-              ストレス軽減、心の安定に効果的。
+            <div class="tool-title">TODOリスト</div>
+            <div class="tool-description break-at-comma">
+              シンプルなタスク管理ツールで、やるべきことを可視化。
+            </div>
+          </div>
+        </a>
+        <a href="./cost.html" class="tool-card no-border">
+          <img src="cost.png" alt="月の生活費計算" class="tool-image">
+          <div class="tool-text">
+            <div class="tool-title">月の生活費計算</div>
+            <div class="tool-description break-at-comma">
+              生活費を入力して、合計金額や年間支出を自動計算、家計見直しに役立ちます。
+            </div>
+          </div>
+        </a>
+        <a href="./read.html" class="tool-card no-border">
+          <img src="read.png" alt="テキスト読み上げ" class="tool-image">
+          <div class="tool-text">
+            <div class="tool-title">テキスト読み上げ</div>
+            <div class="tool-description break-at-comma">
+              ハイライト機能付きテキストの読み上げ、音声の種類、速度、音程の調整、文字数解析／読み上げ時間予測、商用利用可能。
             </div>
           </div>
         </a>
@@ -400,31 +392,16 @@
   <script>
     document.addEventListener('DOMContentLoaded', function () {
       const themeToggle = document.getElementById('theme-toggle');
-      const themeIcon = document.getElementById('theme-icon');
-      // 初期テーマの設定（localStorage から読み込み）
+      // 初期テーマ（localStorage から取得、なければ "light"）
       const savedTheme = localStorage.getItem('theme') || 'light';
       document.body.setAttribute('data-theme', savedTheme);
-      updateThemeIcon(savedTheme);
-      
+      // モード切替のクリックイベント
       themeToggle.addEventListener('click', function () {
         const currentTheme = document.body.getAttribute('data-theme');
         const newTheme = currentTheme === 'light' ? 'dark' : 'light';
         document.body.setAttribute('data-theme', newTheme);
         localStorage.setItem('theme', newTheme);
-        updateThemeIcon(newTheme);
       });
-      
-      function updateThemeIcon(theme) {
-        if (theme === 'light') {
-          // 太陽アイコン（オレンジ）
-          themeIcon.src = 'sun-icon.png';
-          themeIcon.alt = 'ライトモード';
-        } else {
-          // 月アイコン（黒っぽいグレー）
-          themeIcon.src = 'moon-icon.png';
-          themeIcon.alt = 'ダークモード';
-        }
-      }
     });
   </script>
 </body>
