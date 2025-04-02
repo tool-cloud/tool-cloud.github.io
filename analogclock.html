@@ -18,8 +18,8 @@
     }
     .clock-container {
       position: relative;
-      width: 90vmin;
-      height: 90vmin;
+      width: 95vmin;
+      height: 95vmin;
       border: 8px solid #333;
       border-radius: 50%;
       box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
@@ -37,25 +37,24 @@
       background: #333;
       top: 50%;
       left: 50%;
-      transform-origin: 100%;
-      transform: rotate(90deg);
+      transform-origin: 0% 50%;
       transition: all 0.05s ease-in-out;
     }
     .hour-hand {
       width: 25%;
       height: 6px;
-      margin-left: -25%;
+      margin-top: -3px;
     }
     .minute-hand {
       width: 35%;
       height: 4px;
-      margin-left: -35%;
+      margin-top: -2px;
     }
     .second-hand {
       width: 40%;
       height: 2px;
       background: red;
-      margin-left: -40%;
+      margin-top: -1px;
     }
     .center-dot {
       position: absolute;
@@ -66,6 +65,7 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
+      z-index: 10;
     }
     .date-display {
       position: absolute;
@@ -75,36 +75,57 @@
       white-space: nowrap;
     }
     #date-year {
-      top: 25%;
+      top: 30%;
       left: 50%;
       transform: translateX(-50%);
-      font-size: 6vmin;
+      font-size: 5vmin;
     }
     #date-mdw {
-      bottom: 25%;
+      bottom: 30%;
       left: 50%;
       transform: translateX(-50%);
-      font-size: 6vmin;
+      font-size: 5vmin;
     }
     /* DOM側に表示する時計の数字用 */
     .number {
       position: absolute;
       text-align: center;
-      font-size: 8vmin;
+      font-size: 7vmin;
       font-weight: bold;
       color: #333;
       transform: translate(-50%, -50%);
     }
     /* PinPボタン */
     #pipButton {
-      margin-top: 20px;
-      padding: 10px 20px;
-      font-size: 1.2em;
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      padding: 8px 16px;
+      font-size: 1em;
       cursor: pointer;
+      border: none;
+      border-radius: 5px;
+      background-color: #333;
+      color: #fff;
+      transition: background-color 0.3s;
+      z-index: 100;
+    }
+    #pipButton:hover {
+      background-color: #555;
     }
     /* 非表示のcanvas */
     #clockCanvas {
       display: none;
+    }
+    /* デジタル時計表示 */
+    #digital-time {
+      position: absolute;
+      top: 40%;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 4vmin;
+      color: #333;
+      font-weight: bold;
     }
   </style>
 </head>
@@ -118,6 +139,7 @@
       <div class="center-dot"></div>
       <div class="date-display" id="date-year"></div>
       <div class="date-display" id="date-mdw"></div>
+      <div id="digital-time"></div>
     </div>
   </div>
   <!-- PinP用ボタン -->
@@ -133,6 +155,7 @@
     const dateYearElem = document.getElementById('date-year');
     const dateMdwElem = document.getElementById('date-mdw');
     const clockFace = document.getElementById('clock-face');
+    const digitalTime = document.getElementById('digital-time');
     
     // canvas関係
     const canvas = document.getElementById('clockCanvas');
@@ -154,12 +177,26 @@
       const minutes = now.getMinutes();
       const hours = now.getHours();
       
-      secondHand.style.transform = `rotate(${((seconds / 60) * 360) + 90}deg)`;
-      minuteHand.style.transform = `rotate(${((minutes / 60) * 360) + ((seconds / 60) * 6) + 90}deg)`;
-      hourHand.style.transform = `rotate(${(((hours % 12) / 12) * 360) + ((minutes / 60) * 30) + 90}deg)`;
+      // 針の回転角度を計算
+      const secondDeg = (seconds / 60) * 360;
+      const minuteDeg = ((minutes / 60) * 360) + ((seconds / 60) * 6);
+      const hourDeg = (((hours % 12) / 12) * 360) + ((minutes / 60) * 30);
+      
+      secondHand.style.transform = `translateX(0%) rotate(${secondDeg}deg)`;
+      minuteHand.style.transform = `translateX(0%) rotate(${minuteDeg}deg)`;
+      hourHand.style.transform = `translateX(0%) rotate(${hourDeg}deg)`;
 
       dateYearElem.textContent = now.getFullYear() + "年";
-      dateMdwElem.textContent = now.toLocaleDateString('ja-JP', { month: 'long', day: 'numeric', weekday: 'long' });
+      // 日付と曜日を個別に取得、曜日は短縮形にして括弧付きに変更
+      const dateStr = now.toLocaleDateString('ja-JP', { month: 'long', day: 'numeric' });
+      const weekdayStr = now.toLocaleDateString('ja-JP', { weekday: 'short' });
+      dateMdwElem.textContent = dateStr + "(" + weekdayStr + ")";
+      
+      // デジタル時間表示を更新
+      const formattedHours = hours.toString().padStart(2, '0');
+      const formattedMinutes = minutes.toString().padStart(2, '0');
+      const formattedSeconds = seconds.toString().padStart(2, '0');
+      digitalTime.textContent = `${formattedHours}:${formattedMinutes}:${formattedSeconds}`;
     }
     
     // canvas上にアナログ時計を描画（数字・針・日付）
@@ -186,15 +223,15 @@
       ctx.strokeStyle = "#333";
       ctx.stroke();
       
-      // 数字を描画
+      // 数字を描画 - 円周に沿って配置
       ctx.fillStyle = "#333";
       ctx.font = "bold 24px sans-serif";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
       for (let num = 1; num <= 12; num++) {
         const ang = num * Math.PI / 6;
-        const x = cx + Math.sin(ang) * (radius * 0.8);
-        const y = cy - Math.cos(ang) * (radius * 0.8);
+        const x = cx + Math.sin(ang) * (radius * 0.85);
+        const y = cy - Math.cos(ang) * (radius * 0.85);
         ctx.fillText(num.toString(), x, y);
       }
       
@@ -238,9 +275,16 @@
       ctx.textAlign = "center";
       // 上部: 年
       ctx.fillText(now.getFullYear() + "年", cx, cy - radius * 0.5);
-      // 下部: 月日＋曜日
-      const options = { month: 'long', day: 'numeric', weekday: 'long' };
-      ctx.fillText(now.toLocaleDateString('ja-JP', options), cx, cy + radius * 0.5);
+      // 下部: 月日＋曜日（曜日は短縮形で括弧付き）
+      const dateStr = now.toLocaleDateString('ja-JP', { month: 'long', day: 'numeric' });
+      const weekdayStr = now.toLocaleDateString('ja-JP', { weekday: 'short' });
+      ctx.fillText(dateStr + "(" + weekdayStr + ")", cx, cy + radius * 0.5);
+      
+      // デジタル時間表示
+      const formattedHours = hr.toString().padStart(2, '0');
+      const formattedMinutes = min.toString().padStart(2, '0');
+      const formattedSeconds = sec.toString().padStart(2, '0');
+      ctx.fillText(`${formattedHours}:${formattedMinutes}:${formattedSeconds}`, cx, cy * 0.8);
     }
     
     // DOMとcanvas両方の時計を更新する関数
@@ -255,8 +299,9 @@
       if (clockFace.querySelectorAll('.number').length > 0) return;
       for (let i = 1; i <= 12; i++) {
         const angle = (i * 30) * (Math.PI / 180);
-        const x = 50 + 40 * Math.sin(angle);
-        const y = 50 - 40 * Math.cos(angle);
+        // 円周に沿って配置するため、半径を大きくする
+        const x = 50 + 43 * Math.sin(angle);
+        const y = 50 - 43 * Math.cos(angle);
         const numberElement = document.createElement('div');
         numberElement.className = 'number';
         numberElement.style.left = `${x}%`;
