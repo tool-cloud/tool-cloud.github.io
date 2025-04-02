@@ -95,6 +95,40 @@
       .tool-description { font-size: 0.85rem; }
       footer { font-size: 0.8rem; }
     }
+ /* 追加スタイル */
+  .custom-list {
+    list-style-type: none;
+    padding-left: 1.2em;
+  }
+
+  .custom-list li {
+    position: relative;
+    margin-bottom: 8px;
+    line-height: 1.5;
+    display: flex;
+    align-items: baseline;
+  }
+
+  .custom-list li::before {
+    content: "・";
+    position: absolute;
+    left: -1.2em;
+    font-weight: bold;
+    color: #666;
+  }
+
+  @media (max-width: 768px) {
+    .custom-list li {
+      display: block;
+      text-indent: -1.2em;
+      padding-left: 1.2em;
+    }
+    
+    .custom-list li::before {
+      position: static;
+      margin-right: 0.5em;
+    }
+  }
   </style>
 </head>
 <body data-theme="light">
@@ -259,8 +293,12 @@
     </section>
 
     <section class="info-section">
-      <p>各ツールはすべて無料でご利用いただけます。<br>今後も便利なツールを随時追加予定です。<br>ご意見・ご要望はお問い合わせページよりお知らせください。</p>
-    </section>
+  <ul class="custom-list">
+    <li>各ツールはすべて無料でご利用いただけます</li>
+    <li>今後も便利なツールを随時追加予定です</li>
+    <li>ご意見・ご要望はお問い合わせページよりお知らせください</li>
+  </ul>
+</section>
   </main>
 
   <footer>
