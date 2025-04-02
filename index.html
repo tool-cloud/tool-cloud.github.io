@@ -4,211 +4,96 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>スマートツール・コネクト</title>
-  <!-- ファビコンは透過部分を含む画像（例：favicon.png）をご用意ください -->
   <link rel="icon" href="favicon.png" type="image/png">
   <style>
-    /* リセット */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    /* カラーテーマ用変数 */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
     :root {
-      --bg-light: #ffffff;
-      --text-light: #333333;
-      --card-light: #f8f3ec;
-      --link-light: #4a90e2;
-      
-      --bg-dark: #1e1e1e;
-      --text-dark: #cccccc;
-      --card-dark: #2e2e2e;
-      --link-dark: #8ab4f8;
+      --bg-light: #ffffff; --text-light: #333333; --card-light: #f8f3ec; --link-light: #4a90e2;
+      --bg-dark: #1e1e1e; --text-dark: #cccccc; --card-dark: #2e2e2e; --link-dark: #8ab4f8;
     }
-    /* 初期テーマ：ライト */
+
     body[data-theme="light"] {
-      background-color: var(--bg-light);
-      color: var(--text-light);
+      background-color: var(--bg-light); color: var(--text-light);
     }
-    body[data-theme="light"] header,
-    body[data-theme="light"] nav,
-    body[data-theme="light"] footer {
+    body[data-theme="light"] header, body[data-theme="light"] nav, body[data-theme="light"] footer {
       background-color: var(--card-light);
     }
-    body[data-theme="light"] a {
-      color: var(--link-light);
-    }
-    /* ダークテーマ */
+    body[data-theme="light"] a { color: var(--link-light); }
+
     body[data-theme="dark"] {
-      background-color: var(--bg-dark);
-      color: var(--text-dark);
+      background-color: var(--bg-dark); color: var(--text-dark);
     }
-    body[data-theme="dark"] header,
-    body[data-theme="dark"] nav,
-    body[data-theme="dark"] footer {
+    body[data-theme="dark"] header, body[data-theme="dark"] nav, body[data-theme="dark"] footer {
       background-color: var(--card-dark);
     }
-    body[data-theme="dark"] a {
-      color: var(--link-dark);
-    }
+    body[data-theme="dark"] a { color: var(--link-dark); }
+
     body {
-      font-family: Arial, sans-serif;
-      line-height: 1.6;
-      padding: 10px;
+      font-family: Arial, sans-serif; line-height: 1.6; padding: 10px;
       transition: background-color 0.3s, color 0.3s;
     }
-    /* ヘッダー：固定表示は解除し、スマホでもタイトルは1行表示 */
+
     header {
-      width: 100%;
-      padding: 10px 20px;
-      border-bottom: 1px solid #ccc;
-      margin-bottom: 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      writing-mode: horizontal-tb;
+      width: 100%; padding: 10px 20px; border-bottom: 1px solid #ccc;
+      margin-bottom: 20px; display: flex; justify-content: space-between;
+      align-items: center; writing-mode: horizontal-tb;
     }
-    header h1 {
-      font-size: 1.4rem;
-      white-space: nowrap; /* 改行させない */
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    nav {
-      display: flex;
-      align-items: center;
-      gap: 15px;
-      flex-wrap: wrap;
-    }
-    nav a {
-      text-decoration: none;
-      font-weight: bold;
-      white-space: nowrap;
-    }
-    /* モード切替：指定通り <div class="theme-toggle">🌓</div> */
+
+    header h1 { font-size: 1.4rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    nav { display: flex; align-items: center; gap: 15px; flex-wrap: wrap; }
+    nav a { text-decoration: none; font-weight: bold; white-space: nowrap; }
+
     .theme-toggle {
-      cursor: pointer;
-      font-size: 1.8rem;
-      user-select: none;
-      padding: 5px;
-      border-radius: 50%;
-      transition: background-color 0.3s;
+      cursor: pointer; font-size: 1.8rem; user-select: none;
+      padding: 5px; border-radius: 50%; transition: background-color 0.3s;
     }
-    .theme-toggle:hover {
-      background-color: rgba(0,0,0,0.05);
-    }
-    /* メインコンテンツ：ヘッダーと被らないように余白追加 */
-    main {
-      padding: 0 20px;
-      margin-top: 20px;
-    }
-    /* セクション見出し */
-    h2 {
-      font-size: 1.3rem;
-      margin: 20px 0 10px;
-      padding: 10px;
-      background-color: rgba(248, 243, 236, 0.9);
-    }
-    body[data-theme="dark"] h2 {
-      background-color: rgba(30, 30, 30, 0.9);
-    }
-    /* ツール一覧：グリッドレイアウト */
+    .theme-toggle:hover { background-color: rgba(0,0,0,0.05); }
+
+    main { padding: 0 20px; margin-top: 20px; }
+    h2 { font-size: 1.3rem; margin: 20px 0 10px; padding: 10px; background-color: rgba(248, 243, 236, 0.9); }
+    body[data-theme="dark"] h2 { background-color: rgba(30, 30, 30, 0.9); }
+
     .tool-list {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 15px;
-      margin-bottom: 40px;
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 15px; margin-bottom: 40px;
     }
-    /* 上段のツールカード（枠あり、ホバー時に上に移動） */
+
     .tool-card {
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      padding: 10px;
-      text-decoration: none;
-      color: inherit;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      transition: transform 0.2s, background-color 0.2s;
+      display: flex; flex-direction: row; align-items: center; padding: 10px;
+      text-decoration: none; color: inherit; border: 1px solid #ccc;
+      border-radius: 8px; transition: transform 0.2s, background-color 0.2s;
     }
-    .tool-card:hover {
-      transform: translateY(-3px);
-      background-color: rgba(0,0,0,0.03);
-    }
-    /* 下段（「その他」セクション）のツールカード：初期は枠なし */
-    .tool-card.no-border {
-      border: none;
-      padding: 10px 0;
-    }
-    .tool-image {
-      width: 60px;
-      height: 60px;
-      object-fit: cover;
-      border-radius: 8px;
-      margin-right: 10px;
-    }
-    .tool-text {
-      flex: 1;
-      font-size: 1rem;
-    }
-    .tool-title {
-      font-size: 1.1rem;
-      font-weight: bold;
-      margin-bottom: 5px;
-    }
-    .tool-description {
-      font-size: 0.95rem;
-      line-height: 1.4;
-    }
-    /* 下段のツール説明：読点「、」ごとに改行（JavaScriptで自動挿入します） */
-    .tool-description.break-at-comma {
-      white-space: pre-wrap;
-    }
-    /* フッター：横並びに収まるように */
+    .tool-card:hover { transform: translateY(-3px); background-color: rgba(0,0,0,0.03); }
+    .tool-card.no-border { border: none; padding: 10px 0; }
+
+    .tool-image { width: 60px; height: 60px; object-fit: cover; border-radius: 8px; margin-right: 10px; }
+    .tool-text { flex: 1; font-size: 1rem; }
+    .tool-title { font-size: 1.1rem; font-weight: bold; margin-bottom: 5px; }
+    .tool-description { font-size: 0.95rem; line-height: 1.4; }
+    .tool-description.break-at-comma { white-space: pre-line; }
+
     footer {
-      text-align: center;
-      padding: 20px;
-      border-top: 1px solid #ccc;
-      margin-top: 40px;
-      font-size: 0.9rem;
-      white-space: nowrap;
-      overflow-x: auto;
+      text-align: center; padding: 20px; border-top: 1px solid #ccc;
+      margin-top: 40px; font-size: 0.9rem; white-space: nowrap; overflow-x: auto;
     }
-    footer nav {
-      display: inline-flex;
-      gap: 10px;
-      align-items: center;
-    }
-    /* 追加情報：枠なし */
-    .info-section {
-      padding: 15px;
-      margin: 20px 0;
-      font-size: 0.9rem;
-      line-height: 1.5;
-    }
-    /* レスポンシブ調整 */
+    footer nav { display: inline-flex; gap: 10px; align-items: center; }
+
+    .info-section { padding: 15px; margin: 20px 0; font-size: 0.9rem; line-height: 1.5; }
+
     @media (max-width: 768px) {
+      header { flex-wrap: wrap; padding: 10px; }
       header h1 {
-        font-size: 1.2rem;
+        width: 100%; text-align: center; margin-bottom: 10px;
+        overflow: visible; white-space: normal; font-size: 1.4rem;
       }
-      nav a {
-        font-size: 0.9rem;
-      }
-      .theme-toggle {
-        font-size: 1.6rem;
-      }
-      .tool-text {
-        font-size: 0.9rem;
-      }
-      .tool-title {
-        font-size: 1rem;
-      }
-      .tool-description {
-        font-size: 0.85rem;
-      }
-      footer {
-        font-size: 0.8rem;
-      }
+      nav { width: 100%; justify-content: center; gap: 10px; overflow-x: auto; padding-bottom: 5px; }
+      nav a { flex-shrink: 0; }
+      .theme-toggle { font-size: 1.6rem; }
+      .tool-text { font-size: 0.9rem; }
+      .tool-title { font-size: 1rem; }
+      .tool-description { font-size: 0.85rem; }
+      footer { font-size: 0.8rem; }
     }
   </style>
 </head>
@@ -224,10 +109,10 @@
       <div class="theme-toggle" id="theme-toggle">🌓</div>
     </nav>
   </header>
-  
+
   <main>
-    <!-- 上段：計算ツール、時計ツールなど（枠あり） -->
-    <section id="calculation-tools">
+    <!-- 各ツールセクション（実際のコンテンツは変更可能） -->
+   <section id="calculation-tools">
       <h2>計算ツール</h2>
       <div class="tool-list">
         <a href="./calculator.html" class="tool-card">
@@ -372,13 +257,12 @@
         </a>
       </div>
     </section>
-    
-    <!-- 追加情報（枠なし） -->
+
     <section class="info-section">
-      <p>各ツールはすべて無料でご利用いただけます。今後も便利なツールを随時追加予定です。ご意見・ご要望はお問い合わせページよりお知らせください。</p>
+      <p>各ツールはすべて無料でご利用いただけます。<br>今後も便利なツールを随時追加予定です。<br>ご意見・ご要望はお問い合わせページよりお知らせください。</p>
     </section>
   </main>
-  
+
   <footer>
     <p>&copy; 2025 スマートツール・コネクト. All rights reserved.</p>
     <nav>
@@ -388,24 +272,23 @@
       <a href="contact.html">お問い合わせ</a>
     </nav>
   </footer>
-  
+
   <script>
-    // テーマ切替処理
     document.addEventListener('DOMContentLoaded', function () {
+      // テーマ切替機能
       const themeToggle = document.getElementById('theme-toggle');
       const savedTheme = localStorage.getItem('theme') || 'light';
       document.body.setAttribute('data-theme', savedTheme);
-      
+
       themeToggle.addEventListener('click', function () {
         const currentTheme = document.body.getAttribute('data-theme');
         const newTheme = currentTheme === 'light' ? 'dark' : 'light';
         document.body.setAttribute('data-theme', newTheme);
         localStorage.setItem('theme', newTheme);
       });
-      
-      // 下段のツール説明内で「。」ごとに改行を入れる
+
+      // 説明文のフォーマット調整
       document.querySelectorAll('.break-at-comma').forEach(function(elem) {
-        // 既に <br> が入っていない場合のみ処理
         elem.innerHTML = elem.innerHTML.replace(/。/g, "、<br>");
       });
     });
