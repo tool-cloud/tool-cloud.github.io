@@ -7,80 +7,125 @@
   <link rel="icon" href="favicon.ico" type="image/icon">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-
+    
     :root {
       --bg-light: #ffffff; --text-light: #333333; --card-light: #f8f3ec; --link-light: #4a90e2;
       --bg-dark: #1e1e1e; --text-dark: #cccccc; --card-dark: #2e2e2e; --link-dark: #8ab4f8;
+      --hover-bg: rgba(0,0,0,0.05);
+      --separator-color: #ccc;
+      --ad-space-width: 200px;
     }
-
+    
     body[data-theme="light"] {
       background-color: var(--bg-light); color: var(--text-light);
     }
-    body[data-theme="light"] header, body[data-theme="light"] nav, body[data-theme="light"] footer {
+    body[data-theme="light"] header, 
+    body[data-theme="light"] nav, 
+    body[data-theme="light"] footer {
       background-color: var(--card-light);
     }
     body[data-theme="light"] a { color: var(--link-light); }
-
+    
     body[data-theme="dark"] {
       background-color: var(--bg-dark); color: var(--text-dark);
     }
-    body[data-theme="dark"] header, body[data-theme="dark"] nav, body[data-theme="dark"] footer {
+    body[data-theme="dark"] header, 
+    body[data-theme="dark"] nav, 
+    body[data-theme="dark"] footer {
       background-color: var(--card-dark);
     }
     body[data-theme="dark"] a { color: var(--link-dark); }
-
+    
     body {
-      font-family: Arial, sans-serif; line-height: 1.6; padding: 10px;
+      font-family: Arial, sans-serif; line-height: 1.6;
       transition: background-color 0.3s, color 0.3s;
     }
-
-    header {
-      width: 100%; padding: 10px 20px; border-bottom: 1px solid #ccc;
-      margin-bottom: 20px; display: flex; justify-content: space-between;
-      align-items: center; writing-mode: horizontal-tb;
+    
+    /* コンテナ設定：PCでは左右に広告スペース（空白）を確保 */
+    .container {
+      display: flex;
+      justify-content: center;
     }
-
+    .ad-space {
+      flex: 0 0 var(--ad-space-width);
+    }
+    /* スマホ時は非表示 */
+    @media (max-width: 1024px) {
+      .ad-space { display: none; }
+    }
+    .content {
+      flex: 1;
+      max-width: 1200px;
+    }
+    
+    header {
+      width: 100%; padding: 10px 20px; border-bottom: 1px solid var(--separator-color);
+      margin-bottom: 20px; display: flex; justify-content: space-between;
+      align-items: center;
+    }
+    
     header h1 { font-size: 1.4rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     nav { display: flex; align-items: center; gap: 15px; flex-wrap: wrap; }
-    nav a { text-decoration: none; font-weight: bold; white-space: nowrap; }
-
+    nav a {
+      text-decoration: none; font-weight: bold; white-space: nowrap;
+      padding: 5px 8px; border-radius: 4px;
+      transition: background-color 0.2s;
+    }
+    /* ヘッダーリンク hover時に背景色変更 */
+    header nav a:hover { background-color: var(--hover-bg); }
+    
+    /* footer内リンク：間に仕切り線を表示 */
+    footer nav a {
+      text-decoration: none; padding: 5px 8px;
+      position: relative;
+    }
+    footer nav a:not(:last-child)::after {
+      content: "";
+      position: absolute;
+      right: -10px;
+      top: 50%;
+      transform: translateY(-50%);
+      border-right: 1px solid var(--separator-color);
+      height: 16px;
+    }
+    
     .theme-toggle {
       cursor: pointer; font-size: 1.8rem; user-select: none;
       padding: 5px; border-radius: 50%; transition: background-color 0.3s;
     }
-    .theme-toggle:hover { background-color: rgba(0,0,0,0.05); }
-
+    .theme-toggle:hover { background-color: var(--hover-bg); }
+    
     main { padding: 0 20px; margin-top: 20px; }
     h2 { font-size: 1.3rem; margin: 20px 0 10px; padding: 10px; background-color: rgba(248, 243, 236, 0.9); }
     body[data-theme="dark"] h2 { background-color: rgba(30, 30, 30, 0.9); }
-
+    
     .tool-list {
       display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
       gap: 15px; margin-bottom: 40px;
     }
-
+    
     .tool-card {
       display: flex; flex-direction: row; align-items: center; padding: 10px;
-      text-decoration: none; color: inherit; border: 1px solid #ccc;
+      text-decoration: none; color: inherit; border: 1px solid var(--separator-color);
       border-radius: 8px; transition: transform 0.2s, background-color 0.2s;
     }
     .tool-card:hover { transform: translateY(-3px); background-color: rgba(0,0,0,0.03); }
     .tool-card.no-border { border: none; padding: 10px 0; }
-
+    
     .tool-image { width: 60px; height: 60px; object-fit: cover; border-radius: 8px; margin-right: 10px; }
     .tool-text { flex: 1; font-size: 1rem; }
     .tool-title { font-size: 1.1rem; font-weight: bold; margin-bottom: 5px; }
     .tool-description { font-size: 0.95rem; line-height: 1.4; }
     .tool-description.break-at-comma { white-space: pre-line; }
-
+    
     footer {
-      text-align: center; padding: 20px; border-top: 1px solid #ccc;
-      margin-top: 40px; font-size: 0.9rem; white-space: nowrap; overflow-x: auto;
+      text-align: center; padding: 20px; border-top: 1px solid var(--separator-color);
+      margin-top: 40px; font-size: 0.9rem;
     }
     footer nav { display: inline-flex; gap: 10px; align-items: center; }
-
+    
     .info-section { padding: 15px; margin: 20px 0; font-size: 0.9rem; line-height: 1.5; }
-
+    
     @media (max-width: 768px) {
       header { flex-wrap: wrap; padding: 10px; }
       header h1 {
@@ -95,239 +140,356 @@
       .tool-description { font-size: 0.85rem; }
       footer { font-size: 0.8rem; }
     }
- /* 追加スタイル */
-  .custom-list {
-    list-style-type: none;
-    padding-left: 1.2em;
-  }
-
-  .custom-list li {
-    position: relative;
-    margin-bottom: 8px;
-    line-height: 1.5;
-    display: flex;
-    align-items: baseline;
-  }
-
-  .custom-list li::before {
-    content: "・";
-    position: absolute;
-    left: -1.2em;
-    font-weight: bold;
-    color: #666;
-  }
-
-  @media (max-width: 768px) {
-    .custom-list li {
-      display: block;
-      text-indent: -1.2em;
+    
+    /* 追加スタイル */
+    .custom-list {
+      list-style-type: none;
       padding-left: 1.2em;
     }
-    
-    .custom-list li::before {
-      position: static;
-      margin-right: 0.5em;
+    .custom-list li {
+      position: relative;
+      margin-bottom: 8px;
+      line-height: 1.5;
+      display: flex;
+      align-items: baseline;
     }
-  }
+    .custom-list li::before {
+      content: "・";
+      position: absolute;
+      left: -1.2em;
+      font-weight: bold;
+      color: #666;
+    }
+    @media (max-width: 768px) {
+      .custom-list li {
+        display: block;
+        text-indent: -1.2em;
+        padding-left: 1.2em;
+      }
+      .custom-list li::before {
+        position: static;
+        margin-right: 0.5em;
+      }
+    }
+    
+    /* モバイル用：下部固定ボトムバー */
+    #bottom-bar {
+      display: none;
+    }
+    @media (max-width: 768px) {
+      #bottom-bar {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        background-color: var(--card-light);
+        border-top: 1px solid var(--separator-color);
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        padding: 8px 0;
+        z-index: 1000;
+      }
+      #bottom-bar a {
+        text-decoration: none;
+        color: inherit;
+        text-align: center;
+        font-size: 0.9rem;
+      }
+      #bottom-bar a .icon {
+        display: block;
+        font-size: 1.4rem;
+        margin-bottom: 2px;
+      }
+    }
+    
+    /* モバイル用：オーバーレイメニュー */
+    #mobile-menu {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.6);
+      z-index: 1100;
+      justify-content: center;
+      align-items: center;
+    }
+    #mobile-menu .menu-content {
+      background: var(--card-light);
+      padding: 20px;
+      border-radius: 8px;
+      width: 80%;
+      max-width: 300px;
+    }
+    #mobile-menu .menu-content a {
+      display: block;
+      text-decoration: none;
+      color: inherit;
+      padding: 10px;
+      border-bottom: 1px solid var(--separator-color);
+    }
+    #mobile-menu .menu-content a:last-child {
+      border-bottom: none;
+    }
   </style>
 </head>
 <body data-theme="light">
-  <header>
-    <h1>スマートツール・コネクト</h1>
-    <nav>
-      <a href="https://tool-cloud.github.io/blog/">ブログ</a>
-      <a href="about.html">運営者情報</a>
-      <a href="privacy-policy.html">プライバシーポリシー</a>
-      <a href="contact.html">お問い合わせ</a>
-      <a href="contact.html#request" style="color:#e67e22;">ツールリクエスト</a>
-      <div class="theme-toggle" id="theme-toggle">🌓</div>
-    </nav>
-  </header>
-
-  <main>
-    <!-- 各ツールセクション（実際のコンテンツは変更可能） -->
-   <section id="calculation-tools">
-      <h2>計算ツール</h2>
-      <div class="tool-list">
-        <a href="./calculator.html" class="tool-card">
-          <img src="calculator.png" alt="関数電卓" class="tool-image">
-          <div class="tool-text">
-            <div class="tool-title">関数電卓</div>
-            <div class="tool-description">
-              基本演算に加え、括弧、三角関数（sin, cos, tan）、自然対数（ln）、常用対数（log）、平方根（√）、べき乗（^）、定数π、定数eを実装。<br>
-              現在の式とリアルタイム計算結果を同時に表示。
-            </div>
+  <!-- コンテナ（PC：左右に広告スペース） -->
+  <div class="container">
+    <div class="ad-space"></div>
+    <div class="content">
+      <header>
+        <h1>スマートツール・コネクト</h1>
+        <nav>
+          <a href="https://tool-cloud.github.io/blog/">ブログ</a>
+          <a href="about.html">運営者情報</a>
+          <a href="privacy-policy.html">プライバシーポリシー</a>
+          <a href="contact.html">お問い合わせ</a>
+          <a href="contact.html#request" style="color:#e67e22;">ツールリクエスト</a>
+          <div class="theme-toggle" id="theme-toggle">🌓</div>
+        </nav>
+      </header>
+      
+      <main>
+        <!-- 各ツールセクション（実際のコンテンツは変更可能） -->
+        <section id="calculation-tools">
+          <h2>計算ツール</h2>
+          <div class="tool-list">
+            <a href="./calculator.html" class="tool-card">
+              <img src="calculator.png" alt="関数電卓" class="tool-image">
+              <div class="tool-text">
+                <div class="tool-title">関数電卓</div>
+                <div class="tool-description">
+                  基本演算に加え、括弧、三角関数（sin, cos, tan）、自然対数（ln）、常用対数（log）、平方根（√）、べき乗（^）、定数π、定数eを実装。<br>
+                  現在の式とリアルタイム計算結果を同時に表示。
+                </div>
+              </div>
+            </a>
+            <a href="./converter.html" class="tool-card">
+              <img src="converter.png" alt="進数変換ツール" class="tool-image">
+              <div class="tool-text">
+                <div class="tool-title">進数変換ツール</div>
+                <div class="tool-description">
+                  2進数、10進数、16進数、ASCIIを相互にリアルタイム変換可能。
+                </div>
+              </div>
+            </a>
+            <a href="./condenser.html" class="tool-card">
+              <img src="condenser.png" alt="コンデンサ容量計算" class="tool-image">
+              <div class="tool-text">
+                <div class="tool-title">コンデンサ容量計算</div>
+                <div class="tool-description">
+                  静電容量値を表す3桁の数字を入力することで、3種類の単位で容量値をリアルタイム算出、末尾のアルファベット入力で誤差も表示。
+                </div>
+              </div>
+            </a>
+            <a href="./resistor.html" class="tool-card">
+              <img src="resistor.png" alt="抵抗値計算" class="tool-image">
+              <div class="tool-text">
+                <div class="tool-title">抵抗値計算</div>
+                <div class="tool-description">
+                  抵抗値を表す3桁または4桁のEIAコードを入力することで、抵抗値をリアルタイム算出。
+                </div>
+              </div>
+            </a>
           </div>
-        </a>
-        <a href="./converter.html" class="tool-card">
-          <img src="converter.png" alt="進数変換ツール" class="tool-image">
-          <div class="tool-text">
-            <div class="tool-title">進数変換ツール</div>
-            <div class="tool-description">
-              2進数、10進数、16進数、ASCIIを相互にリアルタイム変換可能。
-            </div>
+        </section>
+        
+        <section id="clock-tools">
+          <h2>時計ツール</h2>
+          <div class="tool-list">
+            <a href="./digitalclock.html" class="tool-card">
+              <img src="digitalclock.png" alt="デジタル時計" class="tool-image">
+              <div class="tool-text">
+                <div class="tool-title">デジタル時計</div>
+                <div class="tool-description">
+                  日付、曜日と時刻を表示するデジタル時計、PinP機能付き。
+                </div>
+              </div>
+            </a>
+            <a href="./analogclock.html" class="tool-card">
+              <img src="analogclock.png" alt="アナログ時計" class="tool-image">
+              <div class="tool-text">
+                <div class="tool-title">アナログ時計</div>
+                <div class="tool-description">
+                  日付、曜日と時刻を表示するデジタル時計、PinP機能付き。
+                </div>
+              </div>
+            </a>
+            <a href="./stopwatch.html" class="tool-card">
+              <img src="stopwatch.png" alt="ストップウォッチ" class="tool-image">
+              <div class="tool-text">
+                <div class="tool-title">ストップウォッチ</div>
+                <div class="tool-description">
+                  ラップ機能付きのシンプルなストップウォッチ。
+                </div>
+              </div>
+            </a>
+            <a href="./webtimer.html" class="tool-card">
+              <img src="webtimer.png" alt="タイマー" class="tool-image">
+              <div class="tool-text">
+                <div class="tool-title">タイマー</div>
+                <div class="tool-description">
+                  時、分、秒をカスタム設定、繰り返し、アラーム設定可能。
+                </div>
+              </div>
+            </a>
+            <a href="./timer.html" class="tool-card">
+              <img src="timer.png" alt="ポモドーロタイマー" class="tool-image">
+              <div class="tool-text">
+                <div class="tool-title">ポモドーロタイマー</div>
+                <div class="tool-description">
+                  25分作業＋5分休憩のサイクルで生産性向上、PinP機能付き、サイクル切り替え時のアラーム付き。
+                </div>
+              </div>
+            </a>
+            <a href="./metoro.html" class="tool-card">
+              <img src="metoro.png" alt="メトロノーム" class="tool-image">
+              <div class="tool-text">
+                <div class="tool-title">メトロノーム</div>
+                <div class="tool-description">
+                  タップテンポ、プリセットBPM、音量調整、音色の選択が可能。
+                </div>
+              </div>
+            </a>
           </div>
-        </a>
-        <a href="./condenser.html" class="tool-card">
-          <img src="condenser.png" alt="コンデンサ容量計算" class="tool-image">
-          <div class="tool-text">
-            <div class="tool-title">コンデンサ容量計算</div>
-            <div class="tool-description">
-              静電容量値を表す3桁の数字を入力することで、3種類の単位で容量値をリアルタイム算出、末尾のアルファベット入力で誤差も表示。
-            </div>
+        </section>
+        
+        <!-- 下段：その他 -->
+        <section id="other-tools">
+          <h2>その他</h2>
+          <div class="tool-list">
+            <a href="./fire.html" class="tool-card">
+              <img src="fire.png" alt="FIRE予測～DIE WITH ZERO～" class="tool-image">
+              <div class="tool-text">
+                <div class="tool-title">FIRE予測～DIE WITH ZERO～</div>
+                <div class="tool-description break-at-comma">
+                  総資産がゼロになるまでの期間をシミュレーション（最大80年）
+                </div>
+              </div>
+            </a>
+            <a href="./todo_b.html" class="tool-card">
+              <img src="todo.png" alt="TODOリスト" class="tool-image">
+              <div class="tool-text">
+                <div class="tool-title">TODOリスト</div>
+                <div class="tool-description break-at-comma">
+                  シンプルなタスク管理ツールで、やるべきことを可視化。
+                </div>
+              </div>
+            </a>
+            <a href="./cost.html" class="tool-card">
+              <img src="cost.png" alt="月の生活費計算" class="tool-image">
+              <div class="tool-text">
+                <div class="tool-title">月の生活費計算</div>
+                <div class="tool-description break-at-comma">
+                  生活費を入力して、合計金額や年間支出を自動計算、家計見直しに役立ちます。
+                </div>
+              </div>
+            </a>
+            <a href="./read.html" class="tool-card">
+              <img src="read.png" alt="テキスト読み上げ" class="tool-image">
+              <div class="tool-text">
+                <div class="tool-title">テキスト読み上げ</div>
+                <div class="tool-description break-at-comma">
+                  ハイライト機能付きテキストの読み上げ、音声の種類、速度、音程の調整、文字数解析／読み上げ時間予測、商用利用可能。
+                </div>
+              </div>
+            </a>
           </div>
+        </section>
+        
+        <section class="info-section">
+          <ul class="custom-list">
+            <li>各ツールはすべて無料でご利用いただけます</li>
+            <li>今後も便利なツールを随時追加予定です</li>
+            <li>ご意見・ご要望はお問い合わせページよりお知らせください</li>
+          </ul>
+        </section>
+      </main>
+      
+      <footer>
+        <p>&copy; 2025 スマートツール・コネクト. All rights reserved.</p>
+        <nav>
+          <a href="https://tool-cloud.github.io/blog/">ブログ</a>
+          <a href="about.html">運営者情報</a>
+          <a href="privacy-policy.html">プライバシーポリシー</a>
+          <a href="contact.html">お問い合わせ</a>
+        </nav>
+      </footer>
+      
+      <!-- モバイル用：下部固定ボトムバー -->
+      <nav id="bottom-bar">
+        <a href="#" id="menu-btn">
+          <span class="icon">☰</span>
+          <span>メニュー</span>
         </a>
-        <a href="./resistor.html" class="tool-card">
-          <img src="resistor.png" alt="抵抗値計算" class="tool-image">
-          <div class="tool-text">
-            <div class="tool-title">抵抗値計算</div>
-            <div class="tool-description">
-              抵抗値を表す3桁または4桁のEIAコードを入力することで、抵抗値をリアルタイム算出。
-            </div>
-          </div>
+        <a href="index.html" id="home-btn">
+          <span class="icon">🏠</span>
+          <span>ホーム</span>
         </a>
+        <a href="sidebar.html" id="sidebar-btn">
+          <span class="icon">≡</span>
+          <span>サイドバー</span>
+        </a>
+      </nav>
+      
+      <!-- モバイル用：オーバーレイメニュー（メニュー内のリンク） -->
+      <div id="mobile-menu">
+        <div class="menu-content">
+          <a href="https://tool-cloud.github.io/blog/">ブログ</a>
+          <a href="about.html">運営者情報</a>
+          <a href="privacy-policy.html">プライバシーポリシー</a>
+          <a href="contact.html">お問い合わせ</a>
+          <a href="#" id="close-menu" style="text-align:right;">閉じる</a>
+        </div>
       </div>
-    </section>
-    
-    <section id="clock-tools">
-      <h2>時計ツール</h2>
-      <div class="tool-list">
-        <a href="./digitalclock.html" class="tool-card">
-          <img src="digitalclock.png" alt="デジタル時計" class="tool-image">
-          <div class="tool-text">
-            <div class="tool-title">デジタル時計</div>
-            <div class="tool-description">
-              日付、曜日と時刻を表示するデジタル時計、PinP機能付き。
-            </div>
-          </div>
-        </a>
-        <a href="./analogclock.html" class="tool-card">
-          <img src="analogclock.png" alt="アナログ時計" class="tool-image">
-          <div class="tool-text">
-            <div class="tool-title">アナログ時計</div>
-            <div class="tool-description">
-              日付、曜日と時刻を表示するデジタル時計、PinP機能付き。
-            </div>
-          </div>
-        </a>
-        <a href="./stopwatch.html" class="tool-card">
-          <img src="stopwatch.png" alt="ストップウォッチ" class="tool-image">
-          <div class="tool-text">
-            <div class="tool-title">ストップウォッチ</div>
-            <div class="tool-description">
-              ラップ機能付きのシンプルなストップウォッチ。
-            </div>
-          </div>
-        </a>
-        <a href="./webtimer.html" class="tool-card">
-          <img src="webtimer.png" alt="タイマー" class="tool-image">
-          <div class="tool-text">
-            <div class="tool-title">タイマー</div>
-            <div class="tool-description">
-              時、分、秒をカスタム設定、繰り返し、アラーム設定可能。
-            </div>
-          </div>
-        </a>
-        <a href="./timer.html" class="tool-card">
-          <img src="timer.png" alt="ポモドーロタイマー" class="tool-image">
-          <div class="tool-text">
-            <div class="tool-title">ポモドーロタイマー</div>
-            <div class="tool-description">
-              25分作業＋5分休憩のサイクルで生産性向上、PinP機能付き、サイクル切り替え時のアラーム付き。
-            </div>
-          </div>
-        </a>
-        <a href="./metoro.html" class="tool-card">
-          <img src="metoro.png" alt="メトロノーム" class="tool-image">
-          <div class="tool-text">
-            <div class="tool-title">メトロノーム</div>
-            <div class="tool-description">
-              タップテンポ、プリセットBPM、音量調整、音色の選択が可能。
-            </div>
-          </div>
-        </a>
-      </div>
-    </section>
-    
-    <!-- 下段：その他（枠ありのカード：ファイア予測、TODOリスト、月の生活費計算、テキスト読み上げ） -->
-    <section id="other-tools">
-      <h2>その他</h2>
-      <div class="tool-list">
-        <a href="./fire.html" class="tool-card">
-          <img src="fire.png" alt="FIRE予測～DIE WITH ZERO～" class="tool-image">
-          <div class="tool-text">
-            <div class="tool-title">FIRE予測～DIE WITH ZERO～</div>
-            <div class="tool-description break-at-comma">
-              総資産がゼロになるまでの期間をシミュレーション（最大80年）
-            </div>
-          </div>
-        </a>
-        <a href="./todo_b.html" class="tool-card">
-          <img src="todo.png" alt="TODOリスト" class="tool-image">
-          <div class="tool-text">
-            <div class="tool-title">TODOリスト</div>
-            <div class="tool-description break-at-comma">
-              シンプルなタスク管理ツールで、やるべきことを可視化。
-            </div>
-          </div>
-        </a>
-        <a href="./cost.html" class="tool-card">
-          <img src="cost.png" alt="月の生活費計算" class="tool-image">
-          <div class="tool-text">
-            <div class="tool-title">月の生活費計算</div>
-            <div class="tool-description break-at-comma">
-              生活費を入力して、合計金額や年間支出を自動計算、家計見直しに役立ちます。
-            </div>
-          </div>
-        </a>
-        <a href="./read.html" class="tool-card">
-          <img src="read.png" alt="テキスト読み上げ" class="tool-image">
-          <div class="tool-text">
-            <div class="tool-title">テキスト読み上げ</div>
-            <div class="tool-description break-at-comma">
-              ハイライト機能付きテキストの読み上げ、音声の種類、速度、音程の調整、文字数解析／読み上げ時間予測、商用利用可能。
-            </div>
-          </div>
-        </a>
-      </div>
-    </section>
-
-    <section class="info-section">
-  <ul class="custom-list">
-    <li>各ツールはすべて無料でご利用いただけます</li>
-    <li>今後も便利なツールを随時追加予定です</li>
-    <li>ご意見・ご要望はお問い合わせページよりお知らせください</li>
-  </ul>
-</section>
-  </main>
-
-  <footer>
-    <p>&copy; 2025 スマートツール・コネクト. All rights reserved.</p>
-    <nav>
-      <a href="https://tool-cloud.github.io/blog/">ブログ</a>
-      <a href="about.html">運営者情報</a>
-      <a href="privacy-policy.html">プライバシーポリシー</a>
-      <a href="contact.html">お問い合わせ</a>
-    </nav>
-  </footer>
-
+    </div>
+    <div class="ad-space"></div>
+  </div>
+  
   <script>
     document.addEventListener('DOMContentLoaded', function () {
       // テーマ切替機能
       const themeToggle = document.getElementById('theme-toggle');
       const savedTheme = localStorage.getItem('theme') || 'light';
       document.body.setAttribute('data-theme', savedTheme);
-
       themeToggle.addEventListener('click', function () {
         const currentTheme = document.body.getAttribute('data-theme');
         const newTheme = currentTheme === 'light' ? 'dark' : 'light';
         document.body.setAttribute('data-theme', newTheme);
         localStorage.setItem('theme', newTheme);
       });
-
-      // 説明文のフォーマット調整
+      
+      // 説明文の改行調整
       document.querySelectorAll('.break-at-comma').forEach(function(elem) {
         elem.innerHTML = elem.innerHTML.replace(/。/g, "、<br>");
+      });
+      
+      // モバイル：ボトムバーの表示（スクロールアップ時に表示）
+      let lastScroll = window.pageYOffset;
+      const bottomBar = document.getElementById('bottom-bar');
+      window.addEventListener('scroll', function() {
+        let currentScroll = window.pageYOffset;
+        if (currentScroll < lastScroll) {
+          bottomBar.style.transform = 'translateY(0)';
+        } else {
+          bottomBar.style.transform = 'translateY(100%)';
+        }
+        lastScroll = currentScroll;
+      });
+      
+      // モバイル：オーバーレイメニューのトグル
+      const menuBtn = document.getElementById('menu-btn');
+      const mobileMenu = document.getElementById('mobile-menu');
+      const closeMenu = document.getElementById('close-menu');
+      menuBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        mobileMenu.style.display = 'flex';
+      });
+      closeMenu.addEventListener('click', function(e) {
+        e.preventDefault();
+        mobileMenu.style.display = 'none';
       });
     });
   </script>
