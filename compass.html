@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>スマートフォン方位磁石</title>
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+
+        .compass-container {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            margin-bottom: 20px;
+        }
+
+        .compass-circle {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background-color: #fff;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .compass-face {
+            position: absolute;
+            width: 90%;
+            height: 90%;
+            border-radius: 50%;
+            background: radial-gradient(circle, #fff 60%, #f0f0f0 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transform: rotate(0deg);
+            transition: transform 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        .compass-arrow {
+            position: absolute;
+            height: 80%;
+            width: 80%;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M50 5 L55 50 L50 95 L45 50 Z' fill='%23e74c3c'/%3E%3Cpath d='M50 5 L45 50 L50 95 L55 50 Z' fill='%233498db'/%3E%3Ccircle cx='50' cy='50' r='8' fill='%23333'/%3E%3C/svg%3E");
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+
+        .direction-label {
+            position: absolute;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .direction-n {
+            top: 10px;
+            color: #e74c3c;
+        }
+
+        .direction-e {
+            right: 10px;
+        }
+
+        .direction-s {
+            bottom: 10px;
+        }
+
+        .direction-w {
+            left: 10px;
+        }
+
+        .compass-center {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #333;
+            z-index: 10;
+        }
+
+        .degree-display {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .direction-text {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+        }
+
+        .data-container {
+            background-color: #fff;
+            padding: 15px 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .calibrate-btn {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .calibrate-btn:hover {
+            background-color: #2980b9;
+        }
+
+        .error-message {
+            color: #e74c3c;
+            text-align: center;
+            padding: 10px;
+            max-width: 80%;
+            margin: 0 auto;
+            display: none;
+        }
+
+        .compass-markings {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+        }
+
+        .degree-mark {
+            position: absolute;
+            width: 2px;
+            height: 10px;
+            background-color: #ccc;
+            top: 5px;
+            left: 50%;
+            transform-origin: bottom center;
+        }
+
+        .degree-mark.major {
+            height: 15px;
+            width: 3px;
+            background-color: #999;
+        }
+    </style>
+</head>
+<body>
+    <div class="compass-container">
+        <div class="compass-circle">
+            <div class="compass-markings" id="compass-markings"></div>
+            <div class="compass-face" id="compass-face">
+                <div class="compass-arrow"></div>
+                <div class="direction-label direction-n">N</div>
+                <div class="direction-label direction-e">E</div>
+                <div class="direction-label direction-s">S</div>
+                <div class="direction-label direction-w">W</div>
+            </div>
+            <div class="compass-center"></div>
+        </div>
+    </div>
+
+    <div class="data-container">
+        <div class="degree-display" id="degree-display">0°</div>
+        <div class="direction-text" id="direction-text">北</div>
+    </div>
+
+    <button class="calibrate-btn" id="calibrate-btn">キャリブレーション</button>
+    <div class="error-message" id="error-message"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const compassFace = document.getElementById('compass-face');
+            const degreeDisplay = document.getElementById('degree-display');
+            const directionText = document.getElementById('direction-text');
+            const calibrateBtn = document.getElementById('calibrate-btn');
+            const errorMessage = document.getElementById('error-message');
+            const compassMarkings = document.getElementById('compass-markings');
+            
+            let compassHeading = 0;
+            let isCalibrating = false;
+
+            // 目盛りを作成
+            function createCompassMarkings() {
+                for (let i = 0; i < 360; i += 3) {
+                    const mark = document.createElement('div');
+                    mark.className = i % 30 === 0 ? 'degree-mark major' : 'degree-mark';
+                    mark.style.transform = `rotate(${i}deg) translateX(-50%)`;
+                    compassMarkings.appendChild(mark);
+                }
+            }
+            
+            createCompassMarkings();
+
+            // 方角のテキストを取得
+            function getDirectionText(degrees) {
+                if (degrees >= 337.5 || degrees < 22.5) return '北';
+                if (degrees >= 22.5 && degrees < 67.5) return '北東';
+                if (degrees >= 67.5 && degrees < 112.5) return '東';
+                if (degrees >= 112.5 && degrees < 157.5) return '南東';
+                if (degrees >= 157.5 && degrees < 202.5) return '南';
+                if (degrees >= 202.5 && degrees < 247.5) return '南西';
+                if (degrees >= 247.5 && degrees < 292.5) return '西';
+                if (degrees >= 292.5 && degrees < 337.5) return '北西';
+                return '北'; // デフォルト
+            }
+
+            // デバイスの向きが変わったときのイベント
+            function handleOrientation(event) {
+                if (!event.alpha) {
+                    showError('お使いのデバイスでは方位センサーをサポートしていません。');
+                    return;
+                }
+
+                // iOSの場合はwebkitCompassHeadingを使用
+                let heading;
+                if ('webkitCompassHeading' in event) {
+                    heading = event.webkitCompassHeading;
+                } else {
+                    heading = 360 - event.alpha; // Androidなどの場合
+                }
+
+                compassHeading = heading;
+                updateCompass(compassHeading);
+            }
+
+            // コンパスの表示を更新
+            function updateCompass(heading) {
+                compassFace.style.transform = `rotate(${heading}deg)`;
+                degreeDisplay.textContent = `${Math.round(heading)}°`;
+                directionText.textContent = getDirectionText(heading);
+            }
+
+            // エラーメッセージを表示
+            function showError(message) {
+                errorMessage.textContent = message;
+                errorMessage.style.display = 'block';
+            }
+
+            // キャリブレーションボタンのイベント
+            calibrateBtn.addEventListener('click', function() {
+                if (isCalibrating) return;
+                
+                isCalibrating = true;
+                calibrateBtn.textContent = 'キャリブレーション中...';
+                
+                // デバイスを8の字に動かすように促す
+                alert('デバイスを「8の字」を描くように動かしてください。5秒後に完了します。');
+                
+                setTimeout(function() {
+                    calibrateBtn.textContent = 'キャリブレーション';
+                    isCalibrating = false;
+                    alert('キャリブレーションが完了しました。');
+                }, 5000);
+            });
+
+            // センサーへのアクセスを要求
+            if (window.DeviceOrientationEvent) {
+                if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+                    // iOS 13+では明示的な許可が必要
+                    document.body.addEventListener('click', function() {
+                        DeviceOrientationEvent.requestPermission()
+                            .then(function(result) {
+                                if (result === 'granted') {
+                                    window.addEventListener('deviceorientation', handleOrientation, true);
+                                } else {
+                                    showError('方位センサーへのアクセスが拒否されました。');
+                                }
+                            })
+                            .catch(function(error) {
+                                showError('方位センサーの許可を取得できませんでした: ' + error);
+                            });
+                    }, { once: true });
+                } else {
+                    // 他のデバイス
+                    window.addEventListener('deviceorientation', handleOrientation, true);
+                }
+            } else {
+                showError('お使いのデバイスでは方位センサーをサポートしていません。');
+            }
+        });
+    </script>
+</body>
+</html>
