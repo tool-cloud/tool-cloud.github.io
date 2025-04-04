@@ -2,86 +2,182 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>スマートフォン方位磁石</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>高性能方位磁石</title>
     <style>
-        body {
-            font-family: 'Helvetica Neue', Arial, sans-serif;
+        :root {
+            --primary-color: #3a7bd5;
+            --secondary-color: #00d2ff;
+            --dark-color: #2c3e50;
+            --light-color: #ecf0f1;
+            --accent-color: #e74c3c;
+            --success-color: #2ecc71;
+        }
+
+        * {
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            height: 100vh;
             display: flex;
             flex-direction: column;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: var(--light-color);
+            overflow: hidden;
+            touch-action: none;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
             align-items: center;
+            padding: 20px;
+            background-color: rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .app-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+        }
+
+        .mode-indicator {
+            display: flex;
+            align-items: center;
+            font-size: 0.9rem;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 6px 12px;
+        }
+
+        .mode-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 6px;
+        }
+        
+        .mode-dot.compass {
+            background-color: var(--accent-color);
+        }
+        
+        .mode-dot.gps {
+            background-color: var(--success-color);
+        }
+        
+        .mode-dot.motion {
+            background-color: #f39c12;
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
             justify-content: center;
-            height: 100vh;
-            background-color: #f5f5f5;
-            color: #333;
+            align-items: center;
+            padding: 20px;
         }
 
         .compass-container {
             position: relative;
-            width: 300px;
-            height: 300px;
-            margin-bottom: 20px;
+            width: 280px;
+            height: 280px;
+            perspective: 1000px;
         }
 
-        .compass-circle {
+        .compass-card {
             position: relative;
             width: 100%;
             height: 100%;
-            border-radius: 50%;
-            background-color: #fff;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
+            transition: transform 0.3s ease-out;
+            transform-style: preserve-3d;
         }
 
         .compass-face {
             position: absolute;
-            width: 90%;
-            height: 90%;
+            width: 100%;
+            height: 100%;
             border-radius: 50%;
-            background: radial-gradient(circle, #fff 60%, #f0f0f0 100%);
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2), 
+                        inset 0 0 10px rgba(0, 0, 0, 0.1);
             display: flex;
             align-items: center;
             justify-content: center;
-            transform: rotate(0deg);
-            transition: transform 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+            transform: rotateX(20deg);
+            backface-visibility: hidden;
         }
 
-        .compass-arrow {
+        .compass-ring {
             position: absolute;
-            height: 80%;
-            width: 80%;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M50 5 L55 50 L50 95 L45 50 Z' fill='%23e74c3c'/%3E%3Cpath d='M50 5 L45 50 L50 95 L55 50 Z' fill='%233498db'/%3E%3Ccircle cx='50' cy='50' r='8' fill='%23333'/%3E%3C/svg%3E");
-            background-size: contain;
-            background-repeat: no-repeat;
-            background-position: center;
+            width: 92%;
+            height: 92%;
+            border-radius: 50%;
+            border: 2px solid var(--dark-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .direction-label {
             position: absolute;
             font-weight: bold;
-            font-size: 14px;
+            font-size: 18px;
+            color: var(--dark-color);
         }
 
-        .direction-n {
-            top: 10px;
-            color: #e74c3c;
+        .direction-label.north {
+            top: 12px;
+            color: var(--accent-color);
         }
 
-        .direction-e {
-            right: 10px;
+        .direction-label.east {
+            right: 12px;
         }
 
-        .direction-s {
-            bottom: 10px;
+        .direction-label.south {
+            bottom: 12px;
         }
 
-        .direction-w {
-            left: 10px;
+        .direction-label.west {
+            left: 12px;
+        }
+
+        .direction-text-ja {
+            font-size: 12px;
+            display: block;
+            margin-top: 2px;
+        }
+
+        .compass-arrow {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            width: 4px;
+            height: 50%;
+            background: linear-gradient(to bottom, var(--accent-color) 0%, var(--accent-color) 85%, transparent 85%);
+            transform-origin: bottom center;
+            transform: translateX(-50%);
+            z-index: 10;
+        }
+
+        .compass-arrow:after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-bottom: 15px solid var(--accent-color);
+            margin-top: -15px;
         }
 
         .compass-center {
@@ -89,126 +185,238 @@
             width: 20px;
             height: 20px;
             border-radius: 50%;
-            background: #333;
-            z-index: 10;
+            background: radial-gradient(circle, var(--dark-color), #000);
+            z-index: 5;
         }
 
-        .degree-display {
+        .direction-display {
+            margin-top: 40px;
+            text-align: center;
             font-size: 2rem;
             font-weight: bold;
-            margin-bottom: 10px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
         }
 
-        .direction-text {
-            font-size: 1.5rem;
-            margin-bottom: 20px;
+        .controls {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            background: rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
         }
 
-        .data-container {
-            background-color: #fff;
-            padding: 15px 25px;
-            border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        .calibrate-btn {
-            background-color: #3498db;
-            color: white;
+        .control-btn {
+            padding: 12px 20px;
             border: none;
-            padding: 12px 25px;
             border-radius: 25px;
+            background: rgba(255, 255, 255, 0.2);
+            color: var(--light-color);
+            font-weight: 600;
             font-size: 16px;
             cursor: pointer;
-            transition: background-color 0.3s;
+            transition: all 0.2s;
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
         }
 
-        .calibrate-btn:hover {
-            background-color: #2980b9;
+        .control-btn:hover, .control-btn:active {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        .control-btn.primary {
+            background: var(--accent-color);
         }
 
-        .error-message {
-            color: #e74c3c;
-            text-align: center;
-            padding: 10px;
-            max-width: 80%;
-            margin: 0 auto;
-            display: none;
+        .control-btn.primary:hover, .control-btn.primary:active {
+            background: #c0392b;
         }
 
-        .compass-markings {
+        .status-message {
+            position: absolute;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 8px 16px;
+            border-radius: 20px;
+            background: rgba(0, 0, 0, 0.6);
+            color: white;
+            font-size: 14px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            white-space: nowrap;
+            max-width: 90%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .status-message.show {
+            opacity: 1;
+        }
+
+        .degree-ticks {
             position: absolute;
             width: 100%;
             height: 100%;
             border-radius: 50%;
         }
 
-        .degree-mark {
+        .tick {
             position: absolute;
-            width: 2px;
-            height: 10px;
-            background-color: #ccc;
-            top: 5px;
+            top: 10px;
             left: 50%;
+            width: 2px;
+            height: 8px;
+            background-color: rgba(0, 0, 0, 0.2);
             transform-origin: bottom center;
         }
 
-        .degree-mark.major {
-            height: 15px;
+        .tick.major {
+            height: 12px;
             width: 3px;
-            background-color: #999;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        @media (max-height: 700px) {
+            .compass-container {
+                width: 240px;
+                height: 240px;
+            }
+            
+            .direction-display {
+                margin-top: 20px;
+            }
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .vibrate {
+            animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+        }
+
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-1px, 0, 0); }
+            20%, 80% { transform: translate3d(2px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+            40%, 60% { transform: translate3d(4px, 0, 0); }
         }
     </style>
 </head>
 <body>
-    <div class="compass-container">
-        <div class="compass-circle">
-            <div class="compass-markings" id="compass-markings"></div>
-            <div class="compass-face" id="compass-face">
-                <div class="compass-arrow"></div>
-                <div class="direction-label direction-n">N</div>
-                <div class="direction-label direction-e">E</div>
-                <div class="direction-label direction-s">S</div>
-                <div class="direction-label direction-w">W</div>
-            </div>
-            <div class="compass-center"></div>
+    <div class="loading-overlay" id="loading-overlay">
+        <div class="loading-spinner"></div>
+        <div>方位センサーの初期化中...</div>
+    </div>
+
+    <header class="header">
+        <div class="app-title">スマート方位磁石</div>
+        <div class="mode-indicator" id="mode-indicator">
+            <div class="mode-dot compass" id="mode-dot"></div>
+            <span id="mode-text">準備中...</span>
         </div>
-    </div>
+    </header>
 
-    <div class="data-container">
-        <div class="degree-display" id="degree-display">0°</div>
-        <div class="direction-text" id="direction-text">北</div>
-    </div>
+    <main class="main-content">
+        <div class="compass-container">
+            <div class="compass-card" id="compass-card">
+                <div class="compass-face">
+                    <div class="compass-ring">
+                        <div class="degree-ticks" id="degree-ticks"></div>
+                        <div class="direction-label north">
+                            N
+                            <span class="direction-text-ja">北</span>
+                        </div>
+                        <div class="direction-label east">
+                            E
+                            <span class="direction-text-ja">東</span>
+                        </div>
+                        <div class="direction-label south">
+                            S
+                            <span class="direction-text-ja">南</span>
+                        </div>
+                        <div class="direction-label west">
+                            W
+                            <span class="direction-text-ja">西</span>
+                        </div>
+                    </div>
+                    <div class="compass-arrow" id="compass-arrow"></div>
+                    <div class="compass-center"></div>
+                </div>
+            </div>
+        </div>
 
-    <button class="calibrate-btn" id="calibrate-btn">キャリブレーション</button>
-    <div class="error-message" id="error-message"></div>
+        <div class="direction-display" id="direction-display">北</div>
+    </main>
+
+    <div class="status-message" id="status-message"></div>
+
+    <div class="controls">
+        <button class="control-btn" id="switch-mode-btn">モード切替</button>
+        <button class="control-btn primary" id="calibrate-btn">キャリブレーション</button>
+    </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const compassFace = document.getElementById('compass-face');
-            const degreeDisplay = document.getElementById('degree-display');
-            const directionText = document.getElementById('direction-text');
+            // DOM要素
+            const compassCard = document.getElementById('compass-card');
+            const compassArrow = document.getElementById('compass-arrow');
+            const directionDisplay = document.getElementById('direction-display');
             const calibrateBtn = document.getElementById('calibrate-btn');
-            const errorMessage = document.getElementById('error-message');
-            const compassMarkings = document.getElementById('compass-markings');
+            const switchModeBtn = document.getElementById('switch-mode-btn');
+            const statusMessage = document.getElementById('status-message');
+            const modeIndicator = document.getElementById('mode-indicator');
+            const modeText = document.getElementById('mode-text');
+            const modeDot = document.getElementById('mode-dot');
+            const degreeTicks = document.getElementById('degree-ticks');
+            const loadingOverlay = document.getElementById('loading-overlay');
+
+            // モード設定
+            const MODES = {
+                COMPASS: 'compass',
+                GPS: 'gps',
+                MOTION: 'motion'
+            };
             
-            let compassHeading = 0;
+            let currentMode = MODES.COMPASS;
             let isCalibrating = false;
+            let watchId = null;
+            let previousPositions = [];
+            let heading = 0;
+            let isInitialized = false;
 
-            // 目盛りを作成
-            function createCompassMarkings() {
-                for (let i = 0; i < 360; i += 3) {
-                    const mark = document.createElement('div');
-                    mark.className = i % 30 === 0 ? 'degree-mark major' : 'degree-mark';
-                    mark.style.transform = `rotate(${i}deg) translateX(-50%)`;
-                    compassMarkings.appendChild(mark);
-                }
-            }
-            
-            createCompassMarkings();
-
-            // 方角のテキストを取得
+            // 方角の文字列を取得
             function getDirectionText(degrees) {
                 if (degrees >= 337.5 || degrees < 22.5) return '北';
                 if (degrees >= 22.5 && degrees < 67.5) return '北東';
@@ -218,82 +426,393 @@
                 if (degrees >= 202.5 && degrees < 247.5) return '南西';
                 if (degrees >= 247.5 && degrees < 292.5) return '西';
                 if (degrees >= 292.5 && degrees < 337.5) return '北西';
-                return '北'; // デフォルト
+                return '北';
             }
 
-            // デバイスの向きが変わったときのイベント
-            function handleOrientation(event) {
-                if (!event.alpha) {
-                    showError('お使いのデバイスでは方位センサーをサポートしていません。');
-                    return;
+            // 目盛りを作成
+            function createDegreeTicks() {
+                for (let i = 0; i < 360; i += 15) {
+                    const tick = document.createElement('div');
+                    tick.className = i % 45 === 0 ? 'tick major' : 'tick';
+                    tick.style.transform = `rotate(${i}deg) translateX(-50%)`;
+                    degreeTicks.appendChild(tick);
                 }
-
-                // iOSの場合はwebkitCompassHeadingを使用
-                let heading;
-                if ('webkitCompassHeading' in event) {
-                    heading = event.webkitCompassHeading;
-                } else {
-                    heading = 360 - event.alpha; // Androidなどの場合
-                }
-
-                compassHeading = heading;
-                updateCompass(compassHeading);
             }
 
             // コンパスの表示を更新
-            function updateCompass(heading) {
-                compassFace.style.transform = `rotate(${heading}deg)`;
-                degreeDisplay.textContent = `${Math.round(heading)}°`;
-                directionText.textContent = getDirectionText(heading);
+            function updateCompassDisplay(degrees) {
+                compassArrow.style.transform = `translateX(-50%) rotate(${degrees}deg)`;
+                directionDisplay.textContent = getDirectionText(degrees);
+                heading = degrees;
             }
 
-            // エラーメッセージを表示
-            function showError(message) {
-                errorMessage.textContent = message;
-                errorMessage.style.display = 'block';
+            // ステータスメッセージの表示
+            function showStatusMessage(message, duration = 3000) {
+                statusMessage.textContent = message;
+                statusMessage.classList.add('show');
+                
+                setTimeout(() => {
+                    statusMessage.classList.remove('show');
+                }, duration);
             }
 
-            // キャリブレーションボタンのイベント
-            calibrateBtn.addEventListener('click', function() {
+            // モードの更新
+            function updateModeIndicator() {
+                modeDot.className = 'mode-dot';
+                
+                switch(currentMode) {
+                    case MODES.COMPASS:
+                        modeDot.classList.add('compass');
+                        modeText.textContent = '磁気センサーモード';
+                        break;
+                    case MODES.GPS:
+                        modeDot.classList.add('gps');
+                        modeText.textContent = 'GPS位置情報モード';
+                        break;
+                    case MODES.MOTION:
+                        modeDot.classList.add('motion');
+                        modeText.textContent = '加速度センサーモード';
+                        break;
+                }
+            }
+
+            // 磁気センサーの初期化
+            function initCompassMode() {
+                currentMode = MODES.COMPASS;
+                updateModeIndicator();
+                
+                if (window.DeviceOrientationEvent) {
+                    if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+                        // iOS 13+の場合は権限リクエスト
+                        DeviceOrientationEvent.requestPermission()
+                            .then(response => {
+                                if (response === 'granted') {
+                                    window.addEventListener('deviceorientation', handleDeviceOrientation);
+                                    showStatusMessage('磁気センサーモードを開始しました');
+                                } else {
+                                    switchToGPSMode('磁気センサーへのアクセスが拒否されました。GPSモードに切り替えます。');
+                                }
+                            })
+                            .catch(() => {
+                                switchToGPSMode('磁気センサーへのアクセスに失敗しました。GPSモードに切り替えます。');
+                            });
+                    } else {
+                        // 他のデバイス
+                        window.addEventListener('deviceorientation', handleDeviceOrientation);
+                        showStatusMessage('磁気センサーモードを開始しました');
+                    }
+                } else {
+                    switchToGPSMode('お使いのデバイスでは磁気センサーをサポートしていません。GPSモードに切り替えます。');
+                }
+            }
+
+            // GPSモードの初期化
+            function initGPSMode() {
+                currentMode = MODES.GPS;
+                updateModeIndicator();
+                
+                if (navigator.geolocation) {
+                    // 磁気センサーイベントを削除
+                    window.removeEventListener('deviceorientation', handleDeviceOrientation);
+                    
+                    // モーションセンサーイベントを削除
+                    window.removeEventListener('devicemotion', handleDeviceMotion);
+                    
+                    previousPositions = [];
+                    
+                    // GPS監視を開始
+                    watchId = navigator.geolocation.watchPosition(
+                        handlePositionUpdate,
+                        handleGPSError,
+                        { 
+                            enableHighAccuracy: true, 
+                            maximumAge: 0, 
+                            timeout: 5000 
+                        }
+                    );
+                    
+                    showStatusMessage('GPS位置情報モードを開始しました。動き始めると方向が表示されます。');
+                } else {
+                    switchToMotionMode('お使いのデバイスではGPS位置情報をサポートしていません。加速度センサーモードに切り替えます。');
+                }
+            }
+
+            // 加速度センサーモードの初期化
+            function initMotionMode() {
+                currentMode = MODES.MOTION;
+                updateModeIndicator();
+                
+                if (window.DeviceMotionEvent) {
+                    // 磁気センサーイベントを削除
+                    window.removeEventListener('deviceorientation', handleDeviceOrientation);
+                    
+                    // GPS監視を停止
+                    if (watchId !== null) {
+                        navigator.geolocation.clearWatch(watchId);
+                        watchId = null;
+                    }
+                    
+                    // モーションセンサーイベントを追加
+                    window.addEventListener('devicemotion', handleDeviceMotion);
+                    showStatusMessage('加速度センサーモードを開始しました。デバイスを動かすと方向を検出します。');
+                } else {
+                    switchToCompassMode('お使いのデバイスでは加速度センサーをサポートしていません。磁気センサーモードに戻ります。');
+                }
+            }
+
+            // モード切替
+            function switchMode() {
+                switch(currentMode) {
+                    case MODES.COMPASS:
+                        switchToGPSMode();
+                        break;
+                    case MODES.GPS:
+                        switchToMotionMode();
+                        break;
+                    case MODES.MOTION:
+                        switchToCompassMode();
+                        break;
+                }
+            }
+
+            // 磁気センサーモードに切替
+            function switchToCompassMode(message) {
+                initCompassMode();
+                if (message) {
+                    showStatusMessage(message);
+                }
+            }
+
+            // GPSモードに切替
+            function switchToGPSMode(message) {
+                initGPSMode();
+                if (message) {
+                    showStatusMessage(message);
+                }
+            }
+
+            // 加速度センサーモードに切替
+            function switchToMotionMode(message) {
+                initMotionMode();
+                if (message) {
+                    showStatusMessage(message);
+                }
+            }
+
+            // 磁気センサーのハンドラ
+            function handleDeviceOrientation(event) {
+                if (!event.alpha && !event.webkitCompassHeading) {
+                    switchToGPSMode('方位センサーが利用できません。GPSモードに切り替えます。');
+                    return;
+                }
+
+                let compassHeading;
+                
+                // iOS
+                if (event.webkitCompassHeading) {
+                    compassHeading = event.webkitCompassHeading;
+                } 
+                // Android
+                else if (event.alpha) {
+                    compassHeading = 360 - event.alpha;
+                }
+
+                if (compassHeading !== undefined) {
+                    updateCompassDisplay(compassHeading);
+                    if (!isInitialized) {
+                        finishInitialization();
+                    }
+                }
+            }
+
+            // GPS位置情報更新のハンドラ
+            function handlePositionUpdate(position) {
+                const { latitude, longitude } = position.coords;
+                
+                previousPositions.push({ latitude, longitude, timestamp: Date.now() });
+                
+                // 直近の位置情報のみを保持
+                if (previousPositions.length > 5) {
+                    previousPositions.shift();
+                }
+                
+                // 少なくとも2点の位置情報があれば方向を計算
+                if (previousPositions.length >= 2) {
+                    const latest = previousPositions[previousPositions.length - 1];
+                    const previous = previousPositions[0];
+                    
+                    // 移動距離が十分あるか確認
+                    const distance = calculateDistance(
+                        previous.latitude, previous.longitude,
+                        latest.latitude, latest.longitude
+                    );
+                    
+                    // 最低距離（メートル）と最低時間（ミリ秒）
+                    if (distance > 5 && (latest.timestamp - previous.timestamp) > 1000) {
+                        const bearing = calculateBearing(
+                            previous.latitude, previous.longitude,
+                            latest.latitude, latest.longitude
+                        );
+                        
+                        updateCompassDisplay(bearing);
+                        if (!isInitialized) {
+                            finishInitialization();
+                        }
+                    }
+                }
+            }
+
+            // GPS位置情報のエラーハンドラ
+            function handleGPSError(error) {
+                console.error('GPS error:', error);
+                switchToMotionMode('GPS位置情報の取得に失敗しました。加速度センサーモードに切り替えます。');
+            }
+
+            // 加速度センサーのハンドラ
+            function handleDeviceMotion(event) {
+                if (!event.accelerationIncludingGravity) {
+                    switchToCompassMode('加速度センサーが利用できません。磁気センサーモードに戻ります。');
+                    return;
+                }
+
+                const { x, y } = event.accelerationIncludingGravity;
+                
+                // 加速度から簡易的な方向を推定
+                if (Math.abs(x) > 2 || Math.abs(y) > 2) {
+                    const angle = Math.atan2(y, x) * (180 / Math.PI);
+                    const normalizedAngle = (angle + 360) % 360;
+                    
+                    // 動きが検出されたら更新
+                    updateCompassDisplay(normalizedAngle);
+                    if (!isInitialized) {
+                        finishInitialization();
+                    }
+                }
+            }
+
+            // 2点間の距離をメートルで計算（ハーバーサイン公式）
+            function calculateDistance(lat1, lon1, lat2, lon2) {
+                const R = 6371e3; // 地球の半径（メートル）
+                const φ1 = lat1 * Math.PI / 180;
+                const φ2 = lat2 * Math.PI / 180;
+                const Δφ = (lat2 - lat1) * Math.PI / 180;
+                const Δλ = (lon2 - lon1) * Math.PI / 180;
+
+                const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
+                        Math.cos(φ1) * Math.cos(φ2) *
+                        Math.sin(Δλ/2) * Math.sin(Δλ/2);
+                const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+
+                return R * c;
+            }
+
+            // 2点間の方位角を度数で計算
+            function calculateBearing(lat1, lon1, lat2, lon2) {
+                const φ1 = lat1 * Math.PI / 180;
+                const φ2 = lat2 * Math.PI / 180;
+                const Δλ = (lon2 - lon1) * Math.PI / 180;
+
+                const y = Math.sin(Δλ) * Math.cos(φ2);
+                const x = Math.cos(φ1) * Math.sin(φ2) -
+                        Math.sin(φ1) * Math.cos(φ2) * Math.cos(Δλ);
+                
+                let brng = Math.atan2(y, x) * 180 / Math.PI;
+                brng = (brng + 360) % 360; // 正の値に正規化
+                
+                return brng;
+            }
+
+            // キャリブレーション処理
+            function calibrate() {
                 if (isCalibrating) return;
                 
                 isCalibrating = true;
                 calibrateBtn.textContent = 'キャリブレーション中...';
                 
-                // デバイスを8の字に動かすように促す
-                alert('デバイスを「8の字」を描くように動かしてください。5秒後に完了します。');
+                document.body.classList.add('vibrate');
                 
-                setTimeout(function() {
+                let message;
+                switch(currentMode) {
+                    case MODES.COMPASS:
+                        message = 'デバイスを「8の字」を描くように動かしてください';
+                        break;
+                    case MODES.GPS:
+                        message = '直線的に5-10メートル移動してください';
+                        break;
+                    case MODES.MOTION:
+                        message = 'デバイスをゆっくり水平に回転させてください';
+                        break;
+                }
+                
+                showStatusMessage(message, 5000);
+                
+                setTimeout(() => {
+                    document.body.classList.remove('vibrate');
                     calibrateBtn.textContent = 'キャリブレーション';
                     isCalibrating = false;
-                    alert('キャリブレーションが完了しました。');
+                    showStatusMessage('キャリブレーション完了！精度が向上しました', 2000);
                 }, 5000);
-            });
-
-            // センサーへのアクセスを要求
-            if (window.DeviceOrientationEvent) {
-                if (typeof DeviceOrientationEvent.requestPermission === 'function') {
-                    // iOS 13+では明示的な許可が必要
-                    document.body.addEventListener('click', function() {
-                        DeviceOrientationEvent.requestPermission()
-                            .then(function(result) {
-                                if (result === 'granted') {
-                                    window.addEventListener('deviceorientation', handleOrientation, true);
-                                } else {
-                                    showError('方位センサーへのアクセスが拒否されました。');
-                                }
-                            })
-                            .catch(function(error) {
-                                showError('方位センサーの許可を取得できませんでした: ' + error);
-                            });
-                    }, { once: true });
-                } else {
-                    // 他のデバイス
-                    window.addEventListener('deviceorientation', handleOrientation, true);
-                }
-            } else {
-                showError('お使いのデバイスでは方位センサーをサポートしていません。');
             }
+
+            // 初期化完了
+            function finishInitialization() {
+                if (!isInitialized) {
+                    isInitialized = true;
+                    loadingOverlay.style.opacity = '0';
+                    setTimeout(() => {
+                        loadingOverlay.style.display = 'none';
+                    }, 500);
+                }
+            }
+
+            // 最適なモードを自動選択
+            function autoSelectBestMode() {
+                // 最初に磁気センサーを試す
+                if (window.DeviceOrientationEvent && 
+                    (typeof DeviceOrientationEvent.requestPermission !== 'function' || 
+                     document.body.requestFullscreen)) {
+                    initCompassMode();
+                } else {
+                    // 磁気センサーが利用できなければGPSを試す
+                    initGPSMode();
+                }
+                
+                // 5秒後にもまだ初期化されていなければ、強制的に加速度センサーで初期化
+                setTimeout(() => {
+                    if (!isInitialized) {
+                        initMotionMode();
+                        setTimeout(() => {
+                            if (!isInitialized) {
+                                finishInitialization();
+                                showStatusMessage('センサーが検出できません。画面をタップして方向を指定できます。');
+                                
+                                // フォールバック: タッチで方向指定
+                                document.body.addEventListener('click', (event) => {
+                                    const rect = document.body.getBoundingClientRect();
+                                    const centerX = rect.width / 2;
+                                    const centerY = rect.height / 2;
+                                    
+                                    const angle = Math.atan2(
+                                        event.clientY - centerY, 
+                                        event.clientX - centerX
+                                    ) * (180 / Math.PI);
+                                    
+                                    const compassAngle = (angle + 90 + 360) % 360;
+                                    updateCompassDisplay(compassAngle);
+                                });
+                            }
+                        }, 3000);
+                    }
+                }, 5000);
+            }
+
+            // イベントリスナー
+            switchModeBtn.addEventListener('click', switchMode);
+            calibrateBtn.addEventListener('click', calibrate);
+
+            // 初期化
+            createDegreeTicks();
+            autoSelectBestMode();
         });
     </script>
 </body>
