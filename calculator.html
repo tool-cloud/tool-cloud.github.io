@@ -6,12 +6,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>関数電卓</title>
+  <!-- Google Fonts: Noto Sans JP -->
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
   <style>
     /* 全体レイアウト */
     body {
       margin: 0;
       padding: 0;
-      font-family: Arial, sans-serif;
+      font-family: 'Noto Sans JP', Arial, sans-serif;
       display: flex;
       flex-direction: column;
       height: 100vh;
@@ -33,7 +35,8 @@
     .input-display {
       background: #000;
       color: #0f0;
-      font-size: 2.5rem;
+      /* clamp(最小, 推奨, 最大) を使用して画面サイズに合わせた文字サイズ */
+      font-size: clamp(2rem, 5vw, 3rem);
       padding: 20px;
       text-align: right;
       word-wrap: break-word;
@@ -45,7 +48,7 @@
     .result-display {
       background: #000;
       color: #ff0;
-      font-size: 1.8rem;
+      font-size: clamp(1.5rem, 4vw, 2rem);
       padding: 10px 20px;
       text-align: right;
       word-wrap: break-word;
@@ -62,7 +65,7 @@
     .btn {
       background: #333;
       color: #fff;
-      font-size: 1.5rem;
+      font-size: clamp(1.3rem, 3vw, 1.5rem);
       padding: 20px;
       border: none;
       outline: none;
@@ -88,15 +91,15 @@
     }
     @media (max-width: 500px) {
       .input-display {
-        font-size: 2rem;
+        font-size: clamp(1.8rem, 6vw, 2.5rem);
         padding: 15px;
       }
       .result-display {
-        font-size: 1.5rem;
+        font-size: clamp(1.3rem, 5vw, 1.8rem);
         padding: 10px 15px;
       }
       .btn {
-        font-size: 1.3rem;
+        font-size: clamp(1rem, 3vw, 1.3rem);
         padding: 15px;
       }
     }

@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8536456976562388"
+     crossorigin="anonymous"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>スマホ対応複数カウンター</title>
+  <style>
+    /* 全体基本設定 */
+    body {
+      margin: 0;
+      padding: 20px;
+      background-color: #f0f0f0;
+      font-family: Arial, sans-serif;
+      text-align: center;
+    }
+    
+    /* カウンター全体コンテナ */
+    .counters-container {
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    /* PC用のグリッドレイアウト */
+    @media (min-width: 768px) {
+      .counters-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+        justify-items: center;
+      }
+      
+      /* 初期状態（1つだけの場合）中央配置 */
+      .counters-container.single-counter {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+    }
+    
+    /* 個別カウンター */
+    .counter-item {
+      margin: 0 auto;
+      width: 90%;
+      max-width: 500px;
+    }
+    
+    .counter-name-input {
+      font-size: 1.2em;
+      padding: 8px;
+      width: 100%;
+      margin-bottom: 8px;
+      border-radius: 5px;
+      border: 2px solid #ccc;
+    }
+    
+    .canvas-wrapper {
+      position: relative;
+      display: inline-block;
+      width: 100%;
+    }
+    
+    /* カウンタ枠 */
+    .counter-canvas {
+      display: block;
+      width: 100%;
+      border: 3px solid #000;
+      border-radius: 10px;
+      background-color: #fff;
+      cursor: pointer;
+    }
+    
+    /* オーバーレイ：左右のナビ表示 */
+    .overlay {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2em;
+      color: rgba(255, 255, 255, 0.8);
+      pointer-events: none;
+      padding: 0 5px;
+    }
+    
+    .overlay-left {
+      left: 0;
+      width: 30%;
+      background: rgba(0, 0, 0, 0.2);
+      border-top-left-radius: 7px;
+      border-bottom-left-radius: 7px;
+    }
+    
+    .overlay-right {
+      right: 0;
+      width: 30%;
+      background: rgba(0, 0, 0, 0.2);
+      border-top-right-radius: 7px;
+      border-bottom-right-radius: 7px;
+    }
+    
+    /* 定期カウント設定エリア */
+    .periodic-section {
+      display: none;
+      margin: 10px auto;
+      width: 100%;
+    }
+    
+    .periodic-section input[type="number"],
+    .toggle-periodic-btn,
+    select {
+      font-size: 1.2em;
+      padding: 8px;
+      margin: 10px 0;
+      border-radius: 5px;
+      width: 90%;
+    }
+    
+    .toggle-periodic-btn {
+      border: none;
+      background-color: #4caf50;
+      color: #fff;
+      cursor: pointer;
+    }
+    
+    .toggle-periodic-btn:hover {
+      background-color: #388e3c;
+    }
+    
+    /* 下部ボタン群 */
+    .counter-buttons {
+      margin-top: 10px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    
+    .counter-buttons button {
+      font-size: 1.2em;
+      padding: 10px;
+      border: none;
+      border-radius: 5px;
+      background-color: #007bff;
+      color: #fff;
+      cursor: pointer;
+    }
+    
+    .counter-buttons button:hover {
+      background-color: #0056b3;
+    }
+    
+    /* 削除ボタン */
+    .remove-counter-btn {
+      background-color: #dc3545 !important;
+    }
+    
+    .remove-counter-btn:hover {
+      background-color: #c82333 !important;
+    }
+    
+    /* 追加ボタン */
+    #addCounterBtn {
+      font-size: 1.8em;
+      padding: 15px;
+      margin: 20px auto;
+      border: none;
+      border-radius: 5px;
+      background-color: #6c757d;
+      color: #fff;
+      cursor: pointer;
+      width: 90%;
+      max-width: 500px;
+    }
+    
+    #addCounterBtn:hover {
+      background-color: #5a6268;
+    }
+  </style>
+</head>
+<body>
+  <!-- カウンター全体コンテナ -->
+  <div class="counters-container single-counter" id="countersContainer">
+    <!-- 最初のカウンターはJSで追加 -->
+  </div>
+
+  <!-- カウンター追加ボタン -->
+  <button id="addCounterBtn">新しいカウンターを追加</button>
+
+  <script>
+    // カウンター追加した数を管理
+    let counterCount = 0;
+    // カウンター情報を保存するオブジェクト
+    let counters = {};
+    
+    // 最初のカウンターを作成
+    document.addEventListener('DOMContentLoaded', function() {
+      addCounter();
+      
+      // ローカルストレージからカウンターデータを復元
+      loadCountersFromLocalStorage();
+    });
+    
+    // ローカルストレージからカウンターデータを復元する関数
+    function loadCountersFromLocalStorage() {
+      const savedCounters = localStorage.getItem('counters');
+      if (savedCounters) {
+        const counterData = JSON.parse(savedCounters);
+        
+        // 既存の最初のカウンターを削除
+        document.getElementById('countersContainer').innerHTML = '';
+        counterCount = 0;
+        
+        // 保存されたカウンターを復元
+        Object.keys(counterData).forEach(id => {
+          const data = counterData[id];
+          addCounter(data.value, data.name);
+        });
+      }
+    }
+    
+    // カウンターデータをローカルストレージに保存する関数
+    function saveCountersToLocalStorage() {
+      localStorage.setItem('counters', JSON.stringify(counters));
+    }
+    
+    // カウンターの数に応じてレイアウトクラスを更新
+    function updateContainerClass() {
+      const container = document.getElementById('countersContainer');
+      const counterItems = document.querySelectorAll('.counter-item');
+      
+      if (counterItems.length === 1) {
+        container.classList.add('single-counter');
+      } else {
+        container.classList.remove('single-counter');
+      }
+    }
+    
+    // 新しいカウンターを追加する関数
+    function addCounter(initialValue = 0, name = '') {
+      const counterId = 'counter_' + counterCount;
+      counterCount++;
+      
+      // カウンターの情報を保存
+      counters[counterId] = {
+        value: initialValue,
+        name: name,
+        isPeriodicOn: false
+      };
+      
+      // カウンターのHTMLを作成
+      const counterDiv = document.createElement('div');
+      counterDiv.className = 'counter-item';
+      counterDiv.id = counterId;
+      
+      counterDiv.innerHTML = `
+        <input type="text" class="counter-name-input" placeholder="カウンター名" value="${name}">
+        <div class="canvas-wrapper">
+          <canvas class="counter-canvas" width="500" height="150"></canvas>
+          <div class="overlay overlay-left">← -1</div>
+          <div class="overlay overlay-right">+1 →</div>
+        </div>
+        
+        <select class="periodic-select">
+          <option value="hide">定期カウント非表示</option>
+          <option value="show">定期カウント表示</option>
+        </select>
+        
+        <div class="periodic-section">
+          <button class="toggle-periodic-btn">定期カウント開始</button>
+          <input type="number" class="interval-input" value="5" min="1">秒ごと
+        </div>
+        
+        <div class="counter-buttons">
+          <button class="reset-btn">リセット</button>
+          <button class="remove-counter-btn">カウンターを削除</button>
+        </div>
+      `;
+      
+      // カウンターを追加
+      document.getElementById('countersContainer').appendChild(counterDiv);
+      
+      // レイアウトクラスを更新
+      updateContainerClass();
+      
+      // カウンターを描画
+      const canvas = counterDiv.querySelector('.counter-canvas');
+      const ctx = canvas.getContext('2d');
+      
+      // Canvas の表示サイズを親要素に合わせる
+      function resizeCanvas() {
+        const parentWidth = canvas.parentElement.clientWidth;
+        canvas.style.width = parentWidth + 'px';
+        canvas.style.height = (parentWidth * 0.3) + 'px'; // アスペクト比を保つ
+      }
+      
+      resizeCanvas();
+      window.addEventListener('resize', resizeCanvas);
+      
+      // カウンターを描画する関数
+      function drawCounter() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = "#fff";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.strokeStyle = "#000";
+        ctx.lineWidth = 3;
+        ctx.strokeRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = "#000";
+        let fontSize = canvas.height * 0.7;
+        ctx.font = "bold " + fontSize + "px Arial";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        let formatted = String(counters[counterId].value).padStart(5, '0');
+        ctx.fillText(formatted, canvas.width / 2, canvas.height / 2);
+      }
+      
+      drawCounter();
+      
+      // カウンター名入力フィールドのイベント
+      const nameInput = counterDiv.querySelector('.counter-name-input');
+      nameInput.addEventListener('input', function() {
+        counters[counterId].name = this.value;
+        saveCountersToLocalStorage();
+      });
+      
+      // カウンタークリックでの増減
+      canvas.addEventListener('click', function(e) {
+        const rect = canvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        if (x > rect.width / 2) {
+          counters[counterId].value++;
+        } else {
+          counters[counterId].value--;
+        }
+        drawCounter();
+        saveCountersToLocalStorage();
+      });
+      
+      // 定期カウント表示切替
+      const periodicSelect = counterDiv.querySelector('.periodic-select');
+      const periodicSection = counterDiv.querySelector('.periodic-section');
+      
+      periodicSelect.addEventListener('change', function() {
+        if (this.value === "show") {
+          periodicSection.style.display = "block";
+        } else {
+          // 定期カウント実行中なら停止
+          if (counters[counterId].isPeriodicOn) {
+            clearInterval(counters[counterId].periodicInterval);
+            counters[counterId].isPeriodicOn = false;
+            counterDiv.querySelector('.toggle-periodic-btn').innerText = "定期カウント開始";
+          }
+          periodicSection.style.display = "none";
+        }
+      });
+      
+      // 定期カウント開始/停止
+      const togglePeriodicBtn = counterDiv.querySelector('.toggle-periodic-btn');
+      togglePeriodicBtn.addEventListener('click', function() {
+        if (counters[counterId].isPeriodicOn) {
+          clearInterval(counters[counterId].periodicInterval);
+          counters[counterId].isPeriodicOn = false;
+          this.innerText = "定期カウント開始";
+        } else {
+          let intervalSeconds = parseInt(counterDiv.querySelector('.interval-input').value, 10);
+          if (isNaN(intervalSeconds) || intervalSeconds < 1) {
+            alert("有効な秒数を入力してください。");
+            return;
+          }
+          counters[counterId].periodicInterval = setInterval(function() {
+            counters[counterId].value++;
+            drawCounter();
+            saveCountersToLocalStorage();
+          }, intervalSeconds * 1000);
+          counters[counterId].isPeriodicOn = true;
+          this.innerText = "定期カウント停止";
+        }
+      });
+      
+      // リセットボタン
+      counterDiv.querySelector('.reset-btn').addEventListener('click', function() {
+        counters[counterId].value = 0;
+        drawCounter();
+        saveCountersToLocalStorage();
+      });
+      
+      // 削除ボタン
+      counterDiv.querySelector('.remove-counter-btn').addEventListener('click', function() {
+        // 最低1つのカウンターは残す
+        if (document.querySelectorAll('.counter-item').length <= 1) {
+          alert("少なくとも1つのカウンターが必要です。");
+          return;
+        }
+        
+        // 定期カウント実行中なら停止
+        if (counters[counterId].isPeriodicOn) {
+          clearInterval(counters[counterId].periodicInterval);
+        }
+        
+        // カウンター削除
+        delete counters[counterId];
+        counterDiv.remove();
+        
+        // レイアウトクラスを更新
+        updateContainerClass();
+        
+        saveCountersToLocalStorage();
+      });
+      
+      // 初期値を保存
+      saveCountersToLocalStorage();
+    }
+    
+    // 追加ボタンのイベント
+    document.getElementById('addCounterBtn').addEventListener('click', function() {
+      addCounter();
+    });
+  </script>
+</body>
+</html>
