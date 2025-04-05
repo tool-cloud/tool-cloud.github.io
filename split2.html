@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>割り勘計算機</title>
+     <title>スマホ対応 割り勘計算機</title>
     <style>
         :root {
             --primary: #2196F3;
@@ -12,53 +12,66 @@
             --background: #f5f5f5;
         }
 
+        * {
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: 'Segoe UI', Tahoma, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             line-height: 1.6;
-            margin: 2rem;
+            margin: 0;
+            padding: 1rem;
             background: var(--background);
+            -webkit-text-size-adjust: 100%;
         }
 
         .container {
-            max-width: 800px;
+            max-width: 100%;
             margin: 0 auto;
             background: white;
-            padding: 2rem;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
         }
 
         h1 {
             color: var(--primary);
             text-align: center;
-            margin-bottom: 2rem;
-            font-size: 1.8rem;
+            margin: 1rem 0;
+            font-size: 1.4rem;
         }
 
         .input-group {
-            margin-bottom: 1.5rem;
+            margin-bottom: 1.2rem;
         }
 
         label {
             display: block;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.4rem;
             font-weight: 500;
-            color: #444;
+            color: #333;
+            font-size: 0.95rem;
         }
 
         input, textarea {
             width: 100%;
             padding: 0.8rem;
             border: 1px solid #ddd;
-            border-radius: 5px;
+            border-radius: 6px;
             margin-bottom: 0.5rem;
+            font-size: 1rem;
+            min-width: 0;
+        }
+
+        input:focus, textarea:focus {
+            outline: 2px solid var(--primary);
+            outline-offset: -1px;
         }
 
         details {
-            margin: 1rem 0;
+            margin: 0.8rem 0;
             border: 1px solid #eee;
-            border-radius: 5px;
-            padding: 0.5rem;
+            border-radius: 6px;
         }
 
         details[open] {
@@ -67,27 +80,36 @@
 
         summary {
             cursor: pointer;
-            padding: 0.5rem;
+            padding: 0.8rem;
             font-weight: 500;
+            font-size: 0.95rem;
+            background: #f8f9fa;
         }
 
         .option-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            padding: 0.8rem;
+        }
+
+        .option-row {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1rem;
-            margin: 1rem 0;
+            gap: 0.8rem;
+            grid-template-columns: 1fr 1fr;
         }
 
         .button {
             background: var(--primary);
             color: white;
             border: none;
-            padding: 0.8rem 1.5rem;
-            border-radius: 5px;
+            padding: 1rem;
+            border-radius: 8px;
             cursor: pointer;
             transition: opacity 0.3s;
             width: 100%;
             font-size: 1.1rem;
+            margin: 1rem 0;
         }
 
         .button:hover {
@@ -95,35 +117,52 @@
         }
 
         #results {
-            margin-top: 2rem;
+            margin-top: 1rem;
             padding: 1rem;
             background: #f8f9fa;
-            border-radius: 5px;
+            border-radius: 8px;
         }
 
         .result-category {
             padding: 1rem;
-            margin: 1rem 0;
+            margin: 0.8rem 0;
             background: white;
             border-left: 4px solid var(--primary);
-            border-radius: 3px;
+            border-radius: 4px;
         }
 
         .highlight {
             color: var(--primary);
             font-weight: bold;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
         }
 
         .memo {
             color: #666;
-            font-size: 0.9rem;
-            margin-top: 0.5rem;
+            font-size: 0.85rem;
+            margin-top: 0.4rem;
+            line-height: 1.4;
         }
 
         .per-person {
             background: #e3f2fd;
             border-color: #2196F3;
+            padding: 1.2rem;
+        }
+
+        @media (min-width: 480px) {
+            .container {
+                padding: 1.5rem;
+                max-width: 600px;
+            }
+            
+            .option-row {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            summary {
+                padding: 1rem;
+            }
         }
     </style>
 </head>
@@ -144,8 +183,10 @@
         <details>
             <summary>⏩ 事前支払い設定</summary>
             <div class="option-group">
-                <input type="number" id="prepaidAmount" placeholder="支払済み金額">
-                <input type="number" id="prepaidPeople" placeholder="支払った人数">
+                <div class="option-row">
+                    <input type="number" id="prepaidAmount" placeholder="支払済み金額">
+                    <input type="number" id="prepaidPeople" placeholder="支払った人数">
+                </div>
                 <textarea id="prepaidMemo" placeholder="メモ（例：部長支払い）"></textarea>
             </div>
         </details>
@@ -153,8 +194,10 @@
         <details>
             <summary>🎩 主賓設定</summary>
             <div class="option-group">
-                <input type="number" id="guestAmount" placeholder="1人あたり金額">
-                <input type="number" id="guestCount" placeholder="人数">
+                <div class="option-row">
+                    <input type="number" id="guestAmount" placeholder="1人あたり金額">
+                    <input type="number" id="guestCount" placeholder="人数">
+                </div>
                 <textarea id="guestMemo" placeholder="メモ（例：取引先部長）"></textarea>
             </div>
         </details>
@@ -162,8 +205,10 @@
         <details>
             <summary>⏰ 遅れて参加の人</summary>
             <div class="option-group">
-                <input type="number" id="latecomerDiscount" placeholder="割引金額（例：1000）">
-                <input type="number" id="latecomerCount" placeholder="人数">
+                <div class="option-row">
+                    <input type="number" id="latecomerDiscount" placeholder="割引金額">
+                    <input type="number" id="latecomerCount" placeholder="人数">
+                </div>
                 <textarea id="latecomerMemo" placeholder="メモ（例：30分遅刻）"></textarea>
             </div>
         </details>
@@ -171,8 +216,10 @@
         <details>
             <summary>➕ 多めに支払う人</summary>
             <div class="option-group">
-                <input type="number" id="extraPayAmount" placeholder="追加金額">
-                <input type="number" id="extraPayCount" placeholder="人数">
+                <div class="option-row">
+                    <input type="number" id="extraPayAmount" placeholder="追加金額">
+                    <input type="number" id="extraPayCount" placeholder="人数">
+                </div>
                 <textarea id="extraPayMemo" placeholder="メモ（例：お酒多め）"></textarea>
             </div>
         </details>
@@ -180,8 +227,10 @@
         <details>
             <summary>➖ 少なめに支払う人</summary>
             <div class="option-group">
-                <input type="number" id="discountAmount" placeholder="減額金額">
-                <input type="number" id="discountCount" placeholder="人数">
+                <div class="option-row">
+                    <input type="number" id="discountAmount" placeholder="減額金額">
+                    <input type="number" id="discountCount" placeholder="人数">
+                </div>
                 <textarea id="discountMemo" placeholder="メモ（例：下戸）"></textarea>
             </div>
         </details>
@@ -197,6 +246,7 @@
             </div>
         </div>
     </div>
+
 
     <script>
         function calculate() {
