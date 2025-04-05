@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>割り勘計算機</title>
+    <style>
+        :root {
+            --primary: #2196F3;
+            --secondary: #4CAF50;
+            --accent: #FF9800;
+            --background: #f5f5f5;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            line-height: 1.6;
+            margin: 2rem;
+            background: var(--background);
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: var(--primary);
+            text-align: center;
+            margin-bottom: 2rem;
+            font-size: 1.8rem;
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #444;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 0.5rem;
+        }
+
+        details {
+            margin: 1rem 0;
+            border: 1px solid #eee;
+            border-radius: 5px;
+            padding: 0.5rem;
+        }
+
+        details[open] {
+            border-color: var(--primary);
+        }
+
+        summary {
+            cursor: pointer;
+            padding: 0.5rem;
+            font-weight: 500;
+        }
+
+        .option-group {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: opacity 0.3s;
+            width: 100%;
+            font-size: 1.1rem;
+        }
+
+        .button:hover {
+            opacity: 0.9;
+        }
+
+        #results {
+            margin-top: 2rem;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 5px;
+        }
+
+        .result-category {
+            padding: 1rem;
+            margin: 1rem 0;
+            background: white;
+            border-left: 4px solid var(--primary);
+            border-radius: 3px;
+        }
+
+        .highlight {
+            color: var(--primary);
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .memo {
+            color: #666;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+
+        .per-person {
+            background: #e3f2fd;
+            border-color: #2196F3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🍻 割り勘計算機</h1>
+
+        <div class="input-group">
+            <label>支払い総額（円）</label>
+            <input type="number" id="total" placeholder="例：35000" required>
+        </div>
+
+        <div class="input-group">
+            <label>参加者総人数</label>
+            <input type="number" id="totalPeople" placeholder="例：10" required>
+        </div>
+
+        <details>
+            <summary>⏩ 事前支払い設定</summary>
+            <div class="option-group">
+                <input type="number" id="prepaidAmount" placeholder="支払済み金額">
+                <input type="number" id="prepaidPeople" placeholder="支払った人数">
+                <textarea id="prepaidMemo" placeholder="メモ（例：部長支払い）"></textarea>
+            </div>
+        </details>
+
+        <details>
+            <summary>🎩 主賓設定</summary>
+            <div class="option-group">
+                <input type="number" id="guestAmount" placeholder="1人あたり金額">
+                <input type="number" id="guestCount" placeholder="人数">
+                <textarea id="guestMemo" placeholder="メモ（例：取引先部長）"></textarea>
+            </div>
+        </details>
+
+        <details>
+            <summary>⏰ 遅れて参加の人</summary>
+            <div class="option-group">
+                <input type="number" id="latecomerDiscount" placeholder="割引金額（例：1000）">
+                <input type="number" id="latecomerCount" placeholder="人数">
+                <textarea id="latecomerMemo" placeholder="メモ（例：30分遅刻）"></textarea>
+            </div>
+        </details>
+
+        <details>
+            <summary>➕ 多めに支払う人</summary>
+            <div class="option-group">
+                <input type="number" id="extraPayAmount" placeholder="追加金額">
+                <input type="number" id="extraPayCount" placeholder="人数">
+                <textarea id="extraPayMemo" placeholder="メモ（例：お酒多め）"></textarea>
+            </div>
+        </details>
+
+        <details>
+            <summary>➖ 少なめに支払う人</summary>
+            <div class="option-group">
+                <input type="number" id="discountAmount" placeholder="減額金額">
+                <input type="number" id="discountCount" placeholder="人数">
+                <textarea id="discountMemo" placeholder="メモ（例：下戸）"></textarea>
+            </div>
+        </details>
+
+        <button class="button" onclick="calculate()">計算実行</button>
+
+        <div id="results" style="display:none">
+            <h3>📊 計算結果</h3>
+            <div id="resultHeader" class="result-category per-person"></div>
+            <div id="resultItems"></div>
+            <div class="result-category">
+                合計金額検算: <span id="totalCheck" class="highlight"></span>円
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function calculate() {
+            // 基本情報取得
+            const total = parseInt(document.getElementById('total').value);
+            const totalPeople = parseInt(document.getElementById('totalPeople').value);
+
+            // オプション項目取得
+            const prepaid = {
+                amount: parseInt(document.getElementById('prepaidAmount').value) || 0,
+                people: parseInt(document.getElementById('prepaidPeople').value) || 0,
+                memo: document.getElementById('prepaidMemo').value
+            };
+
+            const guest = {
+                amount: parseInt(document.getElementById('guestAmount').value) || 0,
+                count: parseInt(document.getElementById('guestCount').value) || 0,
+                memo: document.getElementById('guestMemo').value
+            };
+
+            const latecomer = {
+                discount: parseInt(document.getElementById('latecomerDiscount').value) || 0,
+                count: parseInt(document.getElementById('latecomerCount').value) || 0,
+                memo: document.getElementById('latecomerMemo').value
+            };
+
+            const extraPay = {
+                amount: parseInt(document.getElementById('extraPayAmount').value) || 0,
+                count: parseInt(document.getElementById('extraPayCount').value) || 0,
+                memo: document.getElementById('extraPayMemo').value
+            };
+
+            const discount = {
+                amount: parseInt(document.getElementById('discountAmount').value) || 0,
+                count: parseInt(document.getElementById('discountCount').value) || 0,
+                memo: document.getElementById('discountMemo').value
+            };
+
+            // 計算処理
+            let remaining = total - prepaid.amount;
+            let remainingPeople = totalPeople - prepaid.people;
+            const specialCases = [];
+            let perPersonAmount = 0;
+
+            // バリデーション
+            if (remainingPeople < 0) {
+                alert('人数設定が不正です');
+                return;
+            }
+
+            // 基準金額計算
+            const baseAmount = remainingPeople > 0 ? remaining / remainingPeople : 0;
+
+            // 主賓処理
+            if (guest.count > 0) {
+                const amount = guest.amount * guest.count;
+                remaining -= amount;
+                remainingPeople -= guest.count;
+                specialCases.push({
+                    title: `主賓 ${guest.count}人`,
+                    amount: amount,
+                    memo: `${guest.amount.toLocaleString()}円/人 | ${guest.memo}`
+                });
+            }
+
+            // 遅刻者処理（割引）
+            if (latecomer.count > 0 && baseAmount > 0) {
+                const discountPerPerson = Math.min(latecomer.discount, baseAmount);
+                const latecomerAmount = (baseAmount - discountPerPerson) * latecomer.count;
+                remaining -= latecomerAmount;
+                remainingPeople -= latecomer.count;
+                specialCases.push({
+                    title: `遅れて参加 ${latecomer.count}人`,
+                    amount: latecomerAmount,
+                    memo: `${discountPerPerson.toLocaleString()}円割引 | ${latecomer.memo}`
+                });
+            }
+
+            // 多め支払い
+            if (extraPay.count > 0 && baseAmount > 0) {
+                const amount = (baseAmount + extraPay.amount) * extraPay.count;
+                remaining -= amount;
+                remainingPeople -= extraPay.count;
+                specialCases.push({
+                    title: `多め支払い ${extraPay.count}人`,
+                    amount: amount,
+                    memo: `+${extraPay.amount.toLocaleString()}円/人 | ${extraPay.memo}`
+                });
+            }
+
+            // 少なめ支払い
+            if (discount.count > 0 && baseAmount > 0) {
+                const discountPerPerson = Math.min(discount.amount, baseAmount);
+                const discountAmount = (baseAmount - discountPerPerson) * discount.count;
+                remaining -= discountAmount;
+                remainingPeople -= discount.count;
+                specialCases.push({
+                    title: `少なめ支払い ${discount.count}人`,
+                    amount: discountAmount,
+                    memo: `-${discountPerPerson.toLocaleString()}円/人 | ${discount.memo}`
+                });
+            }
+
+            // 通常参加者
+            if (remainingPeople > 0) {
+                perPersonAmount = remaining / remainingPeople;
+                specialCases.unshift({
+                    title: `通常参加者 ${remainingPeople}人`,
+                    amount: perPersonAmount * remainingPeople,
+                    memo: `1人あたり ${Math.round(perPersonAmount).toLocaleString()}円`
+                });
+            }
+
+            // 結果表示
+            const resultDiv = document.getElementById('resultItems');
+            resultDiv.innerHTML = specialCases.slice(1).map(item => `
+                <div class="result-category">
+                    <div>${item.title}</div>
+                    ${item.memo ? `<div class="memo">※ ${item.memo}</div>` : ''}
+                    <div class="highlight">${Math.round(item.amount).toLocaleString()}円</div>
+                </div>
+            `).join('');
+
+            // 一人当たり金額表示
+            document.getElementById('resultHeader').innerHTML = `
+                <div class="highlight">💡 1人あたり目安金額</div>
+                <div style="font-size:1.5rem; margin:1rem 0">
+                    ${Math.round(perPersonAmount).toLocaleString()}円
+                </div>
+                <div class="memo">（通常参加者 ${remainingPeople}人基準）</div>
+            `;
+
+            // 合計検算
+            const totalCheck = specialCases.reduce((sum, item) => sum + item.amount, 0) + prepaid.amount;
+            document.getElementById('totalCheck').textContent = 
+                Math.round(totalCheck).toLocaleString();
+
+            document.getElementById('results').style.display = 'block';
+        }
+    </script>
+</body>
+</html>

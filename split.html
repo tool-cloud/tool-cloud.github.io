@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ドライブ経費割り勘計算ツール</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .calculator {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        .section {
+            margin-bottom: 25px;
+            padding: 15px;
+            border-left: 4px solid #4CAF50;
+            background-color: #f9f9f9;
+        }
+
+        h2 {
+            color: #333;
+            margin-top: 0;
+        }
+
+        .input-group {
+            margin: 15px 0;
+            display: grid;
+            grid-template-columns: 180px 1fr;
+            align-items: center;
+            gap: 10px;
+        }
+
+        input, select {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 200px;
+        }
+
+        input:focus, select:focus {
+            outline: 2px solid #4CAF50;
+        }
+
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background: #45a049;
+        }
+
+        .result {
+            margin-top: 25px;
+            padding: 15px;
+            background: #e8f5e9;
+            border-radius: 5px;
+            display: none;
+        }
+
+        .note {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .result h3 {
+            margin-top: 0;
+        }
+
+        #perPerson {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #d32f2f;
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <h1>🚗 ドライブ経費計算 & 割り勘ツール</h1>
+
+        <div class="section">
+            <h2>▶ 走行情報</h2>
+            <div class="input-group">
+                <label>総走行距離（km）:</label>
+                <input type="number" id="totalDistance" min="0" step="1">
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>▶ 燃料費計算</h2>
+            <div class="input-group">
+                <label>ガソリン代（税込/L）:</label>
+                <input type="number" id="gasPrice" min="0" step="1">
+            </div>
+            <div class="input-group">
+                <label>燃費（km/L）:</label>
+                <input type="number" id="fuelEfficiency" min="1" step="1">
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>▶ 追加費用</h2>
+            <div class="input-group">
+                <label>高速道路料金:</label>
+                <input type="number" id="highway" min="0" step="1" value="0">
+            </div>
+            <div class="input-group">
+                <label>駐車場料金:</label>
+                <input type="number" id="parking" min="0" step="1" value="0">
+            </div>
+            <div class="input-group">
+                <label>その他費用:</label>
+                <input type="number" id="otherCost" min="0" step="1" value="0">
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>▶ 割り勘設定</h2>
+            <div class="input-group">
+                <label>参加人数:</label>
+                <input type="number" id="people" min="1" step="1" value="1">
+            </div>
+        </div>
+
+        <button onclick="calculate()">計算する</button>
+
+        <div class="result" id="result">
+            <h3>💰 計算結果</h3>
+            <p id="perPerson"></p>
+            <p id="totalCost"></p>
+            <p id="breakdown"></p>
+        </div>
+    </div>
+
+    <script>
+        function calculate() {
+            // 入力値の取得
+            const totalDistance = parseFloat(document.getElementById('totalDistance').value);
+            const gasPrice = parseFloat(document.getElementById('gasPrice').value);
+            const fuelEfficiency = parseFloat(document.getElementById('fuelEfficiency').value);
+            const highway = parseFloat(document.getElementById('highway').value) || 0;
+            const parking = parseFloat(document.getElementById('parking').value) || 0;
+            const otherCost = parseFloat(document.getElementById('otherCost').value) || 0;
+            const people = parseInt(document.getElementById('people').value);
+
+            // 計算処理
+            const gasCost = (totalDistance / fuelEfficiency) * gasPrice;
+            const totalCost = gasCost + highway + parking + otherCost;
+            const perPerson = totalCost / people;
+
+            // 結果表示
+            document.getElementById('result').style.display = 'block';
+            document.getElementById('perPerson').innerHTML = `1人あたり: ${Math.round(perPerson).toLocaleString()}円`;
+            document.getElementById('totalCost').innerHTML = `合計費用: ${Math.round(totalCost).toLocaleString()}円`;
+            document.getElementById('breakdown').innerHTML = `
+                <details>
+                    <summary>内訳詳細</summary>
+                    <ul>
+                        <li>燃料費: ${Math.round(gasCost)}円</li>
+                        ${highway ? `<li>高速道路: ${highway}円</li>` : ''}
+                        ${parking ? `<li>駐車場: ${parking}円</li>` : ''}
+                        ${otherCost ? `<li>その他: ${otherCost}円</li>` : ''}
+                    </ul>
+                </details>
+            `;
+        }
+    </script>
+</body>
+</html>
