@@ -1,90 +1,280 @@
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>サイドバー - ツール一覧</title>
-  <link rel="icon" href="favicon.ico" type="image/icon">
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f8f3ec;
-      color: #333;
-      margin: 0;
-      padding: 20px;
-    }
-    .container {
-      max-width: 800px;
-      margin: 0 auto;
-    }
-    header {
-      padding-bottom: 10px;
-      border-bottom: 1px solid #ccc;
-      margin-bottom: 20px;
-    }
-    header h1 {
-      font-size: 1.6rem;
-    }
-    nav h2 {
-      font-size: 1.2rem;
-      margin-top: 20px;
-    }
-    nav ul {
-      list-style: none;
-      padding-left: 0;
-    }
-    nav li {
-      margin: 5px 0;
-    }
-    nav a {
-      display: block;
-      padding: 8px 12px;
-      text-decoration: none;
-      color: #333;
-      background-color: #eee;
-      border-radius: 4px;
-      transition: background-color 0.2s;
-    }
-    nav a:hover {
-      background-color: #ddd;
-    }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <header>
-      <h1>ツール一覧サイドバー</h1>
-    </header>
-    <nav>
-      <!-- 計算ツール -->
-      <h2>計算ツール</h2>
-      <ul>
-        <li><a href="calculator.html">関数電卓</a></li>
-        <li><a href="converter.html">進数変換ツール</a></li>
-        <li><a href="condenser.html">コンデンサ容量計算</a></li>
-        <li><a href="resistor.html">抵抗値計算</a></li>
-      </ul>
-      
-      <!-- 時計ツール -->
-      <h2>時計ツール</h2>
-      <ul>
-        <li><a href="digitalclock.html">デジタル時計</a></li>
-        <li><a href="analogclock.html">アナログ時計</a></li>
-        <li><a href="stopwatch.html">ストップウォッチ</a></li>
-        <li><a href="webtimer.html">タイマー</a></li>
-        <li><a href="timer.html">ポモドーロタイマー</a></li>
-        <li><a href="metoro.html">メトロノーム</a></li>
-      </ul>
-      
-      <!-- その他 -->
-      <h2>その他</h2>
-      <ul>
-        <li><a href="fire.html">FIRE予測～DIE WITH ZERO～</a></li>
-        <li><a href="todo_b.html">TODOリスト</a></li>
-        <li><a href="cost.html">月の生活費計算</a></li>
-        <li><a href="read.html">テキスト読み上げ</a></li>
-      </ul>
-    </nav>
+<!-- sidebar.html -->
+<div class="sidebar-content">
+  <!-- サイドバー上部：プロフィール/サイト情報 -->
+  <div class="sidebar-section">
+    <div class="sidebar-profile">
+      <img src="/api/placeholder/80/80" alt="サイトロゴ" class="sidebar-logo">
+      <h3>スマートツール・コネクト</h3>
+      <p class="sidebar-description">便利なツールでスマートなライフスタイルを</p>
+    </div>
   </div>
-</body>
-</html>
+  
+  <!-- 最近の記事セクション -->
+  <div class="sidebar-section">
+    <h4 class="sidebar-heading">最近の記事</h4>
+    <ul class="sidebar-list">
+      <li><a href="#">AI活用ツールの最新動向</a></li>
+      <li><a href="#">おすすめの生産性向上アプリ5選</a></li>
+      <li><a href="#">初心者でも簡単！データ分析ツール入門</a></li>
+      <li><a href="#">クラウドストレージの選び方</a></li>
+      <li><a href="#">スマートホームデバイスレビュー</a></li>
+    </ul>
+  </div>
+  
+  <!-- カテゴリセクション -->
+  <div class="sidebar-section">
+    <h4 class="sidebar-heading">カテゴリ</h4>
+    <ul class="sidebar-list">
+      <li><a href="#">AIツール</a></li>
+      <li><a href="#">生産性向上</a></li>
+      <li><a href="#">データ分析</a></li>
+      <li><a href="#">クラウドサービス</a></li>
+      <li><a href="#">スマートホーム</a></li>
+      <li><a href="#">モバイルアプリ</a></li>
+    </ul>
+  </div>
+  
+  <!-- タグクラウド -->
+  <div class="sidebar-section">
+    <h4 class="sidebar-heading">人気のタグ</h4>
+    <div class="tag-cloud">
+      <a href="#" class="tag">AI</a>
+      <a href="#" class="tag">生産性</a>
+      <a href="#" class="tag">クラウド</a>
+      <a href="#" class="tag">データ</a>
+      <a href="#" class="tag">スマホ</a>
+      <a href="#" class="tag">自動化</a>
+      <a href="#" class="tag">効率化</a>
+      <a href="#" class="tag">ツール</a>
+      <a href="#" class="tag">テクノロジー</a>
+    </div>
+  </div>
+  
+  <!-- おすすめツール -->
+  <div class="sidebar-section">
+    <h4 class="sidebar-heading">おすすめツール</h4>
+    <div class="sidebar-tools">
+      <a href="#" class="sidebar-tool">
+        <img src="/api/placeholder/40/40" alt="ツール1" class="tool-icon">
+        <span>テキスト要約ツール</span>
+      </a>
+      <a href="#" class="sidebar-tool">
+        <img src="/api/placeholder/40/40" alt="ツール2" class="tool-icon">
+        <span>画像最適化ツール</span>
+      </a>
+      <a href="#" class="sidebar-tool">
+        <img src="/api/placeholder/40/40" alt="ツール3" class="tool-icon">
+        <span>カラーピッカー</span>
+      </a>
+    </div>
+  </div>
+  
+  <!-- 購読フォーム -->
+  <div class="sidebar-section">
+    <h4 class="sidebar-heading">最新情報を購読</h4>
+    <form class="subscribe-form">
+      <input type="email" placeholder="メールアドレス" required>
+      <button type="submit">購読する</button>
+    </form>
+  </div>
+  
+  <!-- SNSリンク -->
+  <div class="sidebar-section">
+    <h4 class="sidebar-heading">フォローする</h4>
+    <div class="social-links">
+      <a href="#" class="social-link">Twitter</a>
+      <a href="#" class="social-link">Facebook</a>
+      <a href="#" class="social-link">Instagram</a>
+      <a href="#" class="social-link">YouTube</a>
+    </div>
+  </div>
+</div>
+
+<style>
+  /* サイドバースタイル */
+  .sidebar-content {
+    font-family: Arial, sans-serif;
+    line-height: 1.5;
+  }
+  
+  .sidebar-section {
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--separator-color);
+  }
+  
+  .sidebar-section:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+  }
+  
+  .sidebar-heading {
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+    padding-bottom: 5px;
+    border-bottom: 2px solid var(--separator-color);
+  }
+  
+  /* プロフィール部分 */
+  .sidebar-profile {
+    text-align: center;
+    margin-bottom: 10px;
+  }
+  
+  .sidebar-logo {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    margin-bottom: 10px;
+  }
+  
+  .sidebar-description {
+    font-size: 0.9rem;
+    color: #666;
+    margin-top: 5px;
+  }
+  
+  /* リスト */
+  .sidebar-list {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar-list li {
+    margin-bottom: 8px;
+    padding-bottom: 8px;
+    border-bottom: 1px dashed var(--separator-color);
+  }
+  
+  .sidebar-list li:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+  }
+  
+  .sidebar-list a {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    padding: 3px 0;
+    transition: padding 0.2s;
+  }
+  
+  .sidebar-list a:hover {
+    padding-left: 5px;
+  }
+  
+  /* タグクラウド */
+  .tag-cloud {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  
+  .tag {
+    background-color: rgba(0,0,0,0.05);
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    text-decoration: none;
+    color: inherit;
+    transition: background-color 0.2s;
+  }
+  
+  .tag:hover {
+    background-color: rgba(0,0,0,0.1);
+  }
+  
+  /* おすすめツール */
+  .sidebar-tools {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .sidebar-tool {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: inherit;
+    padding: 5px;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+  }
+  
+  .sidebar-tool:hover {
+    background-color: rgba(0,0,0,0.05);
+  }
+  
+  .tool-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    margin-right: 10px;
+  }
+  
+  /* 購読フォーム */
+  .subscribe-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .subscribe-form input {
+    padding: 8px;
+    border: 1px solid var(--separator-color);
+    border-radius: 4px;
+  }
+  
+  .subscribe-form button {
+    padding: 8px;
+    background-color: #4a90e2;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  .subscribe-form button:hover {
+    background-color: #357abf;
+  }
+  
+  /* SNSリンク */
+  .social-links {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  
+  .social-link {
+    text-decoration: none;
+    color: inherit;
+    padding: 5px 10px;
+    background-color: rgba(0,0,0,0.05);
+    border-radius: 4px;
+    transition: background-color 0.2s;
+  }
+  
+  .social-link:hover {
+    background-color: rgba(0,0,0,0.1);
+  }
+  
+  /* ダークモード対応 */
+  body[data-theme="dark"] .sidebar-description {
+    color: #aaa;
+  }
+  
+  body[data-theme="dark"] .tag,
+  body[data-theme="dark"] .sidebar-tool:hover,
+  body[data-theme="dark"] .social-link {
+    background-color: rgba(255,255,255,0.05);
+  }
+  
+  body[data-theme="dark"] .tag:hover,
+  body[data-theme="dark"] .social-link:hover {
+    background-color: rgba(255,255,255,0.1);
+  }
+</style>
