@@ -34,11 +34,12 @@
             border-radius: 50%;
             margin: 20px auto;
             transition: transform 0.1s;
+            cursor: pointer;
         }
 
         .controls {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(2, 1fr);
             gap: 10px;
             margin: 20px 0;
         }
@@ -134,7 +135,7 @@
             <span id="bpm">120</span> BPM
         </div>
         
-        <div class="visualizer" id="visualizer"></div>
+        <div class="visualizer" id="visualizer" title="タップして開始/停止"></div>
         
         <input type="range" id="bpmRange" min="30" max="240" value="120">
         
@@ -162,18 +163,16 @@
             <details>
                 <summary>使い方ガイド</summary>
                 <ul>
-                    <li>▶ボタンで開始/停止</li>
+                    <li>青い丸をタップで開始/停止</li>
                     <li>スライダーでBPM調整</li>
                     <li>タップ領域でリズム入力</li>
                     <li>プリセットボタンで瞬時変更</li>
                     <li>音色と拍子を自由に変更</li>
-                    <li>設定は自動保存</li>
                 </ul>
             </details>
         </div>
 
         <div class="controls">
-            <button id="startStop">開始</button>
             <button id="tapTempo">タップでテンポ設定</button>
             <button id="preset120">120 BPM</button>
         </div>
@@ -212,7 +211,6 @@
             timeSignature: 4
         };
 
-        const startStopButton = document.getElementById('startStop');
         const bpmRange = document.getElementById('bpmRange');
         const bpmDisplay = document.getElementById('bpm');
         const visualizer = document.getElementById('visualizer');
@@ -258,11 +256,18 @@
             setTimeout(() => visualizer.style.transform = 'scale(1)', 50);
         }
 
+        function toggleMetronome() {
+            if (!isPlaying) {
+                startMetronome();
+            } else {
+                stopMetronome();
+            }
+        }
+
         function startMetronome() {
             if (!isPlaying) {
                 isPlaying = true;
                 currentBeat = 0;
-                startStopButton.textContent = '停止';
                 const interval = 60000 / settings.bpm;
                 
                 timerId = setInterval(() => {
@@ -270,14 +275,11 @@
                     playClick(currentBeat === 1);
                     updateVisualizer();
                 }, interval);
-            } else {
-                stopMetronome();
             }
         }
 
         function stopMetronome() {
             isPlaying = false;
-            startStopButton.textContent = '開始';
             clearInterval(timerId);
         }
 
@@ -304,7 +306,7 @@
         }
 
         // イベントリスナー
-        startStopButton.addEventListener('click', startMetronome);
+        visualizer.addEventListener('click', toggleMetronome);
         bpmRange.addEventListener('input', updateBPM);
         document.getElementById('tapTempo').addEventListener('click', handleTap);
         document.getElementById('tapArea').addEventListener('click', handleTap);
