@@ -94,8 +94,13 @@
         <button onclick="addTask()">追加</button>
         <ul id="taskList"></ul>
     </div>
-
     <script>
+        // ページ読み込み時に保存されたタスクを表示
+        document.addEventListener('DOMContentLoaded', function() {
+            loadTasks();
+        });
+
+        // タスクを追加する関数
         function addTask() {
             const taskInput = document.getElementById("task");
             const taskText = taskInput.value.trim();
@@ -105,10 +110,49 @@
             li.innerHTML = `${taskText} <button class="delete" onclick="removeTask(this)">削除</button>`;
             document.getElementById("taskList").appendChild(li);
             taskInput.value = "";
+            
+            // タスクをローカルストレージに保存
+            saveTasks();
         }
 
+        // タスクを削除する関数
         function removeTask(button) {
             button.parentElement.remove();
+            
+            // タスクをローカルストレージに保存（削除後の状態）
+            saveTasks();
+        }
+
+        // タスクをローカルストレージに保存する関数
+        function saveTasks() {
+            const taskList = document.getElementById("taskList");
+            const tasks = [];
+            
+            // 各タスクのテキスト内容を配列に格納
+            for (let i = 0; i < taskList.children.length; i++) {
+                const taskText = taskList.children[i].textContent.replace('削除', '').trim();
+                tasks.push(taskText);
+            }
+            
+            // ローカルストレージに保存
+            localStorage.setItem('tasks', JSON.stringify(tasks));
+        }
+
+        // ローカルストレージからタスクを読み込む関数
+        function loadTasks() {
+            const savedTasks = localStorage.getItem('tasks');
+            
+            if (savedTasks) {
+                const tasks = JSON.parse(savedTasks);
+                const taskList = document.getElementById("taskList");
+                
+                // 保存されていた各タスクをリストに追加
+                tasks.forEach(function(taskText) {
+                    const li = document.createElement("li");
+                    li.innerHTML = `${taskText} <button class="delete" onclick="removeTask(this)">削除</button>`;
+                    taskList.appendChild(li);
+                });
+            }
         }
     </script>
 </body>
