@@ -2,13 +2,14 @@
 <html lang="ja">
 <head>
   <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-855JTZTH6F"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-855JTZTH6F');
-  </script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-855JTZTH6F"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-855JTZTH6F');
+</script>
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8536456976562388"
      crossorigin="anonymous"></script>
   <meta charset="UTF-8">
@@ -17,6 +18,7 @@
   <link rel="icon" href="favicon.ico" type="image/icon">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
+    
     :root {
       --bg-light: #ffffff; --text-light: #333333; --card-light: #f8f3ec; --link-light: #4a90e2;
       --bg-dark: #1e1e1e; --text-dark: #cccccc; --card-dark: #2e2e2e; --link-dark: #8ab4f8;
@@ -24,29 +26,32 @@
       --separator-color: #ccc;
       --ad-space-width: 200px;
     }
+    
     body[data-theme="light"] {
       background-color: var(--bg-light); color: var(--text-light);
     }
-    body[data-theme="light"] header,
-    body[data-theme="light"] nav,
+    body[data-theme="light"] header, 
+    body[data-theme="light"] nav, 
     body[data-theme="light"] footer {
       background-color: var(--card-light);
     }
     body[data-theme="light"] a { color: var(--link-light); }
+    
     body[data-theme="dark"] {
       background-color: var(--bg-dark); color: var(--text-dark);
     }
-    body[data-theme="dark"] header,
-    body[data-theme="dark"] nav,
+    body[data-theme="dark"] header, 
+    body[data-theme="dark"] nav, 
     body[data-theme="dark"] footer {
       background-color: var(--card-dark);
     }
     body[data-theme="dark"] a { color: var(--link-dark); }
+    
     body {
       font-family: Arial, sans-serif; line-height: 1.6;
       transition: background-color 0.3s, color 0.3s;
     }
-
+    
     /* コンテナ設定：PCでは左右に広告スペース（空白）を確保 */
     .container {
       display: flex;
@@ -63,24 +68,27 @@
       flex: 1;
       max-width: 1200px;
     }
-
+    
     header {
       width: 100%; padding: 10px 20px; border-bottom: 1px solid var(--separator-color);
       margin-bottom: 20px; display: flex; justify-content: space-between;
       align-items: center;
     }
-    header h1 {
-      font-size: 1.4rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-    }
+    
+    header h1 { font-size: 1.4rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     nav { display: flex; align-items: center; gap: 15px; flex-wrap: wrap; }
     nav a {
       text-decoration: none; font-weight: bold; white-space: nowrap;
       padding: 5px 8px; border-radius: 4px;
       transition: background-color 0.2s;
     }
+    /* ヘッダーリンク hover時に背景色変更 */
     header nav a:hover { background-color: var(--hover-bg); }
+    
+    /* footer内リンク：間に仕切り線を表示 */
     footer nav a {
-      text-decoration: none; padding: 5px 8px; position: relative;
+      text-decoration: none; padding: 5px 8px;
+      position: relative;
     }
     footer nav a:not(:last-child)::after {
       content: "";
@@ -91,157 +99,169 @@
       border-right: 1px solid var(--separator-color);
       height: 16px;
     }
+    
     .theme-toggle {
       cursor: pointer; font-size: 1.8rem; user-select: none;
       padding: 5px; border-radius: 50%; transition: background-color 0.3s;
     }
     .theme-toggle:hover { background-color: var(--hover-bg); }
+    
     main { padding: 0 20px; margin-top: 20px; }
-    h2 {
-      font-size: 1.3rem; margin: 20px 0 10px; padding: 10px;
-      background-color: rgba(248, 243, 236, 0.9);
-    }
-    body[data-theme="dark"] h2 {
-      background-color: rgba(30, 30, 30, 0.9);
-    }
-
+    h2 { font-size: 1.3rem; margin: 20px 0 10px; padding: 10px; background-color: rgba(248, 243, 236, 0.9); }
+    body[data-theme="dark"] h2 { background-color: rgba(30, 30, 30, 0.9); }
+    
     .tool-list {
       display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
       gap: 15px; margin-bottom: 40px;
     }
+    
     .tool-card {
       display: flex; flex-direction: row; align-items: center; padding: 10px;
       text-decoration: none; color: inherit; border: 1px solid var(--separator-color);
       border-radius: 8px; transition: transform 0.2s, background-color 0.2s;
     }
-    .tool-card:hover {
-      transform: translateY(-3px); background-color: rgba(0,0,0,0.03);
-    }
+    .tool-card:hover { transform: translateY(-3px); background-color: rgba(0,0,0,0.03); }
     .tool-card.no-border { border: none; padding: 10px 0; }
-    .tool-image {
-      width: 60px; height: 60px; object-fit: cover; border-radius: 8px; margin-right: 10px;
-    }
+    
+    .tool-image { width: 60px; height: 60px; object-fit: cover; border-radius: 8px; margin-right: 10px; }
     .tool-text { flex: 1; font-size: 1rem; }
     .tool-title { font-size: 1.1rem; font-weight: bold; margin-bottom: 5px; }
     .tool-description { font-size: 0.95rem; line-height: 1.4; }
-
+    
     footer {
       text-align: center; padding: 20px; border-top: 1px solid var(--separator-color);
       margin-top: 40px; font-size: 0.9rem;
     }
-    footer nav {
-      display: inline-flex; gap: 10px; align-items: center;
+    footer nav { display: inline-flex; gap: 10px; align-items: center; }
+    
+    .info-section { padding: 15px; margin: 20px 0; font-size: 0.9rem; line-height: 1.5; }
+    
+    @media (max-width: 768px) {
+      header { flex-wrap: wrap; padding: 10px; }
+      header h1 {
+        width: 100%; text-align: center; margin-bottom: 10px;
+        overflow: visible; white-space: normal; font-size: 1.4rem;
+      }
+      nav { width: 100%; justify-content: center; gap: 10px; overflow-x: auto; padding-bottom: 5px; }
+      nav a { flex-shrink: 0; }
+      .theme-toggle { font-size: 1.6rem; }
+      .tool-text { font-size: 0.9rem; }
+      .tool-title { font-size: 1rem; }
+      .tool-description { font-size: 0.85rem; }
+      footer { font-size: 0.8rem; }
     }
-    .info-section {
-      padding: 15px; margin: 20px 0; font-size: 0.9rem; line-height: 1.5;
-    }
+    
+    /* 追加スタイル */
     .custom-list {
-      list-style-type: none; padding-left: 1.2em;
+      list-style-type: none;
+      padding-left: 1.2em;
     }
     .custom-list li {
-      position: relative; margin-bottom: 8px; line-height: 1.5;
-      display: flex; align-items: baseline;
+      position: relative;
+      margin-bottom: 8px;
+      line-height: 1.5;
+      display: flex;
+      align-items: baseline;
     }
     .custom-list li::before {
-      content: "・"; position: absolute; left: -1.2em;
-      font-weight: bold; color: #666;
+      content: "・";
+      position: absolute;
+      left: -1.2em;
+      font-weight: bold;
+      color: #666;
     }
     @media (max-width: 768px) {
       .custom-list li {
-        display: block; text-indent: -1.2em; padding-left: 1.2em;
+        display: block;
+        text-indent: -1.2em;
+        padding-left: 1.2em;
       }
       .custom-list li::before {
-        position: static; margin-right: 0.5em;
+        position: static;
+        margin-right: 0.5em;
       }
     }
-
-    /* ===== モバイル用：下部固定ボトムバー ===== */
+    
+    /* モバイル用：下部固定ボトムバー */
     #bottom-bar {
       display: none;
     }
     @media (max-width: 768px) {
       #bottom-bar {
-        position: fixed; bottom: 0; left: 0; width: 100%;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
         background-color: var(--card-light);
         border-top: 1px solid var(--separator-color);
-        display: flex; justify-content: space-around; align-items: center;
-        padding: 6px 0;       /* 高さを低く */
-        height: 40px;         /* 明示的に40pxに */
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        padding: 8px 0;
         z-index: 1000;
-        transition: transform 0.3s ease-out;  /* スライドアニメーション */
       }
       #bottom-bar a {
-        flex: 1; text-decoration: none; color: inherit;
-        text-align: center; font-size: 0.9rem;
-        padding: 6px 0;
+        text-decoration: none;
+        color: inherit;
+        text-align: center;
+        font-size: 0.9rem;
       }
       #bottom-bar a .icon {
-        display: block; font-size: 1.4rem; margin-bottom: 2px;
+        display: block;
+        font-size: 1.4rem;
+        margin-bottom: 2px;
       }
     }
-
-    /* ===== モバイル用：オーバーレイメニュー（右スライド） ===== */
+    
+    /* モバイル用：オーバーレイメニュー */
     #mobile-menu {
-      position: fixed; top: 0; right: 0;
-      width: 100%; height: 100%;
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
       background: rgba(0,0,0,0.6);
       z-index: 1100;
-      display: none; justify-content: flex-end; align-items: flex-start;
-    }
-    #mobile-menu.open {
-      display: flex;
+      justify-content: center;
+      align-items: center;
     }
     #mobile-menu .menu-content {
       background: var(--card-light);
-      width: 70%; max-width: 300px; height: 100%;
-      padding: 20px; border-radius: 0 0 0 8px;
-      transform: translateX(100%);
-      transition: transform 0.3s ease-out;
-    }
-    #mobile-menu.open .menu-content {
-      transform: translateX(0);
+      padding: 20px;
+      border-radius: 8px;
+      width: 80%;
+      max-width: 300px;
     }
     #mobile-menu .menu-content a {
-      display: block; text-decoration: none; color: inherit;
-      padding: 12px 0; border-bottom: 1px solid var(--separator-color);
+      display: block;
+      text-decoration: none;
+      color: inherit;
+      padding: 10px;
+      border-bottom: 1px solid var(--separator-color);
     }
     #mobile-menu .menu-content a:last-child {
-      border-bottom: none;
-    }
-
-    /* ===== モバイル用：サイドバー（左スライド） ===== */
-    #sidebar {
-      position: fixed; top: 0; left: 0;
-      width: 70%; max-width: 300px; height: 100%;
-      background: var(--card-light);
-      z-index: 1090;
-      transform: translateX(-100%);
-      transition: transform 0.3s ease-out;
-      display: none;
-    }
-    #sidebar.open {
-      display: block;
-      transform: translateX(0);
-    }
-    #sidebar .sidebar-content {
-      padding: 20px;
-    }
-    #sidebar .sidebar-content a {
-      display: block; text-decoration: none; color: inherit;
-      padding: 12px 0; border-bottom: 1px solid var(--separator-color);
-    }
-    #sidebar .sidebar-content a:last-child {
       border-bottom: none;
     }
   </style>
 </head>
 <body data-theme="light">
+  <!-- コンテナ（PC：左右に広告スペース） -->
   <div class="container">
     <!-- 左側広告スペース -->
     <div class="ad-space">
-      <!-- AdSenseコード省略 -->
+      <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8536456976562388" crossorigin="anonymous"></script>
+      <!-- PC -->
+      <ins class="adsbygoogle"
+           style="display:block"
+           data-ad-client="ca-pub-8536456976562388"
+           data-ad-slot="4504163274"
+           data-ad-format="auto"
+           data-full-width-responsive="true"></ins>
+      <script>
+           (adsbygoogle = window.adsbygoogle || []).push({});
+      </script>
     </div>
-
+    
     <div class="content">
       <header>
         <h1>スマートツール・コネクト</h1>
@@ -251,21 +271,221 @@
           <a href="privacy-policy.html">プライバシーポリシー</a>
           <a href="contact.html">お問い合わせ</a>
           <a href="contact.html#request" style="color:#e67e22;">ツールリクエスト</a>
-          <div class="theme-toggle" id="theme-toggle" aria-label="テーマ切替">🌓</div>
+          <div class="theme-toggle" id="theme-toggle">🌓</div>
         </nav>
       </header>
-
+      
       <main>
-        <!-- 計算ツールセクション -->
+        <!-- 各ツールセクション（実際のコンテンツは変更可能） -->
         <section id="calculation-tools">
           <h2>計算ツール</h2>
           <div class="tool-list">
-            <!-- 各ツールカード省略 -->
+            <a href="./calculator.html" class="tool-card">
+              <img src="calculator.png" alt="関数電卓" class="tool-image">
+              <div class="tool-text">
+                <div class="tool-title">関数電卓</div>
+                <div class="tool-description">
+                  三角関数、自然対数、常用対数、平方根、べき乗、定数π、定数eを実装。<br>
+                  式とリアルタイム計算結果を同時に表示します。
+                </div>
+              </div>
+            </a>
+            <a href="./converter.html" class="tool-card">
+              <img src="converter.png" alt="進数変換ツール" class="tool-image">
+              <div class="tool-text">
+                <div class="tool-title">進数変換ツール</div>
+                <div class="tool-description">
+                  2進数、10進数、16進数、ASCIIのどれかを入力することで相互にリアルタイム変換結果を表示します。
+                </div>
+              </div>
+            </a>
+            <a href="./condenser.html" class="tool-card">
+              <img src="condenser.png" alt="コンデンサ容量計算" class="tool-image">
+              <div class="tool-text">
+                <div class="tool-title">コンデンサ容量計算</div>
+                <div class="tool-description">
+                  容量値を表す3桁の数字を入力することで、容量値をリアルタイムに変換し表示します。<br>
+                  末尾のアルファベット入力で公差も表示します。
+                </div>
+              </div>
+            </a>
+            <a href="./resistor.html" class="tool-card">
+              <img src="resistor.png" alt="抵抗値計算" class="tool-image">
+              <div class="tool-text">
+                <div class="tool-title">抵抗値計算</div>
+                <div class="tool-description">
+                  抵抗値を表す3桁または4桁のEIAコードを入力することで、抵抗値をリアルタイムに変換し表示します。
+                </div>
+              </div>
+            </a>
+             <a href="./split.html" class="tool-card">
+              <img src="split.png" alt="割り勘(ガソリン他)" class="tool-image">
+              <div class="tool-text">
+                <div class="tool-title">割り勘(ガソリン他)</div>
+                <div class="tool-description">
+                  ガソリン代、高速料金、駐車場代、その他にかかった費用を人数で割り勘します。
+                </div>
+              </div>
+            </a>
+             <a href="./split2.html" class="tool-card">
+              <img src="split2.png" alt="割り勘(宴会、購入品)" class="tool-image">
+              <div class="tool-text">
+                <div class="tool-title">割り勘(宴会、購入品)</div>
+                <div class="tool-description">
+                  飲み会や購入品の費用を人数で割り勘します。<br>
+                  オプション設定可(事前入金、多め少なめ、人数)                  
+                </div>
+              </div>
+            </a>
           </div>
         </section>
-        <!-- その他セクションも同様に省略 -->
-      </main>
+        
+        <section id="clock-tools">
+          <h2>時計ツール</h2>
+          <div class="tool-list">
+            <a href="./digitalclock.html" class="tool-card">
+              <img src="digitalclock.png" alt="デジタル時計" class="tool-image">
+              <div class="tool-text">
+                <div class="tool-title">デジタル時計</div>
+                <div class="tool-description">
+                  日付、曜日と時刻を表示するデジタル時計です。<br>
+                  PinP機能付き。
+                </div>
+              </div>
+            </a>
+            <a href="./analogclock.html" class="tool-card">
+              <img src="analogclock.png" alt="アナログ時計" class="tool-image">
+              <div class="tool-text">
+                <div class="tool-title">アナログ時計</div>
+                <div class="tool-description">
+                  日付、曜日と時刻を表示するアナログ時計です。<br>
+                  PinP機能付き。
+                </div>
+              </div>
+            </a>
+            <a href="./stopwatch.html" class="tool-card">
+              <img src="stopwatch.png" alt="ストップウォッチ" class="tool-image">
+              <div class="tool-text">
+                <div class="tool-title">ストップウォッチ</div>
+                <div class="tool-description">
+                  ラップ機能付きのシンプルなストップウォッチです。
+                </div>
+              </div>
+            </a>
+            <a href="./webtimer.html" class="tool-card">
+              <img src="webtimer.png" alt="タイマー" class="tool-image">
+              <div class="tool-text">
+                <div class="tool-title">タイマー</div>
+                <div class="tool-description">
+                  時、分、秒をカスタムで設定できるタイマーです。<br>
+                  繰り返し、アラーム設定も可能です。
+                </div>
+              </div>
+            </a>
+            <a href="./timer.html" class="tool-card">
+              <img src="timer.png" alt="ポモドーロタイマー" class="tool-image">
+              <div class="tool-text">
+                <div class="tool-title">ポモドーロタイマー</div>
+                <div class="tool-description">
+                  25分作業 ＋ 5分休憩のサイクルで画面表示を切り替え、アラーム音を出すタイマーです。<br>
+                  PinP機能付き。
+                </div>
+              </div>
+            </a>
+            <a href="./metoro.html" class="tool-card">
+              <img src="metoro.png" alt="メトロノーム" class="tool-image">
+              <div class="tool-text">
+                <div class="tool-title">メトロノーム</div>
+                <div class="tool-description">
+                  タップテンポ、プリセットBPM、音量調整、音色の選択が可能なメトロノームです。
+                </div>
+              </div>
+            </a>
+            <a href="./counter.html" class="tool-card">
+              <img src="counter.png" alt="カウンター" class="tool-image">
+              <div class="tool-text">
+                <div class="tool-title">カウンター</div>
+                <div class="tool-description">
+                  交通量調査や個数の計算などに使用できる計数機です。
+                </div>
+              </div>
+            </a>
 
+          </div>
+        </section>
+        
+        <!-- 下段：その他 -->
+        <section id="other-tools">
+          <h2>その他</h2>
+          <div class="tool-list">
+            <a href="./fire.html" class="tool-card">
+              <img src="fire.png" alt="FIRE予測～DIE WITH ZERO～" class="tool-image">
+              <div class="tool-text">
+                <div class="tool-title">FIRE予測～DIE WITH ZERO～</div>
+                <div class="tool-description">
+                  総資産がゼロになるまでの期間をシミュレーションします。（最大80年）
+                </div>
+              </div>
+            </a>
+            <a href="./todo_b.html" class="tool-card">
+              <img src="todo.png" alt="TODOリスト" class="tool-image">
+              <div class="tool-text">
+                <div class="tool-title">TODOリスト</div>
+                <div class="tool-description">
+                  やるべきことを可視化するシンプルなタスク管理ツールです。
+                </div>
+              </div>
+            </a>
+            <a href="./cost.html" class="tool-card">
+              <img src="cost.png" alt="月の生活費計算" class="tool-image">
+              <div class="tool-text">
+                <div class="tool-title">月の生活費計算</div>
+                <div class="tool-description">
+                  生活費を入力して、合計金額や年間支出を自動計算、家計費用の計算を行うツールです。
+                </div>
+              </div>
+            </a>
+            <a href="./read.html" class="tool-card">
+              <img src="read.png" alt="テキスト読み上げ" class="tool-image">
+              <div class="tool-text">
+                <div class="tool-title">テキスト読み上げ</div>
+                <div class="tool-description">
+                  ハイライト機能付きテキストの読み上げツールです。
+                  音声の調整、文字数カウント、読み上げ時間予測が可能。
+                </div>
+              </div>
+            </a>
+            <a href="./compass.html" class="tool-card">
+              <img src="compass.png" alt="コンパス　方位磁石" class="tool-image">
+              <div class="tool-text">
+                <div class="tool-title">コンパス　方位磁石</div>
+                <div class="tool-description">
+                  スマートフォン用の方位磁石で位置情報を使用して方位を表示します。
+                </div>
+              </div>
+            </a>
+           <a href="./QR.html" class="tool-card">
+              <img src="QR.png" alt="QRコードリーダー" class="tool-image">
+              <div class="tool-text">
+                <div class="tool-title">QRコードリーダー</div>
+                <div class="tool-description">
+                  開始ボタンを押してカメラでQRコードを読み取ると自動的にページに移動します。
+                </div>
+              </div>
+            </a>
+
+          </div>
+        </section>
+        
+        <section class="info-section">
+          <ul class="custom-list">
+            <li>各ツールはすべて無料でご利用いただけます。</li>
+            <li>今後も便利なツールを随時追加予定です。</li>
+            <li>ご意見・ご要望はお問い合わせページよりお知らせください。</li>
+          </ul>
+        </section>
+      </main>
+      
       <footer>
         <p>&copy; 2025 スマートツール・コネクト. All rights reserved.</p>
         <nav>
@@ -275,122 +495,93 @@
           <a href="contact.html">お問い合わせ</a>
         </nav>
       </footer>
-
-      <!-- モバイル用：下部固定ボトムバー -->
-      <nav id="bottom-bar" role="navigation">
-        <a href="#" id="menu-btn"
-           aria-label="メニュー"
-           aria-controls="mobile-menu"
-           aria-expanded="false">
+      
+       <!-- モバイル用：下部固定ボトムバー - 高さ低減、スライド効果付き -->
+      <nav id="bottom-bar">
+        <a href="#" id="menu-btn">
           <span class="icon">☰</span>
           <span>メニュー</span>
         </a>
-        <a href="index.html" id="home-btn"
-           aria-label="ホーム">
+        <a href="index.html" id="home-btn">
           <span class="icon">🏠</span>
           <span>ホーム</span>
         </a>
-        <a href="#" id="sidebar-btn"
-           aria-label="サイドバー"
-           aria-controls="sidebar"
-           aria-expanded="false">
-          <span class="icon">📂</span>
+        <a href="#" id="sidebar-btn">
+          <span class="icon">📑</span> <!-- サイドバーアイコン変更 -->
           <span>サイドバー</span>
         </a>
       </nav>
-
-      <!-- モバイル用：オーバーレイメニュー -->
-      <div id="mobile-menu"
-           role="dialog"
-           aria-modal="true"
-           aria-hidden="true">
+      
+       <!-- モバイル用：左からスライドインするメニュー -->
+      <div id="mobile-menu">
+        <div class="menu-header">
+          <h3>メニュー</h3>
+          <div id="close-menu" style="font-size: 1.5rem; cursor: pointer;">×</div>
+        </div>
         <div class="menu-content">
           <a href="https://tool-cloud.github.io/blog/">ブログ</a>
           <a href="about.html">運営者情報</a>
           <a href="privacy-policy.html">プライバシーポリシー</a>
           <a href="contact.html">お問い合わせ</a>
-          <a href="#" id="close-menu" style="text-align:right;">閉じる</a>
-        </div>
-      </div>
-
-      <!-- モバイル用：サイドバー -->
-      <div id="sidebar"
-           role="complementary"
-           aria-hidden="true">
-        <div class="sidebar-content">
-          <a href="sidebar.html">サイドバーコンテンツ</a>
-          <!-- 必要なリンクを追加 -->
-          <a href="#" id="close-sidebar" style="text-align:right;">閉じる</a>
+          <a href="contact.html#request" style="color:#e67e22;">ツールリクエスト</a>
         </div>
       </div>
     </div>
-
+    
     <!-- 右側広告スペース -->
     <div class="ad-space">
-      <!-- AdSenseコード省略 -->
+      <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8536456976562388" crossorigin="anonymous"></script>
+      <!-- PC -->
+      <ins class="adsbygoogle"
+           style="display:block"
+           data-ad-client="ca-pub-8536456976562388"
+           data-ad-slot="4504163274"
+           data-ad-format="auto"
+           data-full-width-responsive="true"></ins>
+      <script>
+           (adsbygoogle = window.adsbygoogle || []).push({});
+      </script>
     </div>
   </div>
-
+  
   <script>
     document.addEventListener('DOMContentLoaded', function () {
-      // テーマ切替
+      // テーマ切替機能
       const themeToggle = document.getElementById('theme-toggle');
       const savedTheme = localStorage.getItem('theme') || 'light';
       document.body.setAttribute('data-theme', savedTheme);
       themeToggle.addEventListener('click', function () {
-        const current = document.body.getAttribute('data-theme');
-        const next = current === 'light' ? 'dark' : 'light';
-        document.body.setAttribute('data-theme', next);
-        localStorage.setItem('theme', next);
+        const currentTheme = document.body.getAttribute('data-theme');
+        const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+        document.body.setAttribute('data-theme', newTheme);
+        localStorage.setItem('theme', newTheme);
       });
-
-      // 下部バー：スクロールアップで出現
+      
+   
+      // モバイル：ボトムバーの表示（スクロールアップ時に表示）
       let lastScroll = window.pageYOffset;
       const bottomBar = document.getElementById('bottom-bar');
       window.addEventListener('scroll', function() {
-        let current = window.pageYOffset;
-        if (current < lastScroll) {
+        let currentScroll = window.pageYOffset;
+        if (currentScroll < lastScroll) {
           bottomBar.style.transform = 'translateY(0)';
         } else {
           bottomBar.style.transform = 'translateY(100%)';
         }
-        lastScroll = current;
+        lastScroll = currentScroll;
       });
-
-      // メニューのトグル（右スライド）
+      
+      // モバイル：オーバーレイメニューのトグル
       const menuBtn = document.getElementById('menu-btn');
       const mobileMenu = document.getElementById('mobile-menu');
       const closeMenu = document.getElementById('close-menu');
       menuBtn.addEventListener('click', function(e) {
         e.preventDefault();
-        const isOpen = menuBtn.getAttribute('aria-expanded') === 'true';
-        menuBtn.setAttribute('aria-expanded', String(!isOpen));
-        mobileMenu.setAttribute('aria-hidden', String(isOpen));
-        mobileMenu.classList.toggle('open');
+        mobileMenu.style.display = 'flex';
       });
       closeMenu.addEventListener('click', function(e) {
         e.preventDefault();
-        menuBtn.setAttribute('aria-expanded', 'false');
-        mobileMenu.setAttribute('aria-hidden', 'true');
-        mobileMenu.classList.remove('open');
-      });
-
-      // サイドバーのトグル（左スライド）
-      const sidebarBtn = document.getElementById('sidebar-btn');
-      const sidebar = document.getElementById('sidebar');
-      const closeSidebar = document.getElementById('close-sidebar');
-      sidebarBtn.addEventListener('click', function(e) {
-        e.preventDefault();
-        const isOpen = sidebarBtn.getAttribute('aria-expanded') === 'true';
-        sidebarBtn.setAttribute('aria-expanded', String(!isOpen));
-        sidebar.setAttribute('aria-hidden', String(isOpen));
-        sidebar.classList.toggle('open');
-      });
-      closeSidebar.addEventListener('click', function(e) {
-        e.preventDefault();
-        sidebarBtn.setAttribute('aria-expanded', 'false');
-        sidebar.setAttribute('aria-hidden', 'true');
-        sidebar.classList.remove('open');
+        mobileMenu.style.display = 'none';
       });
     });
   </script>
