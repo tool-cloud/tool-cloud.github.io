@@ -48,6 +48,9 @@
             cursor: pointer;
             border-radius: 4px;
         }
+        #flashlightButton {
+            background-color: #2196F3;
+        }
         .status {
             margin-top: 10px;
             font-style: italic;
@@ -61,77 +64,95 @@
     <div class="status" id="status">カメラへのアクセスを許可してください</div>
     <div id="result"></div>
     <button id="startButton">スキャナーを開始</button>
+    <button id="flashlightButton" disabled>ライトをオン</button>
 
     <script>
         $(document).ready(function() {
             const html5QrCode = new Html5Qrcode("reader");
             let isScanning = false;
-            
-            // QRコードが成功的にスキャンされた時の処理
+            let videoTrack = null;
+            let isTorchOn = false;
+
+            // ライト制御関数
+            function toggleTorch() {
+                if (!videoTrack) return;
+                
+                isTorchOn = !isTorchOn;
+                videoTrack.applyConstraints({
+                    advanced: [{ torch: isTorchOn }]
+                }).then(() => {
+                    $("#flashlightButton").text(isTorchOn ? 'ライトをオフ' : 'ライトをオン');
+                }).catch(err => {
+                    console.error('ライト制御エラー:', err);
+                });
+            }
+
+            // QRコードスキャン成功時の処理
             function onScanSuccess(decodedText, decodedResult) {
-                // スキャンを停止
                 html5QrCode.stop().then(() => {
                     isScanning = false;
+                    videoTrack = null;
                     $("#status").text("スキャン成功: " + decodedText);
-                    
-                    // 結果を表示
                     $("#result").show().text("QRコード内容: " + decodedText);
-                    
-                    // URLの場合は自動的に移動
+                    $("#flashlightButton").prop("disabled", true);
+
                     if (decodedText.startsWith("http://") || decodedText.startsWith("https://")) {
                         $("#status").text("URLを検出: " + decodedText + " に移動します...");
                         setTimeout(() => {
                             window.location.href = decodedText;
-                        }, 1500); // 1.5秒後に移動
+                        }, 1500);
                     }
-                }).catch((err) => {
-                    console.log("スキャン停止エラー:", err);
-                });
+                }).catch(console.error);
             }
-            
+
             // エラー処理
             function onScanFailure(error) {
-                // エラーはコンソールにのみ表示（必要に応じてUIに表示）
                 console.warn(`QRコードスキャンエラー = ${error}`);
             }
-            
-            // スキャンボタンのクリックイベント
+
+            // スキャンボタンクリックイベント
             $("#startButton").click(function() {
                 if (!isScanning) {
                     $("#result").hide();
                     $("#status").text("カメラ起動中...");
                     
-                    // カメラの設定（背面カメラ優先）
                     const config = { 
                         fps: 10,
                         qrbox: { width: 250, height: 250 },
                         aspectRatio: 1.0
                     };
-                    
-                    // カメラスキャン開始
+
                     html5QrCode.start(
-                        { facingMode: "environment" }, // 背面カメラを使用
+                        { facingMode: "environment" },
                         config,
                         onScanSuccess,
                         onScanFailure
                     ).then(() => {
                         isScanning = true;
+                        const videoElement = document.querySelector('#reader video');
+                        if (videoElement) {
+                            videoTrack = videoElement.srcObject.getVideoTracks()[0];
+                            // トーチ機能サポートチェック
+                            if (videoTrack && 'torch' in videoTrack.getCapabilities()) {
+                                $("#flashlightButton").prop("disabled", false);
+                            }
+                        }
                         $("#status").text("QRコードをカメラにかざしてください");
                         $(this).text("スキャナーを停止");
-                    }).catch((err) => {
-                        $("#status").text("カメラエラー: " + err);
-                    });
+                    }).catch(console.error);
                 } else {
-                    // スキャン停止
                     html5QrCode.stop().then(() => {
                         isScanning = false;
+                        videoTrack = null;
                         $("#status").text("スキャナーを停止しました");
                         $(this).text("スキャナーを開始");
-                    }).catch((err) => {
-                        console.log("スキャン停止エラー:", err);
-                    });
+                        $("#flashlightButton").prop("disabled", true).text("ライトをオン");
+                    }).catch(console.error);
                 }
             });
+
+            // ライトボタンクリックイベント
+            $("#flashlightButton").click(toggleTorch);
         });
     </script>
 </body>
