@@ -22,7 +22,7 @@
       flex: 1;
       display: flex;
       flex-direction: column;
-      padding: 20px;
+      padding: 10px;
       position: relative;
     }
 
@@ -31,20 +31,24 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 40vmin; /* 初期表示から大きく */
+      font-size: 18vmin; /* スマホ初期表示でも収まるように調整 */
       font-weight: bold;
       transition: font-size 0.3s;
       text-align: center;
+      width: 100%;
+      padding: 0 10px;
+      box-sizing: border-box;
     }
 
     .controls {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       gap: 10px;
-      padding: 20px;
+      padding: 15px;
       background: rgba(255, 255, 255, 0.9);
       box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.1);
       transition: opacity 0.3s, transform 0.3s;
+      margin-bottom: env(safe-area-inset-bottom, 0); /* iPhoneXなどのノッチ対応 */
     }
 
     .controls.hidden {
@@ -53,8 +57,8 @@
     }
 
     button {
-      padding: 15px;
-      font-size: 4vmin;
+      padding: 12px 5px;
+      font-size: 16px;
       border: none;
       border-radius: 10px;
       cursor: pointer;
@@ -86,6 +90,8 @@
       z-index: 1000;
       width: 80%;
       max-width: 400px;
+      max-height: 90vh;
+      overflow: auto;
     }
 
     .settings-panel.open {
@@ -131,16 +137,31 @@
       position: fixed;
       top: 0;
       left: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     /* スマホ用の調整 */
     @media (max-width: 768px) {
       .timer-display {
-        font-size: 20vmin; /* スマホでの初期サイズを小さめに */
+        font-size: 16vmin; /* スマホでの初期サイズを小さめに */
+        width: 100%;
+        padding: 0 5px;
       }
       
       .timer-display.expanded {
-        font-size: 28vmin; /* 横向き最大表示時 */
+        font-size: 22vmin; /* 横向き最大表示時 */
+      }
+      
+      button {
+        padding: 10px 5px;
+        font-size: 14px;
+      }
+      
+      .controls {
+        padding: 10px;
+        padding-bottom: calc(10px + env(safe-area-inset-bottom, 20px));
       }
     }
   </style>
@@ -206,6 +227,17 @@
 
     // モバイルデバイス判定
     const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    
+    // スマホの場合、最初に適切なフォントサイズを設定
+    if (isMobile) {
+      // viewportの実際の幅を取得
+      const viewportWidth = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
+      const viewportHeight = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
+      
+      // 数字が確実に画面内に収まるようにフォントサイズを計算
+      const fontSize = Math.min(viewportWidth / 10, viewportHeight / 6);
+      timerDisplay.style.fontSize = fontSize + 'px';
+    }
 
     // 初期表示
     controls.classList.add('hidden'); // 初期表示ではコントロールを非表示
@@ -322,9 +354,36 @@
       const seconds = String(totalSeconds % 60).padStart(2, '0');
       timerDisplay.textContent = `${hours}:${minutes}:${seconds}`;
       
-      // フォントサイズを動的に調整（特に横向きモード時）
+      // フォントサイズを動的に調整
+      adjustFontSize();
+    }
+    
+    // フォントサイズを数字の長さと画面サイズに基づいて調整
+    function adjustFontSize() {
       if (isLandscape && isMobile) {
-        timerDisplay.style.fontSize = window.innerHeight * 0.4 + 'px';
+        // 横向きモード時はより大きく表示できる
+        const containerWidth = window.innerHeight; // 回転しているので高さが横幅になる
+        const containerHeight = window.innerWidth; // 回転しているので幅が高さになる
+        
+        // 数字が画面内に収まるように計算
+        // 数字の長さに応じて調整（8文字 = 00:00:00）
+        const fontSize = Math.min(containerWidth * 0.15, containerHeight * 0.5);
+        timerDisplay.style.fontSize = fontSize + 'px';
+      } else if (isMobile) {
+        // 通常モードでのスマホ表示
+        const containerWidth = window.innerWidth;
+        const containerHeight = window.innerHeight;
+        
+        // 数字が画面内に収まるように計算
+        const fontSize = Math.min(containerWidth / 10, containerHeight / 6);
+        timerDisplay.style.fontSize = fontSize + 'px';
+      } else {
+        // PC表示
+        if (controls.classList.contains('hidden')) {
+          timerDisplay.style.fontSize = '40vmin';
+        } else {
+          timerDisplay.style.fontSize = '18vmin';
+        }
       }
     }
 
@@ -345,6 +404,8 @@
         toggleLandscape(false);
       }
       
+      adjustFontSize();
+      
       if (isRunning && !isSettingsOpen) {
         inactivityTimer = setTimeout(hideControls, INACTIVITY_TIMEOUT);
       }
@@ -357,6 +418,8 @@
       controls.classList.add('hidden');
       timerDisplay.classList.add('expanded');
       
+      adjustFontSize();
+      
       // スマホの場合は横向きモードに
       if (isMobile && isRunning) {
         toggleLandscape(true);
@@ -365,20 +428,14 @@
 
     // 横向きモード切替
     function toggleLandscape(enable) {
-      if (enable && !isLandscape) {
+      if (enable && !isLandscape && isMobile) {
         isLandscape = true;
         container.classList.add('landscape-mode');
         document.body.style.backgroundColor = '#000';
         timerDisplay.style.color = '#fff';
         
         // 横向きモード時のフォントサイズ最適化
-        if (window.innerWidth < window.innerHeight) {
-          // 縦長の場合は横向きにすると高さが制限要因
-          timerDisplay.style.fontSize = window.innerHeight * 0.4 + 'px';
-        } else {
-          // 横長の場合は幅が制限要因
-          timerDisplay.style.fontSize = window.innerWidth * 0.2 + 'px';
-        }
+        adjustFontSize();
         
         // 横向き表示をリクエスト（iOS/Androidのみ対応）
         if ('orientation' in screen) {
@@ -395,7 +452,8 @@
         container.classList.remove('landscape-mode');
         document.body.style.backgroundColor = '#f0f0f0';
         timerDisplay.style.color = '';
-        timerDisplay.style.fontSize = '';
+        
+        adjustFontSize();
         
         // 横向きロックを解除
         if ('orientation' in screen) {
@@ -425,14 +483,7 @@
 
     // 画面サイズ変更時の処理
     window.addEventListener('resize', () => {
-      // 横向きモード時のフォントサイズ調整
-      if (isLandscape) {
-        if (window.innerWidth < window.innerHeight) {
-          timerDisplay.style.fontSize = window.innerHeight * 0.4 + 'px';
-        } else {
-          timerDisplay.style.fontSize = window.innerWidth * 0.2 + 'px';
-        }
-      }
+      adjustFontSize();
     });
 
     // 音量テスト再生用のデバウンス関数
@@ -460,15 +511,22 @@
       });
     });
 
-    // 初期表示更新
+    // 初期設定値の表示更新
     document.getElementById('hoursVal').textContent = document.getElementById('hours').value;
     document.getElementById('minutesVal').textContent = document.getElementById('minutes').value;
     document.getElementById('secondsVal').textContent = document.getElementById('seconds').value;
     document.getElementById('volumeVal').textContent = document.getElementById('volume').value;
     alarmAudio.volume = document.getElementById('volume').value;
     
+    // メタビューポート設定を最適化（ノッチ対応など）
+    const metaViewport = document.querySelector('meta[name=viewport]');
+    metaViewport.setAttribute('content', 'width=device-width, initial-scale=1, viewport-fit=cover');
+    
     // 初期表示時にコントロールを非表示
     hideControls();
+    
+    // ページロード時にフォントサイズを調整
+    window.addEventListener('load', adjustFontSize);
   </script>
 </body>
 </html>
