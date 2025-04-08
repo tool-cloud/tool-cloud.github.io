@@ -1,12 +1,15 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8536456976562388"
-     crossorigin="anonymous"></script>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>タイマー</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>フルスクリーン自動回転タイマー</title>
   <style>
+    :root {
+      --base-font-size: 20vmin;
+      --landscape-font-size: 25vmax;
+    }
+
     body {
       margin: 0;
       padding: 0;
@@ -15,14 +18,27 @@
       flex-direction: column;
       background: #f0f0f0;
       font-family: Arial, sans-serif;
+      touch-action: manipulation;
     }
 
     .container {
       flex: 1;
       display: flex;
       flex-direction: column;
-      padding: 20px;
       position: relative;
+      transition: transform 0.5s ease-in-out;
+    }
+
+    .auto-rotate {
+      transform: rotate(-90deg);
+      transform-origin: center center;
+      width: 100vh;
+      height: 100vw;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      margin-left: -50vh;
+      margin-top: -50vw;
     }
 
     .timer-display {
@@ -30,8 +46,12 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 10vmin;
       font-weight: bold;
+      line-height: 1;
+      padding: 10px;
+      text-align: center;
+      overflow: hidden;
+      font-size: var(--base-font-size);
       transition: font-size 0.3s;
     }
 
@@ -42,32 +62,12 @@
       padding: 20px;
       background: rgba(255, 255, 255, 0.9);
       box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.1);
-      transition: opacity 0.3s, transform 0.3s;
+      transition: all 0.3s;
     }
 
-    .controls.hidden {
-      opacity: 0;
-      transform: translateY(100%);
+    .controls.landscape {
+      grid-template-columns: repeat(2, 1fr);
     }
-
-    button {
-      padding: 15px;
-      font-size: 4vmin;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-      color: white;
-    }
-
-    button:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-
-    .set-btn { background: #ffc107; color: #212529; }
-    .start-btn { background: #28a745; }
-    .stop-btn { background: #dc3545; }
-    .reset-btn { background: #6c757d; }
 
     .settings-panel {
       position: fixed;
@@ -119,6 +119,32 @@
       float: right;
       font-weight: bold;
     }
+
+    button {
+      padding: 15px;
+      font-size: 4vmin;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      color: white;
+      touch-action: manipulation;
+    }
+
+    .set-btn { background: #ffc107; color: #212529; }
+    .start-btn { background: #28a745; }
+    .stop-btn { background: #dc3545; }
+    .reset-btn { background: #6c757d; }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    @media (orientation: landscape) {
+      .timer-display {
+        font-size: var(--landscape-font-size);
+      }
+    }
   </style>
 </head>
 <body>
@@ -160,6 +186,69 @@
   </audio>
 
   <script>
+    class AutoRotate {
+      constructor() {
+        this.isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+        this.rotationTimeout = null;
+        this.inactivityTimeout = 5000;
+        this.isAutoRotated = false;
+
+        this.init();
+      }
+
+      init() {
+        if (this.isMobile) {
+          this.setupEventListeners();
+          this.startRotationTimer();
+        }
+      }
+
+      setupEventListeners() {
+        ['touchstart', 'click', 'mousemove'].forEach(event => {
+          document.addEventListener(event, () => {
+            this.resetRotationTimer();
+            if (this.isAutoRotated) this.resetRotation();
+          }, { passive: true });
+        });
+      }
+
+      startRotationTimer() {
+        this.rotationTimeout = setTimeout(() => this.applyAutoRotation(), this.inactivityTimeout);
+      }
+
+      resetRotationTimer() {
+        clearTimeout(this.rotationTimeout);
+        this.startRotationTimer();
+      }
+
+      applyAutoRotation() {
+        if (!screen.orientation.type.startsWith('landscape')) {
+          document.querySelector('.container').classList.add('auto-rotate');
+          this.isAutoRotated = true;
+          this.adjustLandscapeLayout();
+        }
+      }
+
+      resetRotation() {
+        document.querySelector('.container').classList.remove('auto-rotate');
+        this.isAutoRotated = false;
+        this.adjustPortraitLayout();
+      }
+
+      adjustLandscapeLayout() {
+        document.body.classList.add('landscape');
+        document.getElementById('controls').classList.add('landscape');
+        document.getElementById('timerDisplay').style.fontSize = 'var(--landscape-font-size)';
+      }
+
+      adjustPortraitLayout() {
+        document.body.classList.remove('landscape');
+        document.getElementById('controls').classList.remove('landscape');
+        document.getElementById('timerDisplay').style.fontSize = 'var(--base-font-size)';
+      }
+    }
+
+    const autoRotate = new AutoRotate();
     const timerDisplay = document.getElementById('timerDisplay');
     const controls = document.getElementById('controls');
     const settingsPanel = document.getElementById('settingsPanel');
@@ -176,9 +265,8 @@
     let remainingTime = 0;
     let timerInterval;
     let inactivityTimer;
-    const INACTIVITY_TIMEOUT = 3000; // 3秒後にコントロールを非表示
 
-    // 設定パネルの開閉
+    // タイマー機能
     setBtn.addEventListener('click', () => {
       isSettingsOpen = !isSettingsOpen;
       settingsPanel.classList.toggle('open', isSettingsOpen);
@@ -187,7 +275,6 @@
       if (isSettingsOpen) showControls();
     });
 
-    // オーバーレイクリックで閉じる
     overlay.addEventListener('click', () => {
       isSettingsOpen = false;
       settingsPanel.classList.remove('open');
@@ -195,8 +282,11 @@
       updateButtonStates();
     });
 
-    // タイマー開始
-    startBtn.addEventListener('click', () => {
+    startBtn.addEventListener('click', startTimer);
+    stopBtn.addEventListener('click', stopTimer);
+    resetBtn.addEventListener('click', resetTimer);
+
+    function startTimer() {
       if (isRunning || isSettingsOpen) return;
       const hours = parseInt(document.getElementById('hours').value);
       const minutes = parseInt(document.getElementById('minutes').value);
@@ -210,26 +300,23 @@
       showControls();
       updateButtonStates();
       updateDisplay();
-    });
+    }
 
-    // タイマー停止
-    stopBtn.addEventListener('click', () => {
+    function stopTimer() {
       clearInterval(timerInterval);
       isRunning = false;
       updateButtonStates();
-    });
+    }
 
-    // タイマーリセット
-    resetBtn.addEventListener('click', () => {
+    function resetTimer() {
       clearInterval(timerInterval);
       isRunning = false;
       remainingTime = totalTime;
       updateDisplay();
       updateButtonStates();
       showControls();
-    });
+    }
 
-    // タイマー更新
     function updateTimer() {
       remainingTime -= 1000;
       if (remainingTime <= 0) {
@@ -241,7 +328,6 @@
       updateDisplay();
     }
 
-    // 繰り返し処理
     function handleRepeat() {
       const repeatCount = parseInt(document.getElementById('repeatCount').value);
       const infiniteRepeat = document.getElementById('infiniteRepeat').checked;
@@ -255,11 +341,10 @@
       } else {
         isRunning = false;
         updateButtonStates();
-        showControls(); // タイマー終了後にコントロールを表示
+        showControls();
       }
     }
 
-    // 表示更新
     function updateDisplay() {
       const totalSeconds = Math.floor(remainingTime / 1000);
       const hours = String(Math.floor(totalSeconds / 3600)).padStart(2, '0');
@@ -268,64 +353,40 @@
       timerDisplay.textContent = `${hours}:${minutes}:${seconds}`;
     }
 
-    // ボタンの状態更新
     function updateButtonStates() {
       startBtn.disabled = isRunning || isSettingsOpen;
       stopBtn.disabled = !isRunning || isSettingsOpen;
       resetBtn.disabled = isSettingsOpen;
     }
 
-    // コントロールの表示
     function showControls() {
       clearTimeout(inactivityTimer);
       controls.classList.remove('hidden');
-      timerDisplay.style.fontSize = '10vmin';
       if (isRunning && !isSettingsOpen) {
-        inactivityTimer = setTimeout(hideControls, INACTIVITY_TIMEOUT);
+        inactivityTimer = setTimeout(() => controls.classList.add('hidden'), 3000);
       }
     }
 
-    // コントロールの非表示
-    function hideControls() {
-      controls.classList.add('hidden');
-      timerDisplay.style.fontSize = '40vmin';
-    }
-
-    // ユーザー操作の検知
-    ['mousemove', 'touchstart'].forEach(event => {
-      document.addEventListener(event, () => {
-        if (controls.classList.contains('hidden')) {
-          showControls();
-        }
-      });
-    });
-
-    // 音量テスト再生用のデバウンス関数
-    let volumeTestTimeout;
-    function testVolume() {
-      clearTimeout(volumeTestTimeout);
-      volumeTestTimeout = setTimeout(() => {
-        alarmAudio.currentTime = 0; // 音声の再生位置を最初に戻す
-        alarmAudio.play();
-        setTimeout(() => {
-          alarmAudio.pause(); // 短時間だけ再生して停止
-          alarmAudio.currentTime = 0;
-        }, 200); // 200msだけ再生
-      }, 100); // 100msのデバウンス
-    }
-
-    // 設定値の表示更新
     document.querySelectorAll('input[type="range"]').forEach(input => {
       input.addEventListener('input', () => {
         document.getElementById(`${input.id}Val`).textContent = input.value;
-        if (input.id === 'volume') {
-          alarmAudio.volume = input.value;
-          testVolume(); // 音量変更時にテスト再生
-        }
+        if (input.id === 'volume') alarmAudio.volume = input.value;
       });
     });
 
-    // 初期表示更新
+    window.addEventListener('resize', adjustLayout);
+    adjustLayout();
+
+    function adjustLayout() {
+      const aspectRatio = window.innerWidth / window.innerHeight;
+      if (autoRotate.isAutoRotated || aspectRatio > 1) {
+        timerDisplay.style.fontSize = `min(${window.innerHeight * 0.4}px, ${window.innerWidth * 0.2}px)`;
+      } else {
+        timerDisplay.style.fontSize = `min(${window.innerWidth * 0.3}px, ${window.innerHeight * 0.2}px)`;
+      }
+    }
+
+    // 初期設定
     document.getElementById('hoursVal').textContent = document.getElementById('hours').value;
     document.getElementById('minutesVal').textContent = document.getElementById('minutes').value;
     document.getElementById('secondsVal').textContent = document.getElementById('seconds').value;
