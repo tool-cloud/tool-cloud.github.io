@@ -1,15 +1,12 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8536456976562388"
+     crossorigin="anonymous"></script>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>フルスクリーン自動回転タイマー</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>タイマー</title>
   <style>
-    :root {
-      --base-font-size: 20vmin;
-      --landscape-font-size: 25vmax;
-    }
-
     body {
       margin: 0;
       padding: 0;
@@ -18,27 +15,15 @@
       flex-direction: column;
       background: #f0f0f0;
       font-family: Arial, sans-serif;
-      touch-action: manipulation;
+      overflow: hidden;
     }
 
     .container {
       flex: 1;
       display: flex;
       flex-direction: column;
+      padding: 20px;
       position: relative;
-      transition: transform 0.5s ease-in-out;
-    }
-
-    .auto-rotate {
-      transform: rotate(-90deg);
-      transform-origin: center center;
-      width: 100vh;
-      height: 100vw;
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      margin-left: -50vh;
-      margin-top: -50vw;
     }
 
     .timer-display {
@@ -46,13 +31,10 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      font-size: 40vmin; /* 初期表示から大きく */
       font-weight: bold;
-      line-height: 1;
-      padding: 10px;
-      text-align: center;
-      overflow: hidden;
-      font-size: var(--base-font-size);
       transition: font-size 0.3s;
+      text-align: center;
     }
 
     .controls {
@@ -62,12 +44,32 @@
       padding: 20px;
       background: rgba(255, 255, 255, 0.9);
       box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.1);
-      transition: all 0.3s;
+      transition: opacity 0.3s, transform 0.3s;
     }
 
-    .controls.landscape {
-      grid-template-columns: repeat(2, 1fr);
+    .controls.hidden {
+      opacity: 0;
+      transform: translateY(100%);
     }
+
+    button {
+      padding: 15px;
+      font-size: 4vmin;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      color: white;
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .set-btn { background: #ffc107; color: #212529; }
+    .start-btn { background: #28a745; }
+    .stop-btn { background: #dc3545; }
+    .reset-btn { background: #6c757d; }
 
     .settings-panel {
       position: fixed;
@@ -120,35 +122,31 @@
       font-weight: bold;
     }
 
-    button {
-      padding: 15px;
-      font-size: 4vmin;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-      color: white;
-      touch-action: manipulation;
+    /* 横向き表示用のスタイル */
+    .landscape-mode {
+      transform: rotate(90deg);
+      transform-origin: center center;
+      width: 100vh;
+      height: 100vw;
+      position: fixed;
+      top: 0;
+      left: 0;
     }
 
-    .set-btn { background: #ffc107; color: #212529; }
-    .start-btn { background: #28a745; }
-    .stop-btn { background: #dc3545; }
-    .reset-btn { background: #6c757d; }
-
-    button:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-
-    @media (orientation: landscape) {
+    /* スマホ用の調整 */
+    @media (max-width: 768px) {
       .timer-display {
-        font-size: var(--landscape-font-size);
+        font-size: 20vmin; /* スマホでの初期サイズを小さめに */
+      }
+      
+      .timer-display.expanded {
+        font-size: 28vmin; /* 横向き最大表示時 */
       }
     }
   </style>
 </head>
 <body>
-  <div class="container">
+  <div class="container" id="container">
     <div class="timer-display" id="timerDisplay">00:00:00</div>
     <div class="controls" id="controls">
       <button class="set-btn" id="setBtn">設定</button>
@@ -186,70 +184,8 @@
   </audio>
 
   <script>
-    class AutoRotate {
-      constructor() {
-        this.isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-        this.rotationTimeout = null;
-        this.inactivityTimeout = 5000;
-        this.isAutoRotated = false;
-
-        this.init();
-      }
-
-      init() {
-        if (this.isMobile) {
-          this.setupEventListeners();
-          this.startRotationTimer();
-        }
-      }
-
-      setupEventListeners() {
-        ['touchstart', 'click', 'mousemove'].forEach(event => {
-          document.addEventListener(event, () => {
-            this.resetRotationTimer();
-            if (this.isAutoRotated) this.resetRotation();
-          }, { passive: true });
-        });
-      }
-
-      startRotationTimer() {
-        this.rotationTimeout = setTimeout(() => this.applyAutoRotation(), this.inactivityTimeout);
-      }
-
-      resetRotationTimer() {
-        clearTimeout(this.rotationTimeout);
-        this.startRotationTimer();
-      }
-
-      applyAutoRotation() {
-        if (!screen.orientation.type.startsWith('landscape')) {
-          document.querySelector('.container').classList.add('auto-rotate');
-          this.isAutoRotated = true;
-          this.adjustLandscapeLayout();
-        }
-      }
-
-      resetRotation() {
-        document.querySelector('.container').classList.remove('auto-rotate');
-        this.isAutoRotated = false;
-        this.adjustPortraitLayout();
-      }
-
-      adjustLandscapeLayout() {
-        document.body.classList.add('landscape');
-        document.getElementById('controls').classList.add('landscape');
-        document.getElementById('timerDisplay').style.fontSize = 'var(--landscape-font-size)';
-      }
-
-      adjustPortraitLayout() {
-        document.body.classList.remove('landscape');
-        document.getElementById('controls').classList.remove('landscape');
-        document.getElementById('timerDisplay').style.fontSize = 'var(--base-font-size)';
-      }
-    }
-
-    const autoRotate = new AutoRotate();
     const timerDisplay = document.getElementById('timerDisplay');
+    const container = document.getElementById('container');
     const controls = document.getElementById('controls');
     const settingsPanel = document.getElementById('settingsPanel');
     const overlay = document.getElementById('overlay');
@@ -265,16 +201,31 @@
     let remainingTime = 0;
     let timerInterval;
     let inactivityTimer;
+    let isLandscape = false;
+    const INACTIVITY_TIMEOUT = 3000; // 3秒後にコントロールを非表示
 
-    // タイマー機能
+    // モバイルデバイス判定
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+    // 初期表示
+    controls.classList.add('hidden'); // 初期表示ではコントロールを非表示
+    
+    // 設定パネルの開閉
     setBtn.addEventListener('click', () => {
       isSettingsOpen = !isSettingsOpen;
       settingsPanel.classList.toggle('open', isSettingsOpen);
       overlay.classList.toggle('show', isSettingsOpen);
       updateButtonStates();
-      if (isSettingsOpen) showControls();
+      if (isSettingsOpen) {
+        showControls();
+        // 設定画面表示時は横向きモードを解除
+        if (isLandscape) {
+          toggleLandscape(false);
+        }
+      }
     });
 
+    // オーバーレイクリックで閉じる
     overlay.addEventListener('click', () => {
       isSettingsOpen = false;
       settingsPanel.classList.remove('open');
@@ -282,11 +233,8 @@
       updateButtonStates();
     });
 
-    startBtn.addEventListener('click', startTimer);
-    stopBtn.addEventListener('click', stopTimer);
-    resetBtn.addEventListener('click', resetTimer);
-
-    function startTimer() {
+    // タイマー開始
+    startBtn.addEventListener('click', () => {
       if (isRunning || isSettingsOpen) return;
       const hours = parseInt(document.getElementById('hours').value);
       const minutes = parseInt(document.getElementById('minutes').value);
@@ -300,23 +248,39 @@
       showControls();
       updateButtonStates();
       updateDisplay();
-    }
+      
+      // タイマー開始後、短時間でコントロールを非表示に
+      setTimeout(hideControls, INACTIVITY_TIMEOUT);
+    });
 
-    function stopTimer() {
+    // タイマー停止
+    stopBtn.addEventListener('click', () => {
       clearInterval(timerInterval);
       isRunning = false;
       updateButtonStates();
-    }
+      
+      // 停止時に横向きモードを解除
+      if (isLandscape) {
+        toggleLandscape(false);
+      }
+    });
 
-    function resetTimer() {
+    // タイマーリセット
+    resetBtn.addEventListener('click', () => {
       clearInterval(timerInterval);
       isRunning = false;
       remainingTime = totalTime;
       updateDisplay();
       updateButtonStates();
       showControls();
-    }
+      
+      // リセット時に横向きモードを解除
+      if (isLandscape) {
+        toggleLandscape(false);
+      }
+    });
 
+    // タイマー更新
     function updateTimer() {
       remainingTime -= 1000;
       if (remainingTime <= 0) {
@@ -328,6 +292,7 @@
       updateDisplay();
     }
 
+    // 繰り返し処理
     function handleRepeat() {
       const repeatCount = parseInt(document.getElementById('repeatCount').value);
       const infiniteRepeat = document.getElementById('infiniteRepeat').checked;
@@ -341,57 +306,169 @@
       } else {
         isRunning = false;
         updateButtonStates();
-        showControls();
+        showControls(); // タイマー終了後にコントロールを表示
+        // タイマー終了時に横向きモードを解除
+        if (isLandscape) {
+          toggleLandscape(false);
+        }
       }
     }
 
+    // 表示更新
     function updateDisplay() {
       const totalSeconds = Math.floor(remainingTime / 1000);
       const hours = String(Math.floor(totalSeconds / 3600)).padStart(2, '0');
       const minutes = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, '0');
       const seconds = String(totalSeconds % 60).padStart(2, '0');
       timerDisplay.textContent = `${hours}:${minutes}:${seconds}`;
+      
+      // フォントサイズを動的に調整（特に横向きモード時）
+      if (isLandscape && isMobile) {
+        timerDisplay.style.fontSize = window.innerHeight * 0.4 + 'px';
+      }
     }
 
+    // ボタンの状態更新
     function updateButtonStates() {
       startBtn.disabled = isRunning || isSettingsOpen;
       stopBtn.disabled = !isRunning || isSettingsOpen;
       resetBtn.disabled = isSettingsOpen;
     }
 
+    // コントロールの表示
     function showControls() {
       clearTimeout(inactivityTimer);
       controls.classList.remove('hidden');
+      timerDisplay.classList.remove('expanded');
+      
+      if (isLandscape) {
+        toggleLandscape(false);
+      }
+      
       if (isRunning && !isSettingsOpen) {
-        inactivityTimer = setTimeout(() => controls.classList.add('hidden'), 3000);
+        inactivityTimer = setTimeout(hideControls, INACTIVITY_TIMEOUT);
       }
     }
 
-    document.querySelectorAll('input[type="range"]').forEach(input => {
-      input.addEventListener('input', () => {
-        document.getElementById(`${input.id}Val`).textContent = input.value;
-        if (input.id === 'volume') alarmAudio.volume = input.value;
+    // コントロールの非表示
+    function hideControls() {
+      if (isSettingsOpen) return;
+      
+      controls.classList.add('hidden');
+      timerDisplay.classList.add('expanded');
+      
+      // スマホの場合は横向きモードに
+      if (isMobile && isRunning) {
+        toggleLandscape(true);
+      }
+    }
+
+    // 横向きモード切替
+    function toggleLandscape(enable) {
+      if (enable && !isLandscape) {
+        isLandscape = true;
+        container.classList.add('landscape-mode');
+        document.body.style.backgroundColor = '#000';
+        timerDisplay.style.color = '#fff';
+        
+        // 横向きモード時のフォントサイズ最適化
+        if (window.innerWidth < window.innerHeight) {
+          // 縦長の場合は横向きにすると高さが制限要因
+          timerDisplay.style.fontSize = window.innerHeight * 0.4 + 'px';
+        } else {
+          // 横長の場合は幅が制限要因
+          timerDisplay.style.fontSize = window.innerWidth * 0.2 + 'px';
+        }
+        
+        // 横向き表示をリクエスト（iOS/Androidのみ対応）
+        if ('orientation' in screen) {
+          try {
+            screen.orientation.lock('landscape').catch(() => {
+              // エラーは無視（ユーザーの手動操作に委ねる）
+            });
+          } catch (e) {
+            // 古いデバイスやサポートされていないブラウザ向け
+          }
+        }
+      } else if (!enable && isLandscape) {
+        isLandscape = false;
+        container.classList.remove('landscape-mode');
+        document.body.style.backgroundColor = '#f0f0f0';
+        timerDisplay.style.color = '';
+        timerDisplay.style.fontSize = '';
+        
+        // 横向きロックを解除
+        if ('orientation' in screen) {
+          try {
+            screen.orientation.unlock();
+          } catch (e) {
+            // エラーは無視
+          }
+        }
+      }
+    }
+
+    // ユーザー操作の検知
+    ['mousemove', 'touchstart', 'click'].forEach(event => {
+      document.addEventListener(event, () => {
+        if (controls.classList.contains('hidden')) {
+          showControls();
+        } else {
+          // 操作があった場合タイマーをリセット
+          if (isRunning && !isSettingsOpen) {
+            clearTimeout(inactivityTimer);
+            inactivityTimer = setTimeout(hideControls, INACTIVITY_TIMEOUT);
+          }
+        }
       });
     });
 
-    window.addEventListener('resize', adjustLayout);
-    adjustLayout();
-
-    function adjustLayout() {
-      const aspectRatio = window.innerWidth / window.innerHeight;
-      if (autoRotate.isAutoRotated || aspectRatio > 1) {
-        timerDisplay.style.fontSize = `min(${window.innerHeight * 0.4}px, ${window.innerWidth * 0.2}px)`;
-      } else {
-        timerDisplay.style.fontSize = `min(${window.innerWidth * 0.3}px, ${window.innerHeight * 0.2}px)`;
+    // 画面サイズ変更時の処理
+    window.addEventListener('resize', () => {
+      // 横向きモード時のフォントサイズ調整
+      if (isLandscape) {
+        if (window.innerWidth < window.innerHeight) {
+          timerDisplay.style.fontSize = window.innerHeight * 0.4 + 'px';
+        } else {
+          timerDisplay.style.fontSize = window.innerWidth * 0.2 + 'px';
+        }
       }
+    });
+
+    // 音量テスト再生用のデバウンス関数
+    let volumeTestTimeout;
+    function testVolume() {
+      clearTimeout(volumeTestTimeout);
+      volumeTestTimeout = setTimeout(() => {
+        alarmAudio.currentTime = 0; // 音声の再生位置を最初に戻す
+        alarmAudio.play();
+        setTimeout(() => {
+          alarmAudio.pause(); // 短時間だけ再生して停止
+          alarmAudio.currentTime = 0;
+        }, 200); // 200msだけ再生
+      }, 100); // 100msのデバウンス
     }
 
-    // 初期設定
+    // 設定値の表示更新
+    document.querySelectorAll('input[type="range"]').forEach(input => {
+      input.addEventListener('input', () => {
+        document.getElementById(`${input.id}Val`).textContent = input.value;
+        if (input.id === 'volume') {
+          alarmAudio.volume = input.value;
+          testVolume(); // 音量変更時にテスト再生
+        }
+      });
+    });
+
+    // 初期表示更新
     document.getElementById('hoursVal').textContent = document.getElementById('hours').value;
     document.getElementById('minutesVal').textContent = document.getElementById('minutes').value;
     document.getElementById('secondsVal').textContent = document.getElementById('seconds').value;
     document.getElementById('volumeVal').textContent = document.getElementById('volume').value;
     alarmAudio.volume = document.getElementById('volume').value;
+    
+    // 初期表示時にコントロールを非表示
+    hideControls();
   </script>
 </body>
 </html>
