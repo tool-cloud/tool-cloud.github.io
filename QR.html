@@ -1,12 +1,13 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8536456976562388"
+     crossorigin="anonymous"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>QR & バーコード総合ツール</title>
+    <title>QRコードスキャナー</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.4/html5-qrcode.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.4.4/build/qrcode.min.js"></script>
     <style>
         body {
             font-family: 'Helvetica Neue', Arial, sans-serif;
@@ -14,414 +15,161 @@
             margin: 0 auto;
             padding: 10px;
             text-align: center;
-            background-color: #f5f5f5;
         }
-
         .header {
             margin: 5px 0 15px;
-            padding: 15px;
-            background-color: #fff;
-            border-radius: 10px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
-
         h1 {
             color: #333;
-            font-size: 1.8rem;
-            margin: 10px 0;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #eee;
+            font-size: 1.4rem;
+            margin: 5px 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
-
         #reader {
             width: 100%;
             max-width: 500px;
             margin: 0 auto;
-            border: 3px solid #ddd;
-            border-radius: 12px;
-            overflow: hidden;
-            background: #000;
-        }
-
-        #result {
-            margin: 20px auto;
-            padding: 15px;
+            border: 2px solid #ddd;
             border-radius: 8px;
-            background-color: #fff;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            max-width: 500px;
-            word-break: break-all;
+            overflow: hidden;
         }
-
+        #result {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 4px;
+            background-color: #f8f8f8;
+            display: none;
+        }
         button {
             background-color: #4CAF50;
             border: none;
             color: white;
-            padding: 10px 20px;
+            padding: 8px 16px;
             text-align: center;
             text-decoration: none;
             display: inline-block;
             font-size: 14px;
-            margin: 8px 4px;
+            margin: 8px 2px;
             cursor: pointer;
-            border-radius: 25px;
-            transition: all 0.3s;
-            min-width: 140px;
+            border-radius: 4px;
+            min-width: 120px;
         }
-
-        button:hover {
-            opacity: 0.9;
-            transform: translateY(-1px);
-        }
-
         #flashlightButton {
             background-color: #2196F3;
-            display: none;
+            display: none; /* 初期状態は非表示 */
         }
-
         .status {
-            margin: 15px 0;
+            margin: 8px 0;
             font-style: italic;
             color: #666;
-            font-size: 0.95rem;
-        }
-
-        .button-container {
-            margin: 15px 0;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        .form-section {
-            margin: 20px auto;
-            padding: 20px;
-            border: 2px solid #eee;
-            border-radius: 10px;
-            background: #fff;
-            max-width: 500px;
-            text-align: left;
-        }
-
-        .form-row {
-            margin: 15px 0;
-        }
-
-        input[type="text"], 
-        input[type="email"], 
-        input[type="tel"], 
-        select {
-            width: 100%;
-            padding: 12px;
-            margin: 8px 0;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            box-sizing: border-box;
-            font-size: 14px;
-        }
-
-        .history-section {
-            text-align: left;
-            margin: 25px auto;
-            padding: 20px;
-            background: #fff;
-            border-radius: 10px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            max-width: 500px;
-        }
-
-        .history-item {
-            padding: 12px;
-            border-bottom: 1px solid #eee;
             font-size: 0.9rem;
-            line-height: 1.5;
         }
-
-        .hidden {
-            display: none;
-        }
-
-        #scannerContainer {
-            position: relative;
-            margin: 20px 0;
-        }
-
-        #dynamicForms {
-            margin: 20px auto;
-        }
-
-        .type-selector {
-            margin: 15px 0;
-        }
-
-        .price-display {
-            color: #d32f2f;
-            font-weight: bold;
+        .button-container {
             margin: 10px 0;
-            font-size: 1.2rem;
-        }
-
-        canvas {
-            margin: 15px auto;
-            border: 2px solid #eee;
-            border-radius: 8px;
-            padding: 10px;
         }
     </style>
 </head>
 <body>
-    <!-- ヘッダー部 -->
     <div class="header">
-        <h1>QR & バーコード総合ツール</h1>
-        <div class="status" id="status">準備完了</div>
+        <h1>QRコードスキャナー</h1>
+        <div class="status" id="status">カメラへのアクセスを許可してください</div>
         <div class="button-container">
             <button id="flashlightButton">ライトをオン</button>
-            <button id="toggleScanner">スキャン開始</button>
-            <button onclick="toggleHistory('scan')">スキャン履歴</button>
-            <button onclick="toggleHistory('clipboard')">コピー履歴</button>
-            <button onclick="toggleHistory('create')">生成履歴</button>
         </div>
     </div>
-
-    <!-- スキャナーエリア -->
-    <div id="scannerContainer">
-        <div id="reader"></div>
-    </div>
-
-    <!-- コード生成フォーム -->
-    <div id="dynamicForms">
-        <div class="type-selector">
-            <select id="codeType" onchange="showForm()">
-                <option value="wifi">WiFi設定</option>
-                <option value="text">テキスト</option>
-                <option value="contact">連絡先</option>
-                <option value="barcode">バーコード</option>
-            </select>
-        </div>
-
-        <!-- WiFiフォーム -->
-        <div id="wifiForm" class="form-section">
-            <div class="form-row">
-                <input type="text" id="ssid" placeholder="WiFiネットワーク名 (SSID)">
-            </div>
-            <div class="form-row">
-                <select id="security">
-                    <option value="nopass">暗号化なし</option>
-                    <option value="WPA">WPA/WPA2</option>
-                    <option value="WEP">WEP</option>
-                </select>
-            </div>
-            <div class="form-row">
-                <input type="text" id="password" placeholder="パスワード">
-            </div>
-            <button onclick="generateCode()">QRコード生成</button>
-        </div>
-
-        <!-- テキストフォーム -->
-        <div id="textForm" class="form-section hidden">
-            <div class="form-row">
-                <textarea id="textContent" rows="4" placeholder="テキストを入力..."></textarea>
-            </div>
-            <button onclick="generateCode()">QRコード生成</button>
-        </div>
-
-        <!-- 連絡先フォーム -->
-        <div id="contactForm" class="form-section hidden">
-            <div class="form-row">
-                <input type="text" id="contactName" placeholder="名前">
-            </div>
-            <div class="form-row">
-                <input type="tel" id="contactTel" placeholder="電話番号">
-            </div>
-            <div class="form-row">
-                <input type="email" id="contactEmail" placeholder="メールアドレス">
-            </div>
-            <div class="form-row">
-                <input type="text" id="contactNote" placeholder="備考">
-            </div>
-            <button onclick="generateCode()">QRコード生成</button>
-        </div>
-
-        <!-- バーコードフォーム -->
-        <div id="barcodeForm" class="form-section hidden">
-            <div class="form-row">
-                <input type="text" id="barcodeNumber" placeholder="バーコード番号">
-            </div>
-            <div class="form-row">
-                <select id="barcodeType">
-                    <option value="CODE128">CODE128</option>
-                    <option value="EAN13">EAN13</option>
-                    <option value="UPC">UPC</option>
-                </select>
-            </div>
-            <button onclick="generateCode()">バーコード生成</button>
-        </div>
-    </div>
-
-    <!-- 結果表示エリア -->
+    <div id="reader"></div>
     <div id="result"></div>
-
-    <!-- 履歴表示エリア -->
-    <div class="history-section hidden" id="scanHistory">
-        <h3>スキャン履歴</h3>
-        <div id="scanHistoryList"></div>
-    </div>
-
-    <div class="history-section hidden" id="clipboardHistory">
-        <h3>クリップボード履歴</h3>
-        <div id="clipboardHistoryList"></div>
-    </div>
-
-    <div class="history-section hidden" id="createHistory">
-        <h3>生成履歴</h3>
-        <div id="createHistoryList"></div>
-    </div>
-
-    <!-- その他UI要素 -->
-    <input type="file" id="fileInput" accept="image/*" hidden>
-    <button onclick="document.getElementById('fileInput').click()">画像から読み取り</button>
-    <label style="margin-left:15px;">
-        <input type="checkbox" id="autoCopy" checked> 自動コピー
-    </label>
+    <button id="startButton">スキャナーを開始</button>
 
     <script>
-        // 初期化処理
-        let scanner = null;
-        let currentType = 'wifi';
-        const history = {
-            scan: JSON.parse(localStorage.getItem('scanHistory')) || [],
-            clipboard: JSON.parse(localStorage.getItem('clipboardHistory')) || [],
-            create: JSON.parse(localStorage.getItem('createHistory')) || []
-        };
+        $(document).ready(function() {
+            const html5QrCode = new Html5Qrcode("reader");
+            let isScanning = false;
+            let videoTrack = null;
+            let isTorchOn = false;
 
-        // フォーム表示制御
-        function showForm() {
-            $('.form-section').addClass('hidden');
-            currentType = $('#codeType').val();
-            $(`#${currentType}Form`).removeClass('hidden');
-        }
-
-        // スキャナー制御
-        async function toggleScanner() {
-            if (!scanner) {
-                await startScanner();
-                $('#toggleScanner').text('スキャン停止');
-                $('.form-section, .history-section').addClass('hidden');
-            } else {
-                await stopScanner();
-                $('#toggleScanner').text('スキャン開始');
+            // ライト制御関数
+            function toggleTorch() {
+                if (!videoTrack) return;
+                
+                isTorchOn = !isTorchOn;
+                videoTrack.applyConstraints({
+                    advanced: [{ torch: isTorchOn }]
+                }).then(() => {
+                    $("#flashlightButton").text(isTorchOn ? 'ライトをオフ' : 'ライトをオン');
+                }).catch(err => {
+                    console.error('ライト制御エラー:', err);
+                });
             }
-        }
 
-        // スキャン結果処理
-        async function handleScanResult(decodedText) {
-            const autoCopy = $('#autoCopy').prop('checked');
-            
-            if (autoCopy) {
-                await navigator.clipboard.writeText(decodedText);
-                addHistory('clipboard', decodedText);
+            // QRコードスキャン成功時の処理
+            function onScanSuccess(decodedText, decodedResult) {
+                html5QrCode.stop().then(() => {
+                    isScanning = false;
+                    videoTrack = null;
+                    $("#status").text("スキャン成功: " + decodedText);
+                    $("#result").show().text("QRコード内容: " + decodedText);
+                    $("#flashlightButton").hide().prop("disabled", true);
+
+                    if (decodedText.startsWith("http://") || decodedText.startsWith("https://")) {
+                        $("#status").text("URLを検出: " + decodedText + " に移動します...");
+                        setTimeout(() => {
+                            window.location.href = decodedText;
+                        }, 1500);
+                    }
+                }).catch(console.error);
             }
-            
-            addHistory('scan', decodedText);
-            showResult(decodedText);
-            updatePriceDisplay(decodedText);
-        }
 
-        // 価格表示（デモ用）
-        function updatePriceDisplay(barcode) {
-            const mockPrices = {
-                '4902102000000': '¥198',
-                '4901777000000': '¥298',
-                '4500000000': '¥150'
-            };
-            
-            const price = mockPrices[barcode] || '価格情報なし';
-            $('#result').prepend(`<div class="price-display">推定価格: ${price}</div>`);
-        }
-
-        // QR/バーコード生成
-        function generateCode() {
-            let content = '';
-            switch(currentType) {
-                case 'wifi':
-                    content = `WIFI:S:${$('#ssid').val()};T:${$('#security').val()};P:${$('#password').val()};;`;
-                    break;
-                case 'text':
-                    content = $('#textContent').val();
-                    break;
-                case 'contact':
-                    content = `BEGIN:VCARD\nVERSION:3.0\nFN:${$('#contactName').val()}`;
-                    if ($('#contactTel').val()) content += `\nTEL:${$('#contactTel').val()}`;
-                    if ($('#contactEmail').val()) content += `\nEMAIL:${$('#contactEmail').val()}`;
-                    if ($('#contactNote').val()) content += `\nNOTE:${$('#contactNote').val()}`;
-                    content += '\nEND:VCARD';
-                    break;
-                case 'barcode':
-                    content = $('#barcodeNumber').val();
-                    generateBarcode(content);
-                    return;
+            // エラー処理
+            function onScanFailure(error) {
+                console.warn(`QRコードスキャンエラー = ${error}`);
             }
-            
-            QRCode.toCanvas(document.createElement('canvas'), content, (err, canvas) => {
-                $('#result').empty().append(canvas);
-                addHistory('create', content);
+
+            // スキャンボタンクリックイベント
+            $("#startButton").click(function() {
+                if (!isScanning) {
+                    $("#result").hide();
+                    $("#status").text("カメラ起動中...");
+                    
+                    const config = { 
+                        fps: 10,
+                        qrbox: { width: 250, height: 250 },
+                        aspectRatio: 1.0
+                    };
+
+                    html5QrCode.start(
+                        { facingMode: "environment" },
+                        config,
+                        onScanSuccess,
+                        onScanFailure
+                    ).then(() => {
+                        isScanning = true;
+                        const videoElement = document.querySelector('#reader video');
+                        if (videoElement) {
+                            videoTrack = videoElement.srcObject.getVideoTracks()[0];
+                            // トーチ機能サポートチェック
+                            if (videoTrack && 'torch' in videoTrack.getCapabilities()) {
+                                $("#flashlightButton").show().prop("disabled", false);
+                            }
+                        }
+                        $("#status").text("QRコードをカメラにかざしてください");
+                        $(this).text("スキャナーを停止");
+                    }).catch(console.error);
+                } else {
+                    html5QrCode.stop().then(() => {
+                        isScanning = false;
+                        videoTrack = null;
+                        $("#status").text("スキャナーを停止しました");
+                        $(this).text("スキャナーを開始");
+                        $("#flashlightButton").hide().prop("disabled", true).text("ライトをオン");
+                    }).catch(console.error);
+                }
             });
-        }
 
-        // バーコード生成
-        function generateBarcode(content) {
-            // 実際のバーコード生成ライブラリの実装が必要
-            $('#result').html(`<div class="barcode-display">${content}</div>`);
-            addHistory('create', content);
-        }
-
-        // 履歴管理
-        function addHistory(type, data) {
-            history[type].unshift({
-                timestamp: new Date().toISOString(),
-                data: data
-            });
-            localStorage.setItem(`${type}History`, JSON.stringify(history[type]));
-            renderHistory(type);
-        }
-
-        // 初期化処理
-        $(document).ready(() => {
-            showForm();
-            Object.keys(history).forEach(renderHistory);
-            $('#toggleScanner').click(toggleScanner);
-        });
-
-        // ユーティリティ関数
-        function renderHistory(type) {
-            $(`#${type}HistoryList`).html(history[type]
-                .map(item => `
-                    <div class="history-item">
-                        [${new Date(item.timestamp).toLocaleString()}]<br>
-                        ${item.data}
-                    </div>
-                `).join(''));
-        }
-
-        function toggleHistory(type) {
-            $('.history-section').addClass('hidden');
-            $(`#${type}History`).toggleClass('hidden');
-        }
-
-        function showResult(text) {
-            $('#result').html(text).removeClass('hidden');
-        }
-
-        // ファイル読み込み処理
-        document.getElementById('fileInput').addEventListener('change', async (e) => {
-            const file = e.target.files[0];
-            try {
-                const result = await Html5Qrcode.scanFile(file);
-                handleScanResult(result);
-            } catch (err) {
-                alert('読み取りに失敗しました: ' + err);
-            }
+            // ライトボタンクリックイベント
+            $("#flashlightButton").click(toggleTorch);
         });
     </script>
 </body>
