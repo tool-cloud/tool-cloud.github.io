@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>QR・バーコードスキャナー＆生成ツール</title>
+    <title>QR & バーコード総合ツール</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.4/html5-qrcode.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.3/dist/JsBarcode.all.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.4.4/build/qrcode.min.js"></script>
     <style>
         body {
             font-family: 'Helvetica Neue', Arial, sans-serif;
@@ -14,608 +14,414 @@
             margin: 0 auto;
             padding: 10px;
             text-align: center;
+            background-color: #f5f5f5;
         }
+
         .header {
             margin: 5px 0 15px;
+            padding: 15px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
+
         h1 {
             color: #333;
-            font-size: 1.4rem;
-            margin: 5px 0;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            font-size: 1.8rem;
+            margin: 10px 0;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #eee;
         }
+
         #reader {
             width: 100%;
             max-width: 500px;
             margin: 0 auto;
-            border: 2px solid #ddd;
-            border-radius: 8px;
+            border: 3px solid #ddd;
+            border-radius: 12px;
             overflow: hidden;
-            display: none;
-            position: fixed; /* 全画面表示にするために追加 */
-            top: 0;
-            left: 0;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.7); /* 半透明の背景 */
-            z-index: 10; /* 最前面に表示 */
-            display: none; /* 初期状態では非表示 */
-            align-items: center;  /* 垂直方向に中央揃え */
-            justify-content: center; /* 水平方向に中央揃え */
-        }
-        #reader video {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
+            background: #000;
         }
 
-        #result, #barcodeResult, #qrCodeGenerator, #barcodeGenerator {
-            margin-top: 15px;
-            padding: 10px;
-            border-radius: 4px;
-            background-color: #f8f8f8;
-            display: none;
+        #result {
+            margin: 20px auto;
+            padding: 15px;
+            border-radius: 8px;
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            max-width: 500px;
+            word-break: break-all;
         }
+
         button {
             background-color: #4CAF50;
             border: none;
             color: white;
-            padding: 8px 16px;
+            padding: 10px 20px;
             text-align: center;
             text-decoration: none;
             display: inline-block;
             font-size: 14px;
-            margin: 8px 2px;
+            margin: 8px 4px;
             cursor: pointer;
-            border-radius: 4px;
-            min-width: 120px;
+            border-radius: 25px;
+            transition: all 0.3s;
+            min-width: 140px;
         }
+
+        button:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
         #flashlightButton {
             background-color: #2196F3;
             display: none;
         }
+
         .status {
-            margin: 8px 0;
+            margin: 15px 0;
             font-style: italic;
             color: #666;
-            font-size: 0.9rem;
+            font-size: 0.95rem;
         }
+
         .button-container {
+            margin: 15px 0;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .form-section {
+            margin: 20px auto;
+            padding: 20px;
+            border: 2px solid #eee;
+            border-radius: 10px;
+            background: #fff;
+            max-width: 500px;
+            text-align: left;
+        }
+
+        .form-row {
+            margin: 15px 0;
+        }
+
+        input[type="text"], 
+        input[type="email"], 
+        input[type="tel"], 
+        select {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+
+        .history-section {
+            text-align: left;
+            margin: 25px auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            max-width: 500px;
+        }
+
+        .history-item {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        #scannerContainer {
+            position: relative;
+            margin: 20px 0;
+        }
+
+        #dynamicForms {
+            margin: 20px auto;
+        }
+
+        .type-selector {
+            margin: 15px 0;
+        }
+
+        .price-display {
+            color: #d32f2f;
+            font-weight: bold;
             margin: 10px 0;
+            font-size: 1.2rem;
         }
 
-        /* 追加スタイル */
-        #imageUpload {
-            display: none;
-        }
-        label[for="imageUpload"] {
-            background-color: #808080; /* グレーの背景色 */
-            color: white;
-            padding: 8px 16px;
-            border-radius: 4px;
-            cursor: pointer;
-            display: inline-block;
-            margin: 8px 2px;
-        }
-        #qrCodeCanvas {
-            margin-top: 15px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            background-color: white;
-            display: none;
-            max-width: 100%;
-            height: auto;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .input-group {
-            margin-bottom: 10px;
-            text-align: left;
-        }
-        .input-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-        .input-group input, .input-group select, .input-group textarea {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            box-sizing: border-box;
-        }
-        .input-group textarea {
-            resize: vertical;
-            height: 80px;
-        }
-        #barcodeCanvas {
-            margin-top: 15px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            background-color: white;
-            display: none;
-            max-width: 100%;
-            height: auto;
-            margin-left: auto;
-            margin-right: auto;
-        }
-        #generateCodeButton {
-            background-color: #4CAF50;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-            margin-top: 20px;
-        }
-
-        #codeTypeSelect {
+        canvas {
+            margin: 15px auto;
+            border: 2px solid #eee;
+            border-radius: 8px;
             padding: 10px;
-            font-size: 16px;
-            border-radius: 5px;
-            border: 1px solid #ddd;
-            margin-bottom: 20px;
-            width: 100%;
-            box-sizing: border-box;
         }
-
-        .input-container {
-            display: none;
-            margin-bottom: 20px;
-            text-align: left;
-        }
-
-        .input-container label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-
-        .input-container input,
-        .input-container textarea,
-        .input-container select {
-            width: 100%;
-            padding: 10px;
-            font-size: 16px;
-            border-radius: 5px;
-            border: 1px solid #ddd;
-            box-sizing: border-box;
-            margin-bottom: 10px;
-        }
-
-        .input-container textarea {
-            resize: vertical;
-            height: 100px;
-        }
-
     </style>
 </head>
 <body>
+    <!-- ヘッダー部 -->
     <div class="header">
-        <h1>QR・バーコードスキャナー＆生成ツール</h1>
-        <div class="status" id="status">カメラへのアクセスを許可してください</div>
+        <h1>QR & バーコード総合ツール</h1>
+        <div class="status" id="status">準備完了</div>
         <div class="button-container">
-            <button id="startScanButton">スキャナー開始</button>
-            <button id="generateCodeButton">コード生成</button>
-            <button id="showScanHistory">スキャン履歴</button>
-        </div>
-        <div class="button-container">
-            <label for="imageUpload">画像からコード読取</label>
-            <input type="file" id="imageUpload" accept="image/*">
+            <button id="flashlightButton">ライトをオン</button>
+            <button id="toggleScanner">スキャン開始</button>
+            <button onclick="toggleHistory('scan')">スキャン履歴</button>
+            <button onclick="toggleHistory('clipboard')">コピー履歴</button>
+            <button onclick="toggleHistory('create')">生成履歴</button>
         </div>
     </div>
 
-    <div id="reader"></div>
-    <div id="result"></div>
+    <!-- スキャナーエリア -->
+    <div id="scannerContainer">
+        <div id="reader"></div>
+    </div>
 
-    <div id="qrCodeGenerator" style="display: none;">
-        <h2>QRコード生成</h2>
-        <select id="codeTypeSelect">
-            <option value="qr">QRコード</option>
-            <option value="barcode">バーコード</option>
-        </select>
-
-        <div id="qrInputGroup" class="input-container">
-            <label for="qrCodeType">タイプ:</label>
-            <select id="qrCodeType">
+    <!-- コード生成フォーム -->
+    <div id="dynamicForms">
+        <div class="type-selector">
+            <select id="codeType" onchange="showForm()">
+                <option value="wifi">WiFi設定</option>
                 <option value="text">テキスト</option>
-                <option value="wifi">Wi-Fi</option>
                 <option value="contact">連絡先</option>
+                <option value="barcode">バーコード</option>
             </select>
+        </div>
 
-            <div id="textInputGroup" class="input-group">
-                <label for="textInput">テキスト:</label>
-                <textarea id="textInput"></textarea>
+        <!-- WiFiフォーム -->
+        <div id="wifiForm" class="form-section">
+            <div class="form-row">
+                <input type="text" id="ssid" placeholder="WiFiネットワーク名 (SSID)">
             </div>
-
-            <div id="wifiInputGroup" class="input-group">
-                <label for="ssid">ネットワーク名 (SSID):</label>
-                <input type="text" id="ssid">
-                <label for="authType">認証方式:</label>
-                <select id="authType">
+            <div class="form-row">
+                <select id="security">
+                    <option value="nopass">暗号化なし</option>
                     <option value="WPA">WPA/WPA2</option>
                     <option value="WEP">WEP</option>
-                    <option value="nopass">なし</option>
                 </select>
-                <label for="password">パスワード:</label>
-                <input type="password" id="password">
             </div>
-
-            <div id="contactInputGroup" class="input-group">
-                <label for="name">名前:</label>
-                <input type="text" id="name">
-                <label for="tel">電話番号:</label>
-                <input type="tel" id="tel">
-                <label for="email">メールアドレス:</label>
-                <input type="email" id="email">
-                <label for="other">その他:</label>
-                <textarea id="other"></textarea>
+            <div class="form-row">
+                <input type="text" id="password" placeholder="パスワード">
             </div>
-            <button id="generateQrCode" class="generate-button">生成</button>
-            <canvas id="qrCodeCanvas"></canvas>
+            <button onclick="generateCode()">QRコード生成</button>
         </div>
 
-        <div id="barcodeInputGroup" class="input-container" style="display: none;">
-            <h2>バーコード生成</h2>
-            <div class="input-group">
-                <label for="barcodeType">タイプ:</label>
+        <!-- テキストフォーム -->
+        <div id="textForm" class="form-section hidden">
+            <div class="form-row">
+                <textarea id="textContent" rows="4" placeholder="テキストを入力..."></textarea>
+            </div>
+            <button onclick="generateCode()">QRコード生成</button>
+        </div>
+
+        <!-- 連絡先フォーム -->
+        <div id="contactForm" class="form-section hidden">
+            <div class="form-row">
+                <input type="text" id="contactName" placeholder="名前">
+            </div>
+            <div class="form-row">
+                <input type="tel" id="contactTel" placeholder="電話番号">
+            </div>
+            <div class="form-row">
+                <input type="email" id="contactEmail" placeholder="メールアドレス">
+            </div>
+            <div class="form-row">
+                <input type="text" id="contactNote" placeholder="備考">
+            </div>
+            <button onclick="generateCode()">QRコード生成</button>
+        </div>
+
+        <!-- バーコードフォーム -->
+        <div id="barcodeForm" class="form-section hidden">
+            <div class="form-row">
+                <input type="text" id="barcodeNumber" placeholder="バーコード番号">
+            </div>
+            <div class="form-row">
                 <select id="barcodeType">
-                    <option value="EAN13">EAN-13</option>
                     <option value="CODE128">CODE128</option>
-                     <option value="CODE39">CODE39</option>
+                    <option value="EAN13">EAN13</option>
+                    <option value="UPC">UPC</option>
                 </select>
             </div>
-            <div class="input-group">
-                <label for="barcodeValue">値:</label>
-                <input type="text" id="barcodeValue">
-            </div>
-            <div class="input-group">
-                <label for="price">価格:</label>
-                <input type="number" id="price">
-            </div>
-            <div class="input-group">
-                <label for="copyToClipboard">クリップボードにコピー:</label>
-                <input type="checkbox" id="copyToClipboard" checked>
-            </div>
-            <button id="generateBarcode" class="generate-button">生成</button>
-            <canvas id="barcodeCanvas"></canvas>
-            <div id="barcodePrice"></div>
+            <button onclick="generateCode()">バーコード生成</button>
         </div>
     </div>
 
+    <!-- 結果表示エリア -->
+    <div id="result"></div>
+
+    <!-- 履歴表示エリア -->
+    <div class="history-section hidden" id="scanHistory">
+        <h3>スキャン履歴</h3>
+        <div id="scanHistoryList"></div>
+    </div>
+
+    <div class="history-section hidden" id="clipboardHistory">
+        <h3>クリップボード履歴</h3>
+        <div id="clipboardHistoryList"></div>
+    </div>
+
+    <div class="history-section hidden" id="createHistory">
+        <h3>生成履歴</h3>
+        <div id="createHistoryList"></div>
+    </div>
+
+    <!-- その他UI要素 -->
+    <input type="file" id="fileInput" accept="image/*" hidden>
+    <button onclick="document.getElementById('fileInput').click()">画像から読み取り</button>
+    <label style="margin-left:15px;">
+        <input type="checkbox" id="autoCopy" checked> 自動コピー
+    </label>
+
     <script>
-        $(document).ready(function() {
-            const html5QrCode = new Html5Qrcode("reader");
-            let isScanning = false;
-            let videoTrack = null;
-            let isTorchOn = false;
-            const SCAN_HISTORY_KEY = 'scanHistory';
-            const CLIPBOARD_KEY = 'clipboardSetting';
+        // 初期化処理
+        let scanner = null;
+        let currentType = 'wifi';
+        const history = {
+            scan: JSON.parse(localStorage.getItem('scanHistory')) || [],
+            clipboard: JSON.parse(localStorage.getItem('clipboardHistory')) || [],
+            create: JSON.parse(localStorage.getItem('createHistory')) || []
+        };
 
-            let scanHistory = JSON.parse(localStorage.getItem(SCAN_HISTORY_KEY)) || [];
-            let clipboardSetting = JSON.parse(localStorage.getItem(CLIPBOARD_KEY)) || { copy: true };
-            localStorage.setItem(CLIPBOARD_KEY, JSON.stringify(clipboardSetting));
+        // フォーム表示制御
+        function showForm() {
+            $('.form-section').addClass('hidden');
+            currentType = $('#codeType').val();
+            $(`#${currentType}Form`).removeClass('hidden');
+        }
 
-            // 履歴表示関数
-            function displayHistory(history, title) {
-                if (history.length === 0) {
-                    alert(`${title}はありません`);
-                    return;
-                }
-                let historyText = `${title}：\n`;
-                history.forEach((item, index) => {
-                    historyText += `${index + 1}. ${item}\n`;
-                });
-                alert(historyText);
+        // スキャナー制御
+        async function toggleScanner() {
+            if (!scanner) {
+                await startScanner();
+                $('#toggleScanner').text('スキャン停止');
+                $('.form-section, .history-section').addClass('hidden');
+            } else {
+                await stopScanner();
+                $('#toggleScanner').text('スキャン開始');
             }
+        }
 
-            // スキャナー開始・停止関数
-            function toggleScanner(type) {
-                if (!isScanning) {
-                    $("#result").hide();
-                    $("#status").text(type + "スキャナー起動中...");
-                    $("#reader").show();
-                    $("#qrCodeGenerator").hide();
-                    $("#barcodeGenerator").hide();
-                    $(".button-container").hide(); // スキャナー開始時にボタンを非表示にする
-
-                    const config = {
-                        fps: 10,
-                        qrbox: { width: 250, height: 250 },
-                        aspectRatio: 1.0,
-                        useBarCodeDetectorIfSupported: true
-                    };
-
-                    html5QrCode.start(
-                        { facingMode: "environment" },
-                        config,
-                        (decodedText, decodedResult) => {
-                            html5QrCode.stop().then(() => {
-                                isScanning = false;
-                                videoTrack = null;
-                                $("#status").text(type + "スキャン成功: " + decodedText);
-                                $("#result").show().text(type + "コード内容: " + decodedText);
-
-                                scanHistory.push(decodedText);
-                                localStorage.setItem(SCAN_HISTORY_KEY, JSON.stringify(scanHistory));
-
-                                if (type === "QRコード" && (decodedText.startsWith("http://") || decodedText.startsWith("https://"))) {
-                                    $("#status").text("URLを検出: " + decodedText + " に移動します...");
-                                    setTimeout(() => {
-                                        window.location.href = decodedText;
-                                    }, 1500);
-                                }
-                            }).catch(console.error);
-                        },
-                        (error) => {
-                            console.warn(type + `スキャンエラー = ${error}`);
-                        }
-                    ).then(() => {
-                        isScanning = true;
-                        const videoElement = document.querySelector('#reader video');
-                        if (videoElement) {
-                            videoTrack = videoElement.srcObject.getVideoTracks()[0];
-                            if (videoTrack && 'torch' in videoTrack.getCapabilities()) {
-                                $("#flashlightButton").show().prop("disabled", false);
-                            }
-                        }
-                        $("#status").text(type + "コードをカメラにかざしてください");
-                        $("#startScanButton").text("スキャナーを停止");
-                    }).catch(err => {
-                        $("#status").text("カメラ起動に失敗しました: " + err.message);
-                        console.error("カメラ起動エラー", err);
-                    });
-                } else {
-                    html5QrCode.stop().then(() => {
-                        isScanning = false;
-                        videoTrack = null;
-                        $("#status").text("スキャナーを停止しました");
-                        $("#startScanButton").text("スキャナーを開始");
-                        $("#flashlightButton").hide().prop("disabled", true).text("ライトをオン");
-                        $("#reader").hide();
-                        $(".button-container").show(); // スキャナー停止後にボタンを再表示
-                    }).catch(console.error);
-                }
+        // スキャン結果処理
+        async function handleScanResult(decodedText) {
+            const autoCopy = $('#autoCopy').prop('checked');
+            
+            if (autoCopy) {
+                await navigator.clipboard.writeText(decodedText);
+                addHistory('clipboard', decodedText);
             }
+            
+            addHistory('scan', decodedText);
+            showResult(decodedText);
+            updatePriceDisplay(decodedText);
+        }
 
-            // スキャナー開始ボタン
-            $("#startScanButton").click(() => toggleScanner("QR/バーコード"));
+        // 価格表示（デモ用）
+        function updatePriceDisplay(barcode) {
+            const mockPrices = {
+                '4902102000000': '¥198',
+                '4901777000000': '¥298',
+                '4500000000': '¥150'
+            };
+            
+            const price = mockPrices[barcode] || '価格情報なし';
+            $('#result').prepend(`<div class="price-display">推定価格: ${price}</div>`);
+        }
 
-            // ライト制御関数
-            function toggleTorch() {
-                if (!videoTrack) return;
-
-                isTorchOn = !isTorchOn;
-                videoTrack.applyConstraints({
-                    advanced: [{ torch: isTorchOn }]
-                }).then(() => {
-                    $("#flashlightButton").text(isTorchOn ? 'ライトをオフ' : 'ライトをオン');
-                }).catch(err => {
-                    console.error('ライト制御エラー:', err);
-                });
+        // QR/バーコード生成
+        function generateCode() {
+            let content = '';
+            switch(currentType) {
+                case 'wifi':
+                    content = `WIFI:S:${$('#ssid').val()};T:${$('#security').val()};P:${$('#password').val()};;`;
+                    break;
+                case 'text':
+                    content = $('#textContent').val();
+                    break;
+                case 'contact':
+                    content = `BEGIN:VCARD\nVERSION:3.0\nFN:${$('#contactName').val()}`;
+                    if ($('#contactTel').val()) content += `\nTEL:${$('#contactTel').val()}`;
+                    if ($('#contactEmail').val()) content += `\nEMAIL:${$('#contactEmail').val()}`;
+                    if ($('#contactNote').val()) content += `\nNOTE:${$('#contactNote').val()}`;
+                    content += '\nEND:VCARD';
+                    break;
+                case 'barcode':
+                    content = $('#barcodeNumber').val();
+                    generateBarcode(content);
+                    return;
             }
-
-            // ライトボタンクリックイベント
-            $("#flashlightButton").click(toggleTorch);
-
-            // 画像アップロード
-            $("#imageUpload").change(function(e) {
-                const file = e.target.files[0];
-                if (!file) return;
-
-                const reader = new FileReader();
-                reader.onload = function(event) {
-                    const img = new Image();
-                    img.onload = function() {
-                        const canvas = document.createElement('canvas');
-                        const context = canvas.getContext('2d');
-                        canvas.width = img.width;
-                        canvas.height = img.height;
-                        context.drawImage(img, 0, 0, img.width, img.height);
-
-                        html5QrCode.scanFile(canvas, true)
-                            .then(decodedText => {
-                                let type = "コード";
-                                if(decodedText.startsWith("WIFI") || decodedText.startsWith("BEGIN:VCARD")){
-                                    type = "QRコード";
-                                } else {
-                                    type = "バーコード";
-                                }
-                                $("#status").text("画像から" + type + "を読み取りました: " + decodedText);
-                                $("#result").show().text(type + "内容: " + decodedText);
-
-                                scanHistory.push(decodedText);
-                                localStorage.setItem(SCAN_HISTORY_KEY, JSON.stringify(scanHistory));
-
-                            })
-                            .catch(err => {
-                                $("#status").text("画像からコードを読み取れませんでした: " + err.message);
-                                console.error("コード読み取りエラー", err);
-                            });
-                    };
-                    img.src = event.target.result;
-                };
-                reader.readAsDataURL(file);
-                $("#imageUpload").val('');
+            
+            QRCode.toCanvas(document.createElement('canvas'), content, (err, canvas) => {
+                $('#result').empty().append(canvas);
+                addHistory('create', content);
             });
+        }
 
-            // コード生成ボタン
-            $("#generateCodeButton").click(function() {
-                $("#reader").hide();
-                $("#result").hide();
-                $("#qrCodeGenerator").show();
-                $("#barcodeGenerator").hide();
-                $(".button-container").show();
-                $("#qrCodeCanvas").hide();
-                $("#barcodeCanvas").hide();
+        // バーコード生成
+        function generateBarcode(content) {
+            // 実際のバーコード生成ライブラリの実装が必要
+            $('#result').html(`<div class="barcode-display">${content}</div>`);
+            addHistory('create', content);
+        }
+
+        // 履歴管理
+        function addHistory(type, data) {
+            history[type].unshift({
+                timestamp: new Date().toISOString(),
+                data: data
             });
+            localStorage.setItem(`${type}History`, JSON.stringify(history[type]));
+            renderHistory(type);
+        }
 
-            $("#codeTypeSelect").change(function() {
-                const selectedType = $(this).val();
-                if (selectedType === "qr") {
-                    $("#qrInputGroup").show();
-                    $("#barcodeInputGroup").hide();
-                } else if (selectedType === "barcode") {
-                    $("#qrInputGroup").hide();
-                    $("#barcodeInputGroup").show();
-                }
-            });
+        // 初期化処理
+        $(document).ready(() => {
+            showForm();
+            Object.keys(history).forEach(renderHistory);
+            $('#toggleScanner').click(toggleScanner);
+        });
 
-             $("#generateQrCode").click(function() {
-                const qrCodeType = $("#qrCodeType").val();
-                let qrData = "";
-                let title = "";
+        // ユーティリティ関数
+        function renderHistory(type) {
+            $(`#${type}HistoryList`).html(history[type]
+                .map(item => `
+                    <div class="history-item">
+                        [${new Date(item.timestamp).toLocaleString()}]<br>
+                        ${item.data}
+                    </div>
+                `).join(''));
+        }
 
-                if (qrCodeType === "text") {
-                    const text = $("#textInput").val();
-                    if (!text) {
-                        alert("テキストを入力してください");
-                        return;
-                    }
-                    qrData = text;
-                    title = "テキスト: " + text;
-                } else if (qrCodeType === "wifi") {
-                    const ssid = $("#ssid").val();
-                    const authType = $("#authType").val();
-                    const password = $("#password").val();
-                    if (!ssid) {
-                        alert("SSIDを入力してください");
-                        return;
-                    }
-                    if (authType !== "nopass" && !password) {
-                        alert("パスワードを入力してください");
-                        return;
-                    }
-                    qrData = `WIFI:T:${authType};S:${ssid};P:${password};;`;
-                    title = `Wi-Fi: SSID=${ssid}, Auth=${authType}, Pass=${password}`;
-                } else if (qrCodeType === "contact") {
-                    const name = $("#name").val();
-                    const tel = $("#tel").val();
-                    const email = $("#email").val();
-                    const other = $("#other").val();
-                    if (!name && !tel && !email && !other) {
-                        alert("連絡先の情報を入力してください");
-                        return;
-                    }
-                    qrData = `BEGIN:VCARD\nVERSION:3.0\n`;
-                    if (name) qrData += `FN:${name}\n`;
-                    if (tel) qrData += `TEL:${tel}\n`;
-                    if (email) qrData += `EMAIL:${email}\n`;
-                    if (other) qrData += `NOTE:${other}\n`;
-                    qrData += `END:VCARD`;
-                    title = `連絡先: ${name || '-'}, ${tel || '-'}, ${email || '-'}`;
-                }
+        function toggleHistory(type) {
+            $('.history-section').addClass('hidden');
+            $(`#${type}History`).toggleClass('hidden');
+        }
 
-                $("#qrCodeCanvas").show();
-                JsBarcode("#qrCodeCanvas", qrData, {
-                    format: "QRCODE",
-                    width: 200,
-                    height: 200,
-                    displayValue: false
-                });
+        function showResult(text) {
+            $('#result').html(text).removeClass('hidden');
+        }
 
-                scanHistory.push("QRコード生成: " + title);
-                localStorage.setItem(SCAN_HISTORY_KEY, JSON.stringify(scanHistory));
-
-                $("#textInput").val('');
-                $("#ssid").val('');
-                $("#password").val('');
-                $("#name").val('');
-                $("#tel").val('');
-                $("#email").val('');
-                $("#other").val('');
-            });
-
-            $("#generateBarcode").click(function() {
-                const barcodeType = $("#barcodeType").val();
-                const barcodeValue = $("#barcodeValue").val();
-                const price = $("#price").val();
-                const copyToClipboard = $("#copyToClipboard").is(':checked');
-
-                if (!barcodeValue) {
-                    alert("バーコードの値を入力してください");
-                    return;
-                }
-
-                let format = barcodeType;
-                if (barcodeType === "EAN13" && barcodeValue.length !== 12 && barcodeValue.length !== 13) {
-                    alert("EAN-13は12桁または13桁の数字である必要があります");
-                    return;
-                }
-                if (barcodeType === "CODE128" && !/^[a-zA-Z0-9!@#\$%\^&\*\(\)_\+\-=\[\]\{\};:'",<>\.\/\?~\\]+$/.test(barcodeValue)) {
-                    alert("CODE128は英数字と記号のみ使用できます");
-                    return;
-                }
-                if (barcodeType === "CODE39" && !/^[a-zA-Z0-9\s\-\.\$\/\+\%]+$/.test(barcodeValue)) {
-                    alert("CODE39 は、大文字の A ～ Z (A ～ Z)、数字 (0 ～ 9)、および次の記号のみを使用できます: スペース (- . $ / + %)。");
-                    return;
-                }
-
-                $("#barcodeCanvas").show();
-                JsBarcode("#barcodeCanvas", barcodeValue, {
-                    format: format,
-                    displayValue: true,
-                    width: 2,
-                    height: 100
-                });
-
-                let resultText = "バーコード値: " + barcodeValue;
-                if (price) {
-                    resultText += "<br>価格: " + price + "円";
-                    $("#barcodePrice").html("価格: " + price + " 円").show();
-                } else {
-                    $("#barcodePrice").hide();
-                }
-                $("#barcodeResult").html(resultText).show();
-
-                if (copyToClipboard) {
-                    const canvas = document.getElementById("barcodeCanvas");
-                    canvas.toBlob(function(blob) {
-                        const data = [new ClipboardItem({ [blob.type]: blob })];
-                        navigator.clipboard.write(data).then(
-                            function() {
-                                $("#status").text("バーコードをクリップボードにコピーしました");
-                            },
-                            function() {
-                                $("#status").text("バーコードをクリップボードにコピーできませんでした");
-                            }
-                        );
-                    });
-                }
-                scanHistory.push("バーコード生成: " + barcodeValue + (price ? "、価格: " + price + "円" : ""));
-                localStorage.setItem(SCAN_HISTORY_KEY, JSON.stringify(scanHistory));
-
-                $("#barcodeValue").val('');
-                $("#price").val('');
-            });
-
-            // 履歴機能
-            $("#showScanHistory").click(() => displayHistory(scanHistory, "スキャン履歴"));
-
-            // クリップボード設定
-            $("#copyToClipboard").change(function() {
-                clipboardSetting.copy = $(this).is(':checked');
-                localStorage.setItem(CLIPBOARD_KEY, JSON.stringify(clipboardSetting));
-            });
-            $("#copyToClipboard").prop('checked', clipboardSetting.copy);
-
-            // スキャナー開始後に他のボタンを押した場合にスキャナーを停止
-            $('button').not('#startScanButton, #flashlightButton').click(function() {
-                if (isScanning) {
-                    html5QrCode.stop().then(() => {
-                        isScanning = false;
-                        videoTrack = null;
-                        $("#status").text("スキャナーを停止しました");
-                        $("#startScanButton").text("スキャナーを開始");
-                        $("#flashlightButton").hide().prop("disabled", true).text("ライトをオン");
-                        $("#reader").hide();
-                        $(".button-container").show(); // ボタンを再表示
-                    }).catch(console.error);
-                }
-            });
+        // ファイル読み込み処理
+        document.getElementById('fileInput').addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            try {
+                const result = await Html5Qrcode.scanFile(file);
+                handleScanResult(result);
+            } catch (err) {
+                alert('読み取りに失敗しました: ' + err);
+            }
         });
     </script>
 </body>
