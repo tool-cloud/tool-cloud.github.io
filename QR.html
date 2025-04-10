@@ -1,11 +1,9 @@
 <!DOCTYPE html>
 <html lang="ja">
-
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>QRコードスキャナー（カメラ＆画像対応）</title>
-  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
   <style>
     body {
@@ -23,8 +21,7 @@
       margin-bottom: 1rem;
     }
 
-    video,
-    canvas {
+    video, canvas {
       max-width: 100%;
       border: 1px solid #ccc;
       border-radius: 8px;
@@ -91,20 +88,18 @@
     const canvas = document.getElementById("canvas");
     const context = canvas.getContext("2d");
 
-    // 結果表示とジャンプ処理
-    function displayResult(statusMessage, qrData) {
-      $("#status").text(statusMessage);
-      $("#result").show().text("QRコード内容: " + qrData);
+    function displayResult(message, data) {
+      document.getElementById("status").textContent = message;
+      const result = document.getElementById("result");
+      result.style.display = "block";
+      result.textContent = "QRコード内容: " + data;
 
-      if (qrData.startsWith("http://") || qrData.startsWith("https://")) {
-        $("#status").text("URLを検出: " + qrData + " に移動します...");
-        setTimeout(() => {
-          window.location.href = qrData;
-        }, 1500);
+      if (data.startsWith("http://") || data.startsWith("https://")) {
+        document.getElementById("status").textContent = "URLを検出: " + data + " に移動します...";
+        setTimeout(() => window.location.href = data, 1500);
       }
     }
 
-    // カメラからフレームをスキャン
     function scanCameraFrame() {
       if (video.readyState === video.HAVE_ENOUGH_DATA) {
         canvas.width = video.videoWidth;
@@ -115,14 +110,44 @@
         const code = jsQR(imageData.data, imageData.width, imageData.height);
 
         if (code) {
-          displayResult("カメラからスキャン成功: " + code.data, code.data);
-          return; // 成功したら停止
+          displayResult("カメラからスキャン成功", code.data);
+          return; // 検出したら停止
         }
       }
       requestAnimationFrame(scanCameraFrame);
     }
 
-    // カメラ起動
+    function scanImageFile(file) {
+      const reader = new FileReader();
+      reader.onload = function (event) {
+        const img = new Image();
+        img.onload = function () {
+          canvas.width = img.width;
+          canvas.height = img.height;
+          context.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+          const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+          const code = jsQR(imageData.data, imageData.width, imageData.height);
+
+          if (code) {
+            displayResult("画像からスキャン成功", code.data);
+          } else {
+            document.getElementById("status").textContent = "QRコードが見つかりませんでした";
+            document.getElementById("result").style.display = "none";
+          }
+        };
+        img.src = event.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    document.getElementById("imageInput").addEventListener("change", function (event) {
+      const file = event.target.files[0];
+      if (file) {
+        scanImageFile(file);
+      }
+    });
+
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
       navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
         .then(function (stream) {
@@ -130,55 +155,23 @@
           video.setAttribute("playsinline", true); // iOS 対策
           video.play();
           requestAnimationFrame(scanCameraFrame);
+          document.getElementById("status").textContent = "カメラ起動中...";
         })
         .catch(function (err) {
           console.error(err);
-          $("#status").text("カメラのアクセスに失敗しました: " + err.message);
+          document.getElementById("status").textContent = "カメラのアクセスに失敗しました";
         });
     } else {
-      $("#status").text("カメラはサポートされていません。");
+      document.getElementById("status").textContent = "カメラがサポートされていません";
     }
 
-    // 画像ファイルから読み取る
-    $("#imageInput").on("change", function (e) {
-      const file = e.target.files[0];
-      if (!file) return;
-
-      const reader = new FileReader();
-      reader.onload = function () {
-        const img = new Image();
-        img.onload = function () {
-          canvas.width = img.width;
-          canvas.height = img.height;
-          context.drawImage(img, 0, 0);
-
-          const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-          const code = jsQR(imageData.data, imageData.width, imageData.height);
-
-          if (code) {
-            displayResult("画像からスキャン成功: " + code.data, code.data);
-          } else {
-            $("#status").text("画像からQRコードを検出できませんでした。");
-          }
-        };
-        img.onerror = function () {
-          $("#status").text("画像の読み込みに失敗しました。");
-        };
-        img.src = reader.result;
-      };
-      reader.onerror = function () {
-        $("#status").text("ファイルの読み取りに失敗しました。");
-      };
-      reader.readAsDataURL(file);
-    });
-
-    // リセットボタン
-    $("#resetButton").on("click", function () {
-      $("#result").hide().text("");
-      $("#status").text("リセットしました。");
-      $("#imageInput").val(""); // ファイル入力をクリア
+    document.getElementById("resetButton").addEventListener("click", function () {
+      document.getElementById("result").style.display = "none";
+      document.getElementById("status").textContent = "リセットしました";
+      if (video.srcObject) {
+        requestAnimationFrame(scanCameraFrame);
+      }
     });
   </script>
 </body>
-
 </html>
