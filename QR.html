@@ -8,6 +8,7 @@
     <title>QRコードスキャナー</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.4/html5-qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
     <style>
         body {
             font-family: 'Helvetica Neue', Arial, sans-serif;
@@ -58,7 +59,7 @@
         }
         #flashlightButton {
             background-color: #2196F3;
-            display: none; /* 初期状態は非表示 */
+            display: none;
         }
         .status {
             margin: 8px 0;
@@ -67,6 +68,9 @@
             font-size: 0.9rem;
         }
         .button-container {
+            margin: 10px 0;
+        }
+        input[type="file"] {
             margin: 10px 0;
         }
     </style>
@@ -83,6 +87,10 @@
     <div id="result"></div>
     <button id="startButton">スキャナーを開始</button>
 
+    <div>
+        <input type="file" accept="image/*" id="imageInput">
+    </div>
+
     <script>
         $(document).ready(function() {
             const html5QrCode = new Html5Qrcode("reader");
@@ -90,10 +98,8 @@
             let videoTrack = null;
             let isTorchOn = false;
 
-            // ライト制御関数
             function toggleTorch() {
                 if (!videoTrack) return;
-                
                 isTorchOn = !isTorchOn;
                 videoTrack.applyConstraints({
                     advanced: [{ torch: isTorchOn }]
@@ -104,8 +110,7 @@
                 });
             }
 
-            // QRコードスキャン成功時の処理
-            function onScanSuccess(decodedText, decodedResult) {
+            function onScanSuccess(decodedText) {
                 html5QrCode.stop().then(() => {
                     isScanning = false;
                     videoTrack = null;
@@ -122,54 +127,64 @@
                 }).catch(console.error);
             }
 
-            // エラー処理
             function onScanFailure(error) {
                 console.warn(`QRコードスキャンエラー = ${error}`);
             }
 
-            // スキャンボタンクリックイベント
             $("#startButton").click(function() {
-                if (!isScanning) {
-                    $("#result").hide();
-                    $("#status").text("カメラ起動中...");
-                    
-                    const config = { 
-                        fps: 10,
-                        qrbox: { width: 250, height: 250 },
-                        aspectRatio: 1.0
-                    };
-
-                    html5QrCode.start(
-                        { facingMode: "environment" },
-                        config,
-                        onScanSuccess,
-                        onScanFailure
-                    ).then(() => {
-                        isScanning = true;
-                        const videoElement = document.querySelector('#reader video');
-                        if (videoElement) {
-                            videoTrack = videoElement.srcObject.getVideoTracks()[0];
-                            // トーチ機能サポートチェック
-                            if (videoTrack && 'torch' in videoTrack.getCapabilities()) {
-                                $("#flashlightButton").show().prop("disabled", false);
-                            }
-                        }
-                        $("#status").text("QRコードをカメラにかざしてください");
-                        $(this).text("スキャナーを停止");
-                    }).catch(console.error);
-                } else {
-                    html5QrCode.stop().then(() => {
-                        isScanning = false;
-                        videoTrack = null;
-                        $("#status").text("スキャナーを停止しました");
-                        $(this).text("スキャナーを開始");
-                        $("#flashlightButton").hide().prop("disabled", true).text("ライトをオン");
-                    }).catch(console.error);
-                }
+                if (isScanning) return;
+                Html5Qrcode.getCameras().then(devices => {
+                    if (devices && devices.length) {
+                        const cameraId = devices[0].id;
+                        html5QrCode.start(
+                            cameraId,
+                            { fps: 10, qrbox: { width: 250, height: 250 } },
+                            onScanSuccess,
+                            onScanFailure
+                        ).then(() => {
+                            isScanning = true;
+                            $("#status").text("スキャン中...");
+                            $("#flashlightButton").show().prop("disabled", false);
+                            const stream = html5QrCode.getRunningTrack().mediaStream;
+                            videoTrack = stream.getVideoTracks()[0];
+                        });
+                    }
+                }).catch(err => {
+                    console.error('カメラエラー:', err);
+                    $("#status").text("カメラの取得に失敗しました");
+                });
             });
 
-            // ライトボタンクリックイベント
             $("#flashlightButton").click(toggleTorch);
+
+            // 画像からQRコードを読み取る処理
+            $("#imageInput").on("change", function(event) {
+                const file = event.target.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = new Image();
+                    img.onload = function() {
+                        const canvas = document.createElement('canvas');
+                        canvas.width = img.width;
+                        canvas.height = img.height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0);
+
+                        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                        const code = jsQR(imageData.data, imageData.width, imageData.height);
+
+                        if (code) {
+                            onScanSuccess(code.data);
+                        } else {
+                            alert("QRコードが見つかりませんでした。");
+                        }
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            });
         });
     </script>
 </body>
